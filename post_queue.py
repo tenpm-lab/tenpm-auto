@@ -13,6 +13,7 @@ tenpm.lab 쓰레드 예약 게시 프로그램 (2차 버전, GitHub Actions용)
 글 파일 내용
   - --- 로 나누면 그 아래 글은 이어 쓰기로 올라감
   - 각 글 맨 첫 줄에 "사진: a.jpg, b.jpg" 를 쓰면 images 폴더의 사진이 같이 올라감
+    (영상 .mp4/.mov 도 같은 줄에 섞어 쓸 수 있음)
     (사진 1장 = 사진 글, 2장 이상 = 여러 장 넘겨보기 글, 최대 20장)
 
 사용법
@@ -82,7 +83,7 @@ def call(method, path, params):
 
 def wait_ready(token, container_id):
     """사진은 쓰레드가 가져가서 처리할 시간이 필요하다. 준비될 때까지 기다린다."""
-    for _ in range(24):  # 최대 약 2분
+    for _ in range(60):  # 최대 약 5분 (영상은 오래 걸림)
         res = call("GET", f"/{container_id}", {"fields": "status,error_message", "access_token": token})
         status = res.get("status")
         if status in (None, "FINISHED", "PUBLISHED"):
@@ -93,6 +94,17 @@ def wait_ready(token, container_id):
     raise RuntimeError("쓰레드가 글을 준비하는 데 너무 오래 걸려요. 사진 주소를 확인해주세요.")
 
 
+VIDEO_EXT = (".mp4", ".mov")
+
+
+def media_params(name, base):
+    """사진이면 IMAGE, 영상(.mp4/.mov)이면 VIDEO"""
+    url = base + urllib.parse.quote(name)
+    if name.lower().endswith(VIDEO_EXT):
+        return {"media_type": "VIDEO", "video_url": url}
+    return {"media_type": "IMAGE", "image_url": url}
+
+
 def publish(token, user_id, text, photos, reply_to, base):
     params = {"access_token": token, "text": text}
     if reply_to:
@@ -101,17 +113,13 @@ def publish(token, user_id, text, photos, reply_to, base):
     if not photos:
         params["media_type"] = "TEXT"
     elif len(photos) == 1:
-        params["media_type"] = "IMAGE"
-        params["image_url"] = base + urllib.parse.quote(photos[0])
+        params.update(media_params(photos[0], base))
     else:
         children = []
         for name in photos:
-            item = call("POST", f"/{user_id}/threads", {
-                "access_token": token,
-                "media_type": "IMAGE",
-                "image_url": base + urllib.parse.quote(name),
-                "is_carousel_item": "true",
-            })
+            item_params = {"access_token": token, "is_carousel_item": "true"}
+            item_params.update(media_params(name, base))
+            item = call("POST", f"/{user_id}/threads", item_params)
             wait_ready(token, item["id"])
             children.append(item["id"])
         params["media_type"] = "CAROUSEL"
@@ -158,6 +166,8 @@ def check_parts(name, parts):
     if not parts:
         problems.append("글이 비어 있음")
     for i, p in enumerate(parts, 1):
+        if "{쿠팡링크}" in p["text"]:
+            problems.append(f"{i}번째 글에 쿠팡 링크가 아직 안 들어감")
         if len(p["text"]) > 500:
             problems.append(f"{i}번째 글이 {len(p['text'])}자 (500자까지)")
         if len(p["photos"]) > 20:
