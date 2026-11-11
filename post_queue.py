@@ -12,6 +12,7 @@ tenpm.lab 쓰레드 예약 게시 프로그램 (2차 버전, GitHub Actions용)
 
 글 파일 내용
   - --- 로 나누면 그 아래 글은 이어 쓰기로 올라감
+  - 각 글 맨 위에 "주제: 데스크테리어" 를 쓰면 쓰레드 주제 태그가 붙음
   - 각 글 맨 첫 줄에 "사진: a.jpg, b.jpg" 를 쓰면 images 폴더의 사진이 같이 올라감
     (영상 .mp4/.mov 도 같은 줄에 섞어 쓸 수 있음)
     (사진 1장 = 사진 글, 2장 이상 = 여러 장 넘겨보기 글, 최대 20장)
@@ -105,8 +106,10 @@ def media_params(name, base):
     return {"media_type": "IMAGE", "image_url": url}
 
 
-def publish(token, user_id, text, photos, reply_to, base):
+def publish(token, user_id, text, photos, reply_to, base, topic=""):
     params = {"access_token": token, "text": text}
+    if topic:
+        params["topic_tag"] = topic
     if reply_to:
         params["reply_to_id"] = reply_to
 
@@ -125,7 +128,15 @@ def publish(token, user_id, text, photos, reply_to, base):
         params["media_type"] = "CAROUSEL"
         params["children"] = ",".join(children)
 
-    container = call("POST", f"/{user_id}/threads", params)
+    try:
+        container = call("POST", f"/{user_id}/threads", params)
+    except RuntimeError as e:
+        if "topic_tag" not in params:
+            raise
+        # 주제 태그 때문에 거절되면 태그 없이 한 번 더 시도 (글은 꼭 올라가게)
+        print(f"   ⚠️ 주제 태그 없이 다시 올림: {e}")
+        params.pop("topic_tag")
+        container = call("POST", f"/{user_id}/threads", params)
     wait_ready(token, container["id"])
     result = call("POST", f"/{user_id}/threads_publish",
                   {"creation_id": container["id"], "access_token": token})
@@ -150,14 +161,17 @@ def parse_file(path):
         chunk = chunk.strip()
         if not chunk:
             continue
-        photos = []
+        photos, topic = [], ""
         lines = chunk.split("\n")
-        first = lines[0].strip()
-        if first.startswith("사진:") or first.startswith("사진 :"):
-            names = first.split(":", 1)[1]
-            photos = [n.strip() for n in names.split(",") if n.strip()]
-            chunk = "\n".join(lines[1:]).strip()
-        parts.append({"text": chunk, "photos": photos})
+        # 맨 위 "사진:" / "주제:" 줄은 글 내용이 아니라 설정 (순서 상관없음)
+        while lines and lines[0].strip().replace(" :", ":").startswith(("사진:", "주제:")):
+            key, value = lines.pop(0).split(":", 1)
+            if key.strip() == "사진":
+                photos = [n.strip() for n in value.split(",") if n.strip()]
+            else:
+                topic = value.strip().replace(".", "").replace("&", "")[:50]
+        chunk = "\n".join(lines).strip()
+        parts.append({"text": chunk, "photos": photos, "topic": topic})
     return parts
 
 
@@ -201,6 +215,7 @@ def preview():
         for i, p in enumerate(parts, 1):
             label = "본문" if i == 1 else "이어 쓰기"
             pics = f" + 사진 {len(p['photos'])}장" if p["photos"] else ""
+            pics += f" · 주제 {p['topic']}" if p["topic"] else ""
             first_line = p["text"].split("\n")[0][:40]
             print(f"   {i}. {label}{pics}: {first_line}")
         print()
@@ -232,7 +247,7 @@ def run():
         try:
             previous, ids = None, []
             for p in parts:
-                previous = publish(token, me["id"], p["text"], p["photos"], previous, base)
+                previous = publish(token, me["id"], p["text"], p["photos"], previous, base, p["topic"])
                 ids.append(previous)
                 time.sleep(5)
             shutil.move(path, os.path.join(DONE, name))
