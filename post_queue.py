@@ -146,6 +146,22 @@ def publish(token, user_id, text, photos, reply_to, base, topic=""):
     return result["id"]
 
 
+def notify(title, message, link=""):
+    """폰 알림 (ntfy 앱). GitHub 비밀값 NTFY_TOPIC 이 있을 때만 보냄"""
+    topic = os.environ.get("NTFY_TOPIC", "").strip()
+    if not topic:
+        return
+    headers = {"Title": title.encode("utf-8"), "Tags": "clock"}
+    if link:
+        headers["Click"] = link
+    try:
+        req = urllib.request.Request("https://ntfy.sh/" + topic, data=message.encode("utf-8"),
+                                     headers=headers, method="POST")
+        urllib.request.urlopen(req, timeout=20).read()
+    except Exception as e:
+        print(f"   (알림 실패: {e})")
+
+
 # ---------- 글 파일 ----------
 def due_time(filename):
     """20261111-2200_장패드.txt -> 2026-11-11 22:00 (한국 시간)"""
@@ -245,6 +261,7 @@ def run():
             problems.append("사진 주소를 만들 수 없음 (GitHub에서 실행해야 함)")
         if problems:
             print(f"✗ {name} 건너뜀: " + " / ".join(problems))
+            notify("⚠️ 쓰레드 게시 건너뜀", f"{name}\n{problems[0]}")
             failed = True
             continue
         try:
@@ -257,8 +274,16 @@ def run():
             with open(LOG, "a", encoding="utf-8") as f:
                 f.write(f"{datetime.now(KST):%Y-%m-%d %H:%M}\t{name}\t{','.join(ids)}\n")
             print(f"✓ {name} 올림 ({len(ids)}개)")
+            link = ""
+            try:
+                link = call("GET", f"/{ids[0]}", {"fields": "permalink", "access_token": token}).get("permalink", "")
+            except RuntimeError:
+                pass
+            first_line = next((l for l in parts[0]["text"].split("\n") if l.strip() and not l.startswith("[")), "")
+            notify("✅ 쓰레드에 올라감", f"{first_line[:40]}\n({len(ids)}개 · 눌러서 보기)", link)
         except RuntimeError as e:
             print(f"✗ {name} 실패: {e}")
+            notify("⚠️ 쓰레드 게시 실패", f"{name}\nAI 대화창에 '안 올라왔어'라고 보내줘")
             failed = True
 
     if failed:

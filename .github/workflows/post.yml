@@ -25,6 +25,7 @@ jobs:
       - name: 시간이 된 글 올리기
         env:
           THREADS_TOKEN: ${{ secrets.THREADS_TOKEN }}
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
         run: python post_queue.py
 
       - name: 올린 기록 저장
