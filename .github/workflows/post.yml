@@ -26,7 +26,8 @@ jobs:
         env:
           THREADS_TOKEN: ${{ secrets.THREADS_TOKEN }}
           NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
-        run: python post_queue.py
+        run: |
+          if [ "${{ github.event.inputs.mode }}" = "알림테스트" ]; then python post_queue.py 알림테스트; else python post_queue.py; fi
 
       - name: 올린 기록 저장
         if: always()

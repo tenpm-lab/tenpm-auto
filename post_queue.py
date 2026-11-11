@@ -293,5 +293,8 @@ def run():
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] in ("미리보기", "preview"):
         preview()
+    elif len(sys.argv) > 1 and sys.argv[1] in ("알림테스트", "notify-test"):
+        notify("🔔 텐피엠 알림 테스트", "이게 보이면 알림 설정 완료!\n앞으로 글이 올라갈 때마다 이렇게 와요", "https://www.threads.com/@tenpm.lab")
+        print("알림 보냄" if os.environ.get("NTFY_TOPIC") else "NTFY_TOPIC 없음")
     else:
         run()
