@@ -87,6 +87,8 @@ def wait_ready(token, container_id):
     for _ in range(60):  # 최대 약 5분 (영상은 오래 걸림)
         res = call("GET", f"/{container_id}", {"fields": "status,error_message", "access_token": token})
         status = res.get("status")
+        if status not in ("FINISHED", "PUBLISHED"):
+            print(f"   · 준비 중 {container_id}: {status} {res.get('error_message', '')}")
         if status in (None, "FINISHED", "PUBLISHED"):
             return
         if status in ("ERROR", "EXPIRED"):
@@ -124,6 +126,7 @@ def publish(token, user_id, text, photos, reply_to, base, topic=""):
             item_params.update(media_params(name, base))
             item = call("POST", f"/{user_id}/threads", item_params)
             wait_ready(token, item["id"])
+            print(f"   · 사진 준비됨: {name} -> {item['id']}")
             children.append(item["id"])
         params["media_type"] = "CAROUSEL"
         params["children"] = ",".join(children)
