@@ -1,0 +1,36 @@
+name: 쿠팡 링크 꼬리표
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "coupang_links.py"
+      - "links_mode.txt"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: post-queue
+  cancel-in-progress: false
+
+jobs:
+  links:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: 링크 만들기
+        env:
+          COUPANG_ACCESS_KEY: ${{ secrets.COUPANG_ACCESS_KEY }}
+          COUPANG_SECRET_KEY: ${{ secrets.COUPANG_SECRET_KEY }}
+        run: python coupang_links.py $(cat links_mode.txt 2>/dev/null)
+      - name: 저장
+        if: always()
+        run: |
+          git config user.name "tenpm-bot"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add stats posts
+          git diff --cached --quiet || (git commit -m "쿠팡 링크 꼬리표" && git pull --rebase && git push)
