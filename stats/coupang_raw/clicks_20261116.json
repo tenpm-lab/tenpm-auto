@@ -1,0 +1,30 @@
+{
+ "rCode": "0",
+ "rMessage": "",
+ "data": [
+  {
+   "date": "20261109",
+   "trackingCode": "AF3733751",
+   "subId": "",
+   "addtag": "400",
+   "ctag": "9701875337",
+   "click": 1
+  },
+  {
+   "date": "20261110",
+   "trackingCode": "AF3733751",
+   "subId": "",
+   "addtag": "400",
+   "ctag": "9582972749",
+   "click": 1
+  },
+  {
+   "date": "20261111",
+   "trackingCode": "AF3733751",
+   "subId": "",
+   "addtag": "400",
+   "ctag": "9663864919",
+   "click": 1
+  }
+ ]
+}
