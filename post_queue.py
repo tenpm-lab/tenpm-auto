@@ -265,8 +265,17 @@ def run():
     os.makedirs(DONE, exist_ok=True)
     failed = False
 
+    posted = set()
+    if os.path.exists(LOG):
+        with open(LOG, encoding="utf-8") as f:
+            posted = {l.split("\t")[1] for l in f if l.count("\t") >= 2}
+
     for name in due:
         path = os.path.join(QUEUE, name)
+        if name in posted:  # 이미 올린 글이면 다시 안 올림 (중복 방지)
+            print(f"↷ {name} 이미 올라감 → 건너뜀")
+            shutil.move(path, os.path.join(DONE, name))
+            continue
         parts = parse_file(path)
         problems = check_parts(name, parts)
         if any(p["photos"] for p in parts) and not base:

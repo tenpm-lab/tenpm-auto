@@ -22,6 +22,11 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      - name: 최신 상태로 맞추기 (줄 서서 기다린 실행이 옛날 상태로 또 올리는 것 방지)
+        run: |
+          git fetch origin main
+          git reset --hard origin/main
+
       - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
