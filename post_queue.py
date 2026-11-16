@@ -157,9 +157,21 @@ def notify(title, message, link=""):
     try:
         req = urllib.request.Request("https://ntfy.sh/" + topic, data=message.encode("utf-8"),
                                      headers=headers, method="POST")
-        urllib.request.urlopen(req, timeout=20).read()
+        with urllib.request.urlopen(req, timeout=20) as res:
+            status = res.status
+        _notify_log(f"{title}\t보냄({status})")
     except Exception as e:
         print(f"   (알림 실패: {e})")
+        _notify_log(f"{title}\t실패: {str(e)[:150]}")
+
+
+def _notify_log(line):
+    """알림이 실제로 나갔는지 기록 (주소·비밀값은 안 적음)"""
+    try:
+        with open(os.path.join(HERE, "posts", "notify_log.txt"), "a", encoding="utf-8") as f:
+            f.write(f"{datetime.now(KST):%Y-%m-%d %H:%M}\t{line}\n")
+    except Exception:
+        pass
 
 
 # ---------- 글 파일 ----------
