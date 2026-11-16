@@ -283,6 +283,13 @@ def run():
             notify("✅ 쓰레드에 올라감", f"{first_line[:40]}\n({len(ids)}개 · 눌러서 보기)", link)
         except RuntimeError as e:
             print(f"✗ {name} 실패: {e}")
+            # 원인 기록 (토큰은 오류 문구에 안 들어감) + 일부만 올라간 경우 중복 게시 막기
+            with open(os.path.join(HERE, "posts", "error_log.txt"), "a", encoding="utf-8") as f:
+                f.write(f"{datetime.now(KST):%Y-%m-%d %H:%M}\t{name}\t올라간 부분={','.join(ids) or '없음'}\t{str(e)[:400]}\n")
+            if ids:
+                hold = os.path.join(HERE, "posts", "hold")
+                os.makedirs(hold, exist_ok=True)
+                shutil.move(path, os.path.join(hold, name))
             notify("⚠️ 쓰레드 게시 실패", f"{name}\nAI 대화창에 '안 올라왔어'라고 보내줘")
             failed = True
 
