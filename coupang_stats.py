@@ -111,6 +111,23 @@ def main():
         w.writerow(["날짜", "클릭", "주문", "주문금액", "수익"])
         w.writerows(sorted(old.values()))
 
+    # 글별(subId) 클릭·수익 누적 → stats/coupang_by_post.csv
+    by = {}
+    for kind in ("clicks", "commission"):
+        fp = os.path.join(STATS, "coupang_raw", f"{kind}_{end:%Y%m%d}.json")
+        for row in (json.load(open(fp, encoding="utf-8")).get("data") or []):
+            sid = row.get("subId") or "(꼬리표 없음)"
+            b = by.setdefault(sid, {"click": 0, "commission": 0})
+            if kind == "clicks":
+                b["click"] += num(row, "click")
+            else:
+                b["commission"] += num(row, "commission")
+    with open(os.path.join(STATS, "coupang_by_post.csv"), "w", newline="", encoding="utf-8-sig") as f:
+        w = csv.writer(f)
+        w.writerow(["subId(글)", f"클릭({start:%m/%d}~{end:%m/%d})", "수익"])
+        for sid, b in sorted(by.items(), key=lambda x: -x[1]["click"]):
+            w.writerow([sid, int(b["click"]), int(b["commission"])])
+
     week = [v for d, v in days.items() if d >= f"{end - timedelta(days=6):%Y%m%d}"]
     msg = (f"최근 7일 클릭 {int(sum(v['click'] for v in week))} · 주문 {int(sum(v['order'] for v in week))}"
            f" · 수익 {int(sum(v['commission'] for v in week)):,}원")
