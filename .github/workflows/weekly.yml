@@ -36,9 +36,14 @@ jobs:
           NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
         run: |
           python weekly_report.py > /tmp/report.txt
-          if [ -n "$NTFY_TOPIC" ]; then
-            head -4 /tmp/report.txt | tail -2 | curl -s -H "Title: 📈 주간 리포트 나옴 (AI가 분석 중)" -H "Tags: chart_with_upwards_trend" --data-binary @- "https://ntfy.sh/$NTFY_TOPIC" > /dev/null
-          fi
+          python - <<'PY'
+          import os, urllib.request
+          t = os.environ.get("NTFY_TOPIC", "").strip()
+          if t:
+              body = "".join(open("/tmp/report.txt", encoding="utf-8").readlines()[2:4]).strip()
+              urllib.request.urlopen(urllib.request.Request("https://ntfy.sh/" + t, data=body.encode(),
+                  headers={"Title": "📈 주간 리포트 나옴 (AI가 분석 중)".encode(), "Tags": "chart_with_upwards_trend"}, method="POST"), timeout=20).read()
+          PY
       - name: 저장
         run: |
           git config user.name "tenpm-bot"
