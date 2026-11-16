@@ -26,6 +26,8 @@ def rows(name):
 def kind(fname):
     if "_info_" in fname:
         return "정보"
+    if "_am_" in fname:
+        return "아침한줄"
     if "_talk_" in fname:
         return "공감"
     if "weekly" in fname:
