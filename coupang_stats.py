@@ -83,6 +83,8 @@ def main():
             print(f"❌ {kind} 실패:", e)
             notify("⚠️ 쿠팡 수집 실패", f"{kind}: {str(e)[:80]}\nAI 대화창에 '쿠팡 실패'라고 보내줘")
             sys.exit(1)
+        for row in res.get("data") or []:
+            row.pop("trackingCode", None)  # 공개 저장소라 파트너 코드는 저장 안 함
         with open(os.path.join(STATS, "coupang_raw", f"{kind}_{end:%Y%m%d}.json"), "w", encoding="utf-8") as f:
             json.dump(res, f, ensure_ascii=False, indent=1)
         for row in res.get("data") or []:
