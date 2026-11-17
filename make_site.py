@@ -76,6 +76,9 @@ for cat in SPEC["cats"]:
 page = f"""<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{e(SPEC['title'])} · tenpm.lab</title>
+<link rel="icon" href="favicon.png"><link rel="apple-touch-icon" href="icon.png">
+<meta property="og:title" content="텐피엠이 써본 것만 모음"><meta property="og:description" content="직장인·육아 살림템, 실제로 쓰는 것만 모았어요">
+<meta property="og:image" content="https://tenpm-lab.github.io/tenpm-auto/og.jpg"><meta property="og:url" content="https://tenpm-lab.github.io/tenpm-auto/"><meta property="og:type" content="website">
 <style>
 :root{{--bg:#fbf4ea;--ink:#3b2f2a;--sub:#8c7b70;--acc:#d9764f;--card:#fff;--line:#eadfd1}}
 *{{box-sizing:border-box}}body{{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif}}
