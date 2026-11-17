@@ -1,0 +1,24 @@
+{
+ "rCode": "0",
+ "rMessage": "",
+ "data": [
+  {
+   "date": "20261109",
+   "subId": "",
+   "commission": 0.0,
+   "click": 1
+  },
+  {
+   "date": "20261110",
+   "subId": "",
+   "commission": 0.0,
+   "click": 1
+  },
+  {
+   "date": "20261111",
+   "subId": "",
+   "commission": 0.0,
+   "click": 1
+  }
+ ]
+}
