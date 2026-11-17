@@ -12,6 +12,7 @@ SPEC = json.load(open(os.path.join(HERE, "site", "items.json"), encoding="utf-8"
 CACHE_P = os.path.join(HERE, "site", "links_bio.json")
 cache = json.load(open(CACHE_P, encoding="utf-8")) if os.path.exists(CACHE_P) else {}
 opened = 0
+errors = []
 
 for cat in SPEC["cats"]:
     for it in cat["items"]:
@@ -19,12 +20,19 @@ for cat in SPEC["cats"]:
         if key in cache:
             it["link"] = cache[key]
             continue
-        url = it.get("url")
-        if not url:
-            url = resolve(it["short"]); opened += 1
-        res = call("POST", f"{BASE}/deeplink", body={"coupangUrls": [url], "subId": "bio"})
-        it["link"] = cache[key] = (res.get("data") or [{}])[0].get("shortenUrl", "")
-        print("✓", it["name"], it["link"])
+        try:
+            url = it.get("url")
+            if not url:
+                url = resolve(it["short"]); opened += 1
+            res = call("POST", f"{BASE}/deeplink", body={"coupangUrls": [url], "subId": "bio"})
+            link = (res.get("data") or [{}])[0].get("shortenUrl", "")
+            if not link:
+                raise RuntimeError(str(res)[:200])
+            it["link"] = cache[key] = link
+            print("✓", it["name"], link)
+        except Exception as ex:
+            errors.append(f"{it['name']}: {str(ex)[:200]}")
+            it["link"] = it.get("short") or it.get("url")  # 실패하면 원래 링크로
 json.dump(cache, open(CACHE_P, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 if opened:
     with open(os.path.join(HERE, "stats", "bot_clicks.csv"), "a", encoding="utf-8") as f:
@@ -72,6 +80,7 @@ footer a{{color:var(--sub)}}
 <footer>매일 밤 10시 실험 기록 → 쓰레드 @tenpm.lab<br>
 <a href="https://blog.naver.com/tenpmlab">블로그 · 텐피엠 퇴근 후 AI 부업</a></footer>
 </main></body></html>"""
+open(os.path.join(HERE, "site", "build_log.txt"), "w", encoding="utf-8").write("\n".join(errors) or "오류 없음")
 os.makedirs(os.path.join(HERE, "docs"), exist_ok=True)
 open(os.path.join(HERE, "docs", "index.html"), "w", encoding="utf-8").write(page)
 print("페이지 완성:", sum(len(c["items"]) for c in SPEC["cats"]), "개")

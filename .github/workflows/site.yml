@@ -27,7 +27,7 @@ jobs:
         env:
           COUPANG_ACCESS_KEY: ${{ secrets.COUPANG_ACCESS_KEY }}
           COUPANG_SECRET_KEY: ${{ secrets.COUPANG_SECRET_KEY }}
-        run: python make_site.py
+        run: python make_site.py || true
       - run: |
           git config user.name "tenpm-bot"
           git config user.email "github-actions[bot]@users.noreply.github.com"
