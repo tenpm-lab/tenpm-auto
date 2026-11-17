@@ -1,0 +1,30 @@
+name: 쿠팡 링크 확인
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "links_check.txt"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: post-queue
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - run: git fetch origin main && git reset --hard origin/main
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: python check_links.py
+      - run: |
+          git config user.name "tenpm-bot"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add stats/link_check.txt
+          git diff --cached --quiet || (git commit -m "링크 확인" && git pull --rebase && git push)
