@@ -55,9 +55,12 @@ _ip = os.path.join(HERE, "bio", "product_info.json")
 INFO = json.load(open(_ip, encoding="utf-8")) if os.path.exists(_ip) else {}
 def price_of(it):
     import re as _re
-    m = _re.search(r"/products/(\d+)", it.get("url", ""))
+    m = _re.search(r"/products/(\d+)(?:.*itemId=(\d+))?", it.get("url", ""))
     d = INFO.get(m.group(1), {}) if m else {}
-    return None  # 가격 표시 꺼둠: API 가격이 우리가 건 옵션과 다른 경우가 있어서 (11/17)
+    api = int(float(d["price"])) if d.get("ok") and d.get("price") else None
+    if api and m.group(2) and d.get("item_id") == m.group(2):
+        return api
+    return it.get("price") or api
 cards = []
 for cat in SPEC["cats"]:
     rows = []
@@ -110,7 +113,7 @@ footer{{margin-top:30px;font-size:12px;color:var(--sub);line-height:1.6;text-ali
 <p class="intro">{e(SPEC['intro'])}</p>
 <div class="links"><a href="https://www.threads.com/@tenpm.lab">쓰레드</a><a href="https://blog.naver.com/tenpmlab">블로그</a></div>
 </header>
-<p class="notice">이 페이지의 링크는 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.<br>
+<p class="notice">이 페이지의 링크는 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다. 가격은 바뀔 수 있어요.<br>
 ‘리뷰 페이백’ 표시 제품은 구매 후 리뷰 작성 대가로 구매 금액을 돌려받았어요.</p>
 <nav>{"".join(f'<a href="#c{i}">{e(c["name"])}</a>' for i, c in enumerate(SPEC["cats"]))}</nav>
 {"".join(cards)}

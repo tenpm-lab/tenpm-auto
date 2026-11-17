@@ -37,7 +37,8 @@
       "응원 칫솔 20개",
       "메시지 칫솔",
       "힐링 문구 칫솔"
-     ]
+     ],
+     "price": 12820
     },
     {
      "name": "핸드크림",
@@ -77,7 +78,8 @@
       "컴퓨터 책상 1200 모니터 받침대",
       "모니터 선반 일체형 책상",
       "책상 모니터선반 세트 1200"
-     ]
+     ],
+     "price": 34990
     },
     {
      "name": "2단 발받침대",
@@ -106,13 +108,15 @@
      "name": "책상 매트",
      "say": "싼 티 안 나는 책상 매트",
      "short": "https://link.coupang.com/a/izk0YM7THg",
-     "img": "mat3_close.jpg"
+     "img": "mat3_close.jpg",
+     "price": 8800
     },
     {
      "name": "말랑이",
      "say": "회의 중 손 심심할 때",
      "short": "https://link.coupang.com/a/izlfTfRLMG",
-     "img": "malang_press.jpg"
+     "img": "malang_press.jpg",
+     "price": 3800
     }
    ]
   },
@@ -123,7 +127,8 @@
      "name": "캡슐커피",
      "say": "카페 대신 매일 한 잔",
      "short": "https://link.coupang.com/a/izk9Qrhb2q",
-     "img": "coffee_box.jpg"
+     "img": "coffee_box.jpg",
+     "price": 18650
     },
     {
      "name": "카사바칩",
@@ -134,7 +139,8 @@
      "kw": [
       "카사바칩",
       "카사바 칩 과자"
-     ]
+     ],
+     "price": 4500
     },
     {
      "name": "땅콩버터",

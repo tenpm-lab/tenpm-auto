@@ -50,7 +50,8 @@ for it in todo:
         found = next((x for x in ((r.get("data") or {}).get("productData") or []) if str(x.get("productId")) == p), None)
         if found:
             info[p] = {"name": it["name"], "price": found.get("productPrice"), "image": found.get("productImage"),
-                       "title": found.get("productName"), "ts": now, "ok": True, "kw_used": kw}
+                       "title": found.get("productName"), "ts": now, "ok": True, "kw_used": kw,
+                       "item_id": (re.search(r"itemId=(\d+)", found.get("productUrl", "")) or [None, None])[1]}
             log.append(f"{it['name']}: {found.get('productPrice')}원 ('{kw}')")
             break
         cur = info.setdefault(p, {})
