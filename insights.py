@@ -85,6 +85,13 @@ def unanswered(token, posts, me="tenpm.lab", days=7):
                 continue
             if i["id"] in answered:
                 continue
+            # 내 글에 바로 단 첫 댓글이거나, 질문(?)이 있는 댓글만 챙김.
+            # 내 답글에 다시 단 마무리 인사("화요팅" 등)는 대화가 끝난 거라 빼기 (11/17 Ssuii 요청)
+            first = (i.get("replied_to") or {}).get("id") == post["id"]
+            if not first and "?" not in (i.get("text") or ""):
+                continue
+            if set((i.get("text") or "").replace(" ", "")) <= set("▓░▒█"):
+                continue  # 블록 문자만 있는 스팸
             todo.append({"post": (post.get("text") or "").split("\n")[0][:20], "who": i.get("username"),
                          "text": (i.get("text") or "")[:40], "link": i.get("permalink", "")})
     return todo
