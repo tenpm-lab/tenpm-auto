@@ -55,11 +55,11 @@ cards = []
 for cat in SPEC["cats"]:
     rows = []
     for it in cat["items"]:
-        pay = '<div class="pay">구매 후 리뷰 작성 대가로 구매 금액을 돌려받은 제품</div>' if it.get("payback") else ""
+        pay = '<span class="pay">리뷰 페이백</span>' if it.get("payback") else ""
         img = f'<img src="img/{e(it["img"])}" alt="{e(it["name"])}" loading="lazy">' if it.get("img") else ""
-        rows.append(f'<a class="item" href="{e(it["link"])}" target="_blank" rel="sponsored noopener">{img}'
+        rows.append(f'<a class="item" href="{e(it["link"])}" target="_blank" rel="sponsored noopener">{pay}{img}'
                     f'<div class="body"><div class="say">{e(it["say"])}</div><div class="name">{e(it["name"])}</div>'
-                    f'<div class="go">보러 가기 ›</div>{pay}</div></a>')
+                    f'<div class="go">보러 가기 ›</div></div></a>')
     cards.append(f'<section id="c{len(cards)}"><h2>{e(cat["name"])} <span class="cnt">{len(rows)}</span></h2><div class="grid">{"".join(rows)}</div></section>')
 
 page = f"""<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8">
@@ -87,7 +87,7 @@ h2{{font-size:18px;margin:22px 0 10px}}.cnt{{color:var(--acc);font-size:14px}}
 .body{{padding:10px 11px 12px;display:flex;flex-direction:column;gap:4px;flex:1}}
 .say{{font-weight:800;font-size:15px;line-height:1.38;color:var(--ink)}}
 .name{{color:var(--sub);font-size:12.5px}}
-.pay{{color:#b3a497;font-size:10px;line-height:1.35;margin-top:4px}}
+.item{{position:relative}}.pay{{position:absolute;top:8px;left:8px;background:rgba(255,255,255,.92);color:#8a6f5a;font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px;z-index:1}}
 .price{{font-weight:800;font-size:14px;margin-top:2px}}.price.muted{{color:var(--sub);font-weight:600;font-size:12px}}
 .go{{margin-top:auto;padding-top:6px;color:var(--acc);font-weight:800;font-size:12.5px}}
 .tags{{display:flex;gap:4px;flex-wrap:wrap}}.tags:empty{{display:none}}
@@ -103,7 +103,7 @@ footer{{margin-top:30px;font-size:12px;color:var(--sub);line-height:1.6;text-ali
 <div class="links"><a href="https://www.threads.com/@tenpm.lab">쓰레드</a><a href="https://blog.naver.com/tenpmlab">블로그</a></div>
 </header>
 <p class="notice">이 페이지의 링크는 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.<br>
-</p>
+‘리뷰 페이백’ 표시 제품은 구매 후 리뷰 작성 대가로 구매 금액을 돌려받았어요.</p>
 <nav>{"".join(f'<a href="#c{i}">{e(c["name"])}</a>' for i, c in enumerate(SPEC["cats"]))}</nav>
 {"".join(cards)}
 <footer>매일 밤 10시 실험 기록 → 쓰레드 @tenpm.lab<br>
