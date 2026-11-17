@@ -1,0 +1,11 @@
+name: 검색 권한 테스트
+on:
+  workflow_dispatch:
+jobs:
+  t:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - run: python search_test.py
+        env:
+          THREADS_TOKEN: ${{ secrets.THREADS_TOKEN }}
