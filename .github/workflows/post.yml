@@ -38,10 +38,16 @@ jobs:
         run: |
           if [ "${{ github.event.inputs.mode }}" = "알림테스트" ]; then python post_queue.py 알림테스트; else python post_queue.py; fi
 
+      - name: 팔로워 수 기록 (바뀌었을 때만)
+        if: always()
+        env:
+          THREADS_TOKEN: ${{ secrets.THREADS_TOKEN }}
+        run: python follower_log.py || true
+
       - name: 올린 기록 저장
         if: always()
         run: |
           git config user.name "tenpm-bot"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -A posts
+          git add -A posts stats/followers.csv
           git diff --cached --quiet || (git commit -m "자동 게시 기록" && git push)

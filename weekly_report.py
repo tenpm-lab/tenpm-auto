@@ -114,6 +114,18 @@ def main():
     if wk:
         out += [f"쿠팡 이번 주: 클릭 {sum(int(d['클릭']) for d in wk)} · 주문 {sum(int(d['주문']) for d in wk)} · 수익 {sum(int(d['수익']) for d in wk):,}원"]
 
+    # 팔로워가 늘어난 시각 → 그 직전 6시간 안에 올라간 글 (11/17~)
+    fl = rows("followers.csv")
+    gains = []
+    for a, b in zip(fl, fl[1:]):
+        d = int(b["팔로워"]) - int(a["팔로워"])
+        if d > 0 and b["시각(KST)"][:10] >= start:
+            t = datetime.strptime(b["시각(KST)"], "%Y-%m-%d %H:%M")
+            before = [x for x in table if x["when"][:16] and t - timedelta(hours=6) <= datetime.strptime(x["when"][:16], "%Y-%m-%d %H:%M") <= t]
+            near = max(before, key=lambda x: x["when"]) if before else None
+            gains.append(f"| {b['시각(KST)'][5:]} | +{d} | " + (f"{near['kind']} · {near['first']}" if near else "-") + " |")
+    if gains:
+        out += ["", "## 팔로워가 늘어난 때 (직전 6시간 안에 올라간 글)", "", "| 시각 | 증가 | 직전 글 |", "|---|---|---|"] + gains
     os.makedirs(os.path.join(S, "weekly"), exist_ok=True)
     path = os.path.join(S, "weekly", f"{now:%Y-%m-%d}.md")
     open(path, "w", encoding="utf-8").write("\n".join(out) + "\n")
