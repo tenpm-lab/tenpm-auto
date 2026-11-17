@@ -23,12 +23,19 @@ def pid(it):
     m = re.search(r"/products/(\d+)", it.get("url", ""))
     return m.group(1) if m else None
 todo = [it for it in items if pid(it)]
-todo.sort(key=lambda it: info.get(pid(it), {}).get("ts", ""))  # 안 가져온 것·오래된 것 먼저
+todo.sort(key=lambda it: (info.get(pid(it), {}).get("ok", False), info.get(pid(it), {}).get("ts", "")))  # 안 가져온 것·오래된 것 먼저
 now = datetime.now(KST).strftime("%Y-%m-%d %H:%M")
 log = []
 for it in todo[:MAX]:
     p = pid(it)
-    kw = it.get("kw") or it["name"]
+    kws = it.get("kw") or it["name"]
+    if isinstance(kws, str): kws = [kws]
+    tried = info.get(p, {}).get("tried", [])
+    # 아직 안 맞은 상품은 시도 안 한 검색어부터 (상품번호 → kw 목록 → 이름)
+    cand = [p] + list(kws) + [it["name"]]
+    if not info.get(p, {}).get("ok"):
+        cand = [k for k in cand if k not in tried] or cand
+    kw = info[p]["kw_used"] if info.get(p, {}).get("ok") and info[p].get("kw_used") else cand[0]
     try:
         r = call("GET", SEARCH, "keyword=" + urllib.parse.quote(kw) + "&limit=10")
     except Exception as e:
@@ -42,12 +49,12 @@ for it in todo[:MAX]:
     prev = info.get(p, {})
     if found:
         info[p] = {"name": it["name"], "price": found.get("productPrice"), "image": found.get("productImage"),
-                   "title": found.get("productName"), "ts": now, "ok": True}
+                   "title": found.get("productName"), "ts": now, "ok": True, "kw_used": kw}
         log.append(f"{it['name']}: {found.get('productPrice')}원")
     else:
-        prev.update({"name": it["name"], "ts": now, "ok": False})
+        prev.update({"name": it["name"], "ts": now, "ok": False, "tried": tried + [kw]})
         info[p] = prev
-        log.append(f"{it['name']}: 검색 결과에 없음 (kw 바꿔야 함)")
+        log.append(f"{it['name']}: '{kw}' 검색 결과에 없음")
 json.dump(info, open(P, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 open(os.path.join(HERE, "bio", "fetch_log.txt"), "w", encoding="utf-8").write(now + "\n" + "\n".join(log) + "\n")
 print("\n".join(log))
