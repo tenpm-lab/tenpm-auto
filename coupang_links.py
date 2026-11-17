@@ -72,6 +72,7 @@ def main(apply):
                 sid = sub_id(name)
                 try:
                     target = resolve(short)
+                    globals().setdefault('_hits', [0])[0] += 1
                     res = call("POST", f"{BASE}/deeplink", body={"coupangUrls": [target], "subId": sid})
                     data = (res.get("data") or [{}])[0]
                     new = data.get("shortenUrl", "")
@@ -95,5 +96,18 @@ def main(apply):
         w.writerows(done.values())
 
 
+
+
+def _log_bot(n, reason="꼬리표 링크 만들 때 원래 짧은 링크 열어봄(coupang_links.py)"):
+    """우리 프로그램이 쿠팡 링크를 열어본 횟수 기록 (쿠팡 리포트 클릭에 섞일 수 있어서 나중에 빼고 보려고)"""
+    import datetime as _d, os as _o
+    if n <= 0:
+        return
+    p = _o.path.join(_o.path.dirname(_o.path.abspath(__file__)), "stats", "bot_clicks.csv")
+    with open(p, "a", encoding="utf-8") as f:
+        f.write(f"{_d.datetime.now(_d.timezone(_d.timedelta(hours=9))):%Y-%m-%d},{n},{reason}\n")
+
+
 if __name__ == "__main__":
     main(len(sys.argv) > 1 and sys.argv[1] in ("적용", "apply"))
+    _log_bot(globals().get("_hits", [0])[0])

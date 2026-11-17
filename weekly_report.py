@@ -104,6 +104,9 @@ def main():
     untagged = clicks.get("(꼬리표 없음)", {})
     if untagged:
         out += ["", f"꼬리표 없는 예전 링크 클릭(최근 14일): {list(untagged.values())[1]}"]
+    bots = [b for b in rows("bot_clicks.csv") if b["날짜"] >= start]
+    if bots:
+        out += [f"참고: 이번 주 우리 프로그램이 쿠팡 링크를 열어본 횟수 {sum(int(b['횟수']) for b in bots)}번 (쿠팡 클릭에 섞였을 수 있음, 빼고 볼 것)"]
     daily = rows("coupang_daily.csv")
     wk = [d for d in daily if d["날짜"] >= start.replace("-", "")]
     if wk:
