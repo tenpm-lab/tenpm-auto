@@ -8,8 +8,8 @@ from coupang_stats import BASE, call
 from coupang_links import resolve
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-SPEC = json.load(open(os.path.join(HERE, "site", "items.json"), encoding="utf-8"))
-CACHE_P = os.path.join(HERE, "site", "links_bio.json")
+SPEC = json.load(open(os.path.join(HERE, "bio", "items.json"), encoding="utf-8"))
+CACHE_P = os.path.join(HERE, "bio", "links_bio.json")
 cache = json.load(open(CACHE_P, encoding="utf-8")) if os.path.exists(CACHE_P) else {}
 opened = 0
 errors = []
@@ -80,7 +80,7 @@ footer a{{color:var(--sub)}}
 <footer>매일 밤 10시 실험 기록 → 쓰레드 @tenpm.lab<br>
 <a href="https://blog.naver.com/tenpmlab">블로그 · 텐피엠 퇴근 후 AI 부업</a></footer>
 </main></body></html>"""
-open(os.path.join(HERE, "site", "build_log.txt"), "w", encoding="utf-8").write("\n".join(errors) or "오류 없음")
+open(os.path.join(HERE, "bio", "build_log.txt"), "w", encoding="utf-8").write("\n".join(errors) or "오류 없음")
 os.makedirs(os.path.join(HERE, "docs"), exist_ok=True)
 open(os.path.join(HERE, "docs", "index.html"), "w", encoding="utf-8").write(page)
 print("페이지 완성:", sum(len(c["items"]) for c in SPEC["cats"]), "개")

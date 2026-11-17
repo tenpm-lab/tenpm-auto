@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - "site/items.json"
+      - "bio/items.json"
       - "make_site.py"
-      - "site/run.py"
+      - "bio/run.py"
 
 permissions:
   contents: write
@@ -28,11 +28,11 @@ jobs:
         env:
           COUPANG_ACCESS_KEY: ${{ secrets.COUPANG_ACCESS_KEY }}
           COUPANG_SECRET_KEY: ${{ secrets.COUPANG_SECRET_KEY }}
-        run: python site/run.py
+        run: python bio/run.py
       - run: |
           git config user.name "tenpm-bot"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           mkdir -p docs
-          git add -A docs site stats
+          git add -A docs bio stats
           git diff --cached --quiet || git commit -m "모음 페이지 갱신"
           for i in 1 2 3; do git pull --rebase -X theirs && git push && break; sleep 5; done
