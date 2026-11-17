@@ -147,7 +147,7 @@ def main():
             for t in todo:
                 f.write(f"- [{t['post']}] {t['who']}: {t['text']} {t['link']}\n")
         if todo:
-            msg += f"\n💬 답 안 한 댓글 {len(todo)}개\n" + "\n".join(f"· {t['who']}: {t['text'][:25]}" for t in todo[:3])
+            msg += f"\n💬 답 안 한 댓글 {len(todo)}개\n" + "\n".join(f"· {t['who']}: {t['text'][:25]}\n  {t['link']}" for t in todo[:5])
     print(msg)
     if os.environ.get("NOTIFY_SUMMARY") == "1":
         notify("📊 오늘의 쓰레드 성과", msg)
