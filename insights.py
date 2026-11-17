@@ -64,6 +64,32 @@ def append(path, header, rows):
         w.writerows(rows)
 
 
+def unanswered(token, posts, me="tenpm.lab", days=7):
+    """최근 글들에서 남이 단 댓글 중 우리가 아직 답 안 한 것"""
+    from datetime import datetime as _dt
+    cutoff = (_dt.now(timezone.utc) - timedelta(days=days)).strftime("%Y-%m-%dT%H:%M")
+    todo = []
+    for post in posts:
+        if post.get("timestamp", "")[:16] < cutoff:
+            continue
+        try:
+            conv = get(f"/{post['id']}/conversation", {
+                "fields": "id,text,username,timestamp,permalink,replied_to", "limit": 100, "access_token": token})
+        except RuntimeError as e:
+            print("댓글 읽기 실패:", str(e)[:120])
+            return None
+        items = conv.get("data", [])
+        answered = {(i.get("replied_to") or {}).get("id") for i in items if i.get("username") == me}
+        for i in items:
+            if i.get("username") in (None, me):
+                continue
+            if i["id"] in answered:
+                continue
+            todo.append({"post": (post.get("text") or "").split("\n")[0][:20], "who": i.get("username"),
+                         "text": (i.get("text") or "")[:40], "link": i.get("permalink", "")})
+    return todo
+
+
 def main():
     token = os.environ.get("THREADS_TOKEN", "").strip()
     if not token:
@@ -114,6 +140,14 @@ def main():
 
     top = sorted(rows, key=lambda r: r[4] or 0, reverse=True)[:3]
     msg = f"글 {len(rows)}개 · 팔로워 {followers}\n" + "\n".join(f"{r[4]}회 · {r[3][:20]}" for r in top)
+    todo = unanswered(token, posts)
+    if todo is not None:
+        with open(os.path.join(STATS, "unanswered.txt"), "w", encoding="utf-8") as f:
+            f.write(f"{today} 기준 답 안 한 댓글 {len(todo)}개\n")
+            for t in todo:
+                f.write(f"- [{t['post']}] {t['who']}: {t['text']} {t['link']}\n")
+        if todo:
+            msg += f"\n💬 답 안 한 댓글 {len(todo)}개\n" + "\n".join(f"· {t['who']}: {t['text'][:25]}" for t in todo[:3])
     print(msg)
     if os.environ.get("NOTIFY_SUMMARY") == "1":
         notify("📊 오늘의 쓰레드 성과", msg)
