@@ -68,9 +68,9 @@ for cat in SPEC["cats"]:
         pay = '<span class="pay">리뷰 페이백</span>' if it.get("payback") else ""
         img = f'<img src="img/{e(it["img"])}" alt="{e(it["name"])}" loading="lazy">' if it.get("img") else ""
         rows.append(f'<a class="item" href="{e(it["link"])}" target="_blank" rel="sponsored noopener">{pay}{img}'
-                    f'<div class="body"><div class="say">{e(it["say"])}</div><div class="name">{e(it["name"])}</div>'
+                    f'<div class="body"><div class="name">{e(it["name"])}</div><div class="say">{e(it["say"])}</div>'
                     + (f'<div class="price">{price_of(it):,}원</div>' if price_of(it) else '')
-                    + f'<div class="go">보러 가기 ›</div></div></a>')
+                    + '</div></a>')
     cards.append(f'<section id="c{len(cards)}"><h2>{e(cat["name"])} <span class="cnt">{len(rows)}</span></h2><div class="grid">{"".join(rows)}</div></section>')
 
 page = f"""<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8">
@@ -95,11 +95,11 @@ h2{{font-size:18px;margin:22px 0 10px}}.cnt{{color:var(--acc);font-size:14px}}
 @media(min-width:620px){{.grid{{grid-template-columns:repeat(3,1fr)}}}}
 .item{{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;text-decoration:none;color:inherit;display:flex;flex-direction:column}}
 .item img{{width:100%;aspect-ratio:1;object-fit:cover;display:block;background:#eee}}
-.body{{padding:10px 11px 12px;display:flex;flex-direction:column;gap:4px;flex:1}}
-.say{{font-weight:800;font-size:15px;line-height:1.38;color:var(--ink)}}
-.name{{color:var(--sub);font-size:12.5px}}
-.item{{position:relative}}.price{{font-weight:800;font-size:14px;color:var(--ink);margin-top:3px}}.pay{{position:absolute;top:8px;left:8px;background:rgba(255,255,255,.92);color:#8a6f5a;font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px;z-index:1}}
-.price{{font-weight:800;font-size:14px;margin-top:2px}}.price.muted{{color:var(--sub);font-weight:600;font-size:12px}}
+.body{{padding:11px 12px 13px;display:flex;flex-direction:column;gap:3px;flex:1}}
+.say{{font-size:12.5px;line-height:1.4;color:#a2694a}}
+.name{{font-weight:800;font-size:15px;line-height:1.35;color:var(--ink)}}
+.item{{position:relative}}.pay{{position:absolute;top:8px;left:8px;background:rgba(255,255,255,.92);color:#8a6f5a;font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px;z-index:1}}
+.price{{font-weight:800;font-size:16px;color:var(--ink);margin-top:auto;padding-top:8px}}.price.muted{{color:var(--sub);font-weight:600;font-size:12px}}
 .go{{margin-top:auto;padding-top:6px;color:var(--acc);font-weight:800;font-size:12.5px}}
 .tags{{display:flex;gap:4px;flex-wrap:wrap}}.tags:empty{{display:none}}
 .tag{{font-size:10.5px;font-weight:700;color:var(--acc);border:1px solid var(--acc);border-radius:99px;padding:1px 6px}}
