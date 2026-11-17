@@ -60,7 +60,7 @@ def price_of(it):
     api = int(float(d["price"])) if d.get("ok") and d.get("price") else None
     if api and m.group(2) and d.get("item_id") == m.group(2):
         return api
-    return it.get("price") or api
+    return it.get("price") or api or (int(float(d["approx"])) if d.get("approx") else None)
 cards = []
 for cat in SPEC["cats"]:
     rows = []

@@ -55,6 +55,9 @@ for it in todo:
             log.append(f"{it['name']}: {found.get('productPrice')}원 ('{kw}')")
             break
         cur = info.setdefault(p, {})
+        top = ((r.get("data") or {}).get("productData") or [None])[0]
+        if top and not cur.get("approx"):   # 같은 상품을 못 찾으면 비슷한 상품 1위 가격을 참고용으로
+            cur["approx"] = top.get("productPrice")
         cur.update({"name": it["name"], "ts": now, "ok": False})
         cur["tried"] = cur.get("tried", []) + [kw]
         log.append(f"{it['name']}: '{kw}' 결과에 없음")
