@@ -3,69 +3,40 @@
  "intro": "퇴근 후 AI가 시키는 대로 부업 실험 중인 30대 직장인 아빠. 우리 집·회사에서 실제로 쓰는 것만 올려요.",
  "cats": [
   {
-   "name": "육아",
+   "name": "육아·살림",
    "items": [
-    {
-     "name": "토마스 기차 레일 세트",
-     "say": "레일 이어주면 혼자 한참 갖고 놂",
-     "url": "https://www.coupang.com/vp/products/9103599139?itemId=26763471135",
-     "similar": true,
-     "img": "train_track.jpg"
-    },
-    {
-     "name": "아기 식탁 트레이 커버",
-     "say": "먹고 나면 커버만 빼서 헹구면 끝",
-     "url": "https://www.coupang.com/vp/products/8302135157?itemId=23951333623",
-     "similar": true,
-     "img": "tray_top.jpg"
-    },
     {
      "name": "층간소음 실내화",
-     "say": "아이가 뛰기 시작해서 신김. 그 뒤로 연락은 안 옴",
+     "say": "아랫집 연락, 그 뒤로 안 옴",
      "url": "https://www.coupang.com/vp/products/1762588356?itemId=3001866602",
      "img": "sandal_side.jpg"
-    }
-   ]
-  },
-  {
-   "name": "살림",
-   "items": [
+    },
     {
-     "name": "S고리 10개",
-     "say": "수건걸이에 걸고 청소솔·스프레이 매달아 둠",
+     "name": "욕실 S고리",
+     "say": "청소솔, 이제 바닥에 안 둠",
      "url": "https://www.coupang.com/vp/products/8479257258?itemId=24536304841",
-     "img": "shook_one.jpg",
-     "price": "5,500원 (10개)"
+     "img": "shook_one.jpg"
     },
     {
-     "name": "대용량 리빙박스 180L",
-     "say": "제각각인 이불·가방을 한 번에 정리",
-     "url": "https://www.coupang.com/vp/products/9716349519?itemId=29288168074",
-     "similar": true,
-     "img": "box_two.jpg"
-    },
-    {
-     "name": "응원 문구 칫솔 20개",
-     "say": "칫솔대마다 응원 한마디, 하나에 640원꼴",
+     "name": "응원 문구 칫솔",
+     "say": "양치할 때마다 응원받음",
      "url": "https://www.coupang.com/vp/products/9264326605?itemId=27414149644",
      "payback": true,
-     "img": "brush_five.jpg",
-     "price": "12,820원 (20개)"
-    },
-    {
-     "name": "자석 삼각대 셀카봉 1.7m",
-     "say": "요리 영상 찍을 때 씀. 폰이 자석으로 붙음",
-     "url": "https://www.coupang.com/vp/products/9719424138?itemId=29085477764",
-     "payback": true,
-     "img": "tri_phone.jpg"
+     "img": "brush_five.jpg"
     },
     {
      "name": "핸드크림",
-     "say": "바르고 바로 키보드 쳐도 안 묻어남",
+     "say": "바르고 바로 키보드 쳐도 안 묻음",
      "url": "https://www.coupang.com/vp/products/9675642013?itemId=29141250576",
      "payback": true,
-     "img": "hc_tube.jpg",
-     "price": "10,900원 (3개)"
+     "img": "hc_tube.jpg"
+    },
+    {
+     "name": "자석 삼각대 셀카봉",
+     "say": "요리 영상, 이걸로 다 찍음",
+     "url": "https://www.coupang.com/vp/products/9719424138?itemId=29085477764",
+     "payback": true,
+     "img": "tri_phone.jpg"
     }
    ]
   },
@@ -73,69 +44,62 @@
    "name": "직장인 책상",
    "items": [
     {
-     "name": "컴퓨터 책상 + 모니터 받침대 세트",
-     "say": "폭 1200, 3개월 넘게 쓰는 중",
+     "name": "컴퓨터 책상 세트",
+     "say": "3개월째 단점을 못 찾음",
      "url": "https://www.coupang.com/vp/products/8837525267?itemId=25754369646",
-     "img": "desk_room.jpg",
-     "price": "34,990원"
+     "img": "desk_room.jpg"
     },
     {
-     "name": "책상 밑 2단 발받침대",
-     "say": "점심엔 다리 올리고 눕기",
+     "name": "2단 발받침대",
+     "say": "점심시간엔 다리 올리고 눕기",
      "url": "https://www.coupang.com/vp/products/7830616996?itemId=21259952418",
      "img": "foot_up.jpg"
     },
     {
-     "name": "가죽 노트북 파우치 겸 거치대",
-     "say": "색 안 배고, 펴면 마우스패드",
+     "name": "노트북 파우치 거치대",
+     "say": "접으면 거치대, 펴면 마우스패드",
      "url": "https://www.coupang.com/vp/products/8700463499?itemId=25264874689",
-     "img": "pouch_stand.jpg",
-     "price": "16,900원"
+     "img": "pouch_stand.jpg"
     },
     {
      "name": "서랍형 모니터 받침대",
-     "say": "이어폰·포스트잇 다 들어감",
+     "say": "책상 위 잡동사니 싹 숨김",
      "url": "https://www.coupang.com/vp/products/9325834083?itemId=27644423676",
-     "img": "stand2_full.jpg",
-     "price": "9,980원"
+     "img": "stand2_full.jpg"
     },
     {
-     "name": "책상 매트 80x40",
-     "say": "8,800원인데 마감이 안 싸 보임",
+     "name": "책상 매트",
+     "say": "싼 티 안 나는 책상 매트",
      "short": "https://link.coupang.com/a/izk0YM7THg",
-     "img": "mat3_close.jpg",
-     "price": "8,800원"
+     "img": "mat3_close.jpg"
     },
     {
-     "name": "말랑이 손장난감",
+     "name": "말랑이",
      "say": "회의 중 손 심심할 때",
      "short": "https://link.coupang.com/a/izlfTfRLMG",
-     "img": "malang_press.jpg",
-     "price": "3,800원"
+     "img": "malang_press.jpg"
     }
    ]
   },
   {
-   "name": "간식·홈카페",
+   "name": "간식·커피",
    "items": [
     {
-     "name": "캡슐커피 150개",
-     "say": "한 잔에 124원꼴",
+     "name": "캡슐커피",
+     "say": "카페 대신 매일 한 잔",
      "short": "https://link.coupang.com/a/izk9Qrhb2q",
-     "img": "coffee_box.jpg",
-     "price": "18,650원 (150개)"
+     "img": "coffee_box.jpg"
     },
     {
      "name": "카사바칩",
-     "say": "오후 3시 서랍 간식, 담백함",
+     "say": "덜 찔리는 오후 3시 간식",
      "url": "https://www.coupang.com/vp/products/7759805082?itemId=27146263314",
      "payback": true,
-     "img": "chip_front.jpg",
-     "price": "4,500원 (3봉)"
+     "img": "chip_front.jpg"
     },
     {
      "name": "땅콩버터",
-     "say": "사과에 찍어 먹음, 풍미가 부드러움",
+     "say": "사과에 찍어 먹으면 끝",
      "url": "https://www.coupang.com/vp/products/9724749343?itemId=29101624583",
      "payback": true,
      "img": "pb_jar.jpg"
@@ -143,6 +107,5 @@
    ]
   }
  ],
- "updated": "2026-11-17",
- "price_note": "가격은 글 쓸 때(11월) 기준이라 지금은 다를 수 있어요."
+ "updated": "2026-11-17"
 }
