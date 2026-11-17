@@ -101,6 +101,8 @@ def main():
     for t in sorted(table, key=lambda x: -x["views"]):
         out.append(f"| {t['when'][5:16]} | {t['kind']} | [{t['first']}]({t['link']}) | {t['views']:,} | {t['likes']} | "
                    f"{t['replies']} | {t['reposts']} | {t['shares']} | {t['clicks']} |")
+    hub = clicks.get("bio", {})
+    out += ["", f"모음 페이지(프로필·상품 글 댓글 링크)에서 쿠팡으로 간 클릭(최근 14일): {list(hub.values())[1] if hub else 0}"]
     untagged = clicks.get("(꼬리표 없음)", {})
     if untagged:
         out += ["", f"꼬리표 없는 예전 링크 클릭(최근 14일): {list(untagged.values())[1]}"]

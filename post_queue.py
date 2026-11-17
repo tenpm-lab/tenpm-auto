@@ -42,6 +42,7 @@ LOG = os.path.join(HERE, "posts", "posted_log.txt")
 
 
 # ---------- 설정 ----------
+HUB_URL = "https://tenpm-lab.github.io/tenpm-auto/"
 def read_token():
     token = os.environ.get("THREADS_TOKEN", "").strip()
     if token:
@@ -203,6 +204,13 @@ def parse_file(path):
                 topic = value.strip().replace(".", "").replace("&", "")[:50]
         chunk = "\n".join(lines).strip()
         parts.append({"text": chunk, "photos": photos, "topic": topic})
+    # 10시 상품 글: 마지막 댓글에 '써본 것 모음' 페이지 링크를 자동으로 붙임 (11/17~)
+    name = os.path.basename(path)
+    if parts and ("-2200_" in name or "_bf_" in name) and HUB_URL not in raw:
+        last = parts[-1]
+        add = "\n\n써본 거 전부 모아둔 곳 👉 " + HUB_URL
+        if "coupang.com" in last["text"] and len(last["text"]) + len(add) <= 500:
+            last["text"] += add
     return parts
 
 
