@@ -26,6 +26,10 @@ def rows(name):
 def kind(fname):
     if "_info_" in fname:
         return "정보"
+    if "_money_" in fname:
+        return "부업정보"
+    if "_list_" in fname:
+        return "목록"
     if "_am_" in fname:
         return "아침한줄"
     if "_talk_" in fname:
