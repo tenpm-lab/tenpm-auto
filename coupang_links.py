@@ -60,11 +60,14 @@ def main(apply):
         with open(OUT, encoding="utf-8-sig") as f:
             for r in list(csv.DictReader(f)):
                 done[(r["파일"], r["원래링크"])] = r
+    made = {r.get("새링크") for r in done.values() if r.get("새링크")}
     for name in sorted(os.listdir(QUEUE)):
         path = os.path.join(QUEUE, name)
         text = open(path, encoding="utf-8").read()
         changed = text
         for short in sorted(set(SHORT.findall(text))):
+            if short in made:  # 이미 꼬리표 붙은 링크는 다시 안 엶 (클릭 수 부풀리기 방지)
+                continue
             key = (name, short)
             if key in done and done[key].get("새링크"):
                 new = done[key]["새링크"]

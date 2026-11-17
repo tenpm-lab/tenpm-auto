@@ -4,7 +4,6 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - "coupang_links.py"
       - "links_mode.txt"
 
 permissions:
