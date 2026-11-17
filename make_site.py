@@ -57,7 +57,7 @@ def price_of(it):
     import re as _re
     m = _re.search(r"/products/(\d+)", it.get("url", ""))
     d = INFO.get(m.group(1), {}) if m else {}
-    return d.get("price") if d.get("ok") else None
+    return None  # 가격 표시 꺼둠: API 가격이 우리가 건 옵션과 다른 경우가 있어서 (11/17)
 cards = []
 for cat in SPEC["cats"]:
     rows = []

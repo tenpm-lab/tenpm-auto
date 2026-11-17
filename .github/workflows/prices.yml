@@ -2,9 +2,6 @@ name: 모음 페이지 가격 갱신
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "37 18 * * *"   # 03:37 KST
-    - cron: "41 19 * * *"   # 04:41 KST (검색 제한 때문에 두 번에 나눔)
 
 permissions:
   contents: write
