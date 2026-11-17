@@ -51,6 +51,13 @@ for cat in SPEC["cats"]:
             im.save(os.path.join(HERE, "docs", "img", it["img"]), quality=80)
 
 e = html.escape
+_ip = os.path.join(HERE, "bio", "product_info.json")
+INFO = json.load(open(_ip, encoding="utf-8")) if os.path.exists(_ip) else {}
+def price_of(it):
+    import re as _re
+    m = _re.search(r"/products/(\d+)", it.get("url", ""))
+    d = INFO.get(m.group(1), {}) if m else {}
+    return d.get("price") if d.get("ok") else None
 cards = []
 for cat in SPEC["cats"]:
     rows = []
@@ -59,7 +66,8 @@ for cat in SPEC["cats"]:
         img = f'<img src="img/{e(it["img"])}" alt="{e(it["name"])}" loading="lazy">' if it.get("img") else ""
         rows.append(f'<a class="item" href="{e(it["link"])}" target="_blank" rel="sponsored noopener">{pay}{img}'
                     f'<div class="body"><div class="say">{e(it["say"])}</div><div class="name">{e(it["name"])}</div>'
-                    f'<div class="go">보러 가기 ›</div></div></a>')
+                    + (f'<div class="price">{price_of(it):,}원</div>' if price_of(it) else '')
+                    + f'<div class="go">보러 가기 ›</div></div></a>')
     cards.append(f'<section id="c{len(cards)}"><h2>{e(cat["name"])} <span class="cnt">{len(rows)}</span></h2><div class="grid">{"".join(rows)}</div></section>')
 
 page = f"""<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8">
@@ -87,7 +95,7 @@ h2{{font-size:18px;margin:22px 0 10px}}.cnt{{color:var(--acc);font-size:14px}}
 .body{{padding:10px 11px 12px;display:flex;flex-direction:column;gap:4px;flex:1}}
 .say{{font-weight:800;font-size:15px;line-height:1.38;color:var(--ink)}}
 .name{{color:var(--sub);font-size:12.5px}}
-.item{{position:relative}}.pay{{position:absolute;top:8px;left:8px;background:rgba(255,255,255,.92);color:#8a6f5a;font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px;z-index:1}}
+.item{{position:relative}}.price{{font-weight:800;font-size:14px;color:var(--ink);margin-top:3px}}.pay{{position:absolute;top:8px;left:8px;background:rgba(255,255,255,.92);color:#8a6f5a;font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px;z-index:1}}
 .price{{font-weight:800;font-size:14px;margin-top:2px}}.price.muted{{color:var(--sub);font-weight:600;font-size:12px}}
 .go{{margin-top:auto;padding-top:6px;color:var(--acc);font-weight:800;font-size:12.5px}}
 .tags{{display:flex;gap:4px;flex-wrap:wrap}}.tags:empty{{display:none}}
