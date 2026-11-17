@@ -6,6 +6,7 @@ on:
     paths:
       - "site/items.json"
       - "make_site.py"
+      - "site/run.py"
 
 permissions:
   contents: write
@@ -27,7 +28,7 @@ jobs:
         env:
           COUPANG_ACCESS_KEY: ${{ secrets.COUPANG_ACCESS_KEY }}
           COUPANG_SECRET_KEY: ${{ secrets.COUPANG_SECRET_KEY }}
-        run: python make_site.py || true
+        run: python site/run.py
       - run: |
           git config user.name "tenpm-bot"
           git config user.email "github-actions[bot]@users.noreply.github.com"
