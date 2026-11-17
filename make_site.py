@@ -39,6 +39,17 @@ if opened:
         from datetime import datetime, timedelta, timezone
         f.write(f"{datetime.now(timezone(timedelta(hours=9))):%Y-%m-%d},{opened},모음 페이지 만들 때 예전 짧은 링크 열어봄(make_site.py)\n")
 
+from PIL import Image
+os.makedirs(os.path.join(HERE, "docs", "img"), exist_ok=True)
+for cat in SPEC["cats"]:
+    for it in cat["items"]:
+        src = os.path.join(HERE, "images", it.get("img", ""))
+        if it.get("img") and os.path.exists(src):
+            im = Image.open(src).convert("RGB")
+            w, h = im.size; s0 = min(w, h)
+            im = im.crop(((w - s0) // 2, (h - s0) // 2, (w + s0) // 2, (h + s0) // 2)).resize((480, 480))
+            im.save(os.path.join(HERE, "docs", "img", it["img"]), quality=80)
+
 e = html.escape
 cards = []
 for cat in SPEC["cats"]:
@@ -47,35 +58,55 @@ for cat in SPEC["cats"]:
         tags = ""
         if it.get("payback"): tags += '<span class="tag">페이백</span>'
         if it.get("similar"): tags += '<span class="tag soft">비슷한 상품</span>'
-        rows.append(f'<a class="item" href="{e(it["link"])}" target="_blank" rel="sponsored noopener">'
-                    f'<div><div class="name">{e(it["name"])}{tags}</div><div class="say">{e(it["say"])}</div></div>'
-                    f'<div class="go">보기 ›</div></a>')
-    cards.append(f'<section><h2>{e(cat["name"])}</h2>{"".join(rows)}</section>')
+        img = f'<img src="img/{e(it["img"])}" alt="{e(it["name"])}" loading="lazy">' if it.get("img") else ""
+        price = f'<div class="price">{e(it["price"])}</div>' if it.get("price") else '<div class="price muted">가격은 쿠팡에서 확인</div>'
+        rows.append(f'<a class="item" href="{e(it["link"])}" target="_blank" rel="sponsored noopener">{img}'
+                    f'<div class="body"><div class="name">{e(it["name"])}</div><div class="tags">{tags}</div>'
+                    f'<div class="say">“{e(it["say"])}”</div>{price}<div class="go">쿠팡에서 보기 ›</div></div></a>')
+    cards.append(f'<section id="c{len(cards)}"><h2>{e(cat["name"])} <span class="cnt">{len(rows)}</span></h2><div class="grid">{"".join(rows)}</div></section>')
 
 page = f"""<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{e(SPEC['title'])} · tenpm.lab</title>
 <style>
-:root{{--bg:#fbf4ea;--ink:#3b2f2a;--sub:#8c7b70;--acc:#d9764f;--card:#fff;--line:#e9dccd}}
+:root{{--bg:#fbf4ea;--ink:#3b2f2a;--sub:#8c7b70;--acc:#d9764f;--card:#fff;--line:#eadfd1}}
 *{{box-sizing:border-box}}body{{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif}}
-main{{max-width:560px;margin:0 auto;padding:28px 18px 60px}}
-.badge{{display:inline-block;background:var(--acc);color:#fff;border-radius:99px;padding:4px 12px;font-size:13px;font-weight:700}}
-h1{{font-size:26px;margin:14px 0 8px}}.intro{{color:var(--sub);font-size:15px;line-height:1.55;margin:0 0 10px}}
-.notice{{font-size:12px;color:var(--sub);background:#f3e8da;border-radius:12px;padding:10px 12px;line-height:1.5}}
-h2{{font-size:17px;margin:26px 0 10px}}
-.item{{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin:8px 0;text-decoration:none;color:inherit}}
-.item:active{{transform:scale(.99)}}.name{{font-weight:700;font-size:15px}}.say{{color:var(--sub);font-size:13px;margin-top:3px}}
-.go{{color:var(--acc);font-weight:700;font-size:14px;white-space:nowrap}}
-.tag{{font-size:11px;font-weight:700;color:var(--acc);border:1px solid var(--acc);border-radius:99px;padding:1px 7px;margin-left:6px;vertical-align:2px}}
+main{{max-width:720px;margin:0 auto;padding:28px 16px 60px}}
+header{{text-align:center;padding:10px 0 6px}}
+.avatar{{width:76px;height:76px;border-radius:50%;background:#12141b;display:inline-flex;align-items:center;justify-content:center}}
+.avatar svg{{width:46px;height:46px}}
+h1{{font-size:24px;margin:12px 0 6px}}.handle{{color:var(--acc);font-weight:700;font-size:14px}}
+.intro{{color:var(--sub);font-size:14px;line-height:1.6;margin:8px auto 14px;max-width:440px}}
+.links{{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:14px}}
+.links a{{background:#fff;border:1px solid var(--line);border-radius:99px;padding:8px 14px;font-size:13px;font-weight:700;color:var(--ink);text-decoration:none}}
+.notice{{font-size:11.5px;color:var(--sub);background:#f3e8da;border-radius:12px;padding:10px 12px;line-height:1.55}}
+nav{{position:sticky;top:0;background:var(--bg);display:flex;gap:6px;overflow-x:auto;padding:12px 0 8px;z-index:2}}
+nav a{{flex:none;background:#fff;border:1px solid var(--line);border-radius:99px;padding:6px 12px;font-size:13px;color:var(--ink);text-decoration:none}}
+h2{{font-size:18px;margin:22px 0 10px}}.cnt{{color:var(--acc);font-size:14px}}
+.grid{{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}}
+@media(min-width:620px){{.grid{{grid-template-columns:repeat(3,1fr)}}}}
+.item{{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;text-decoration:none;color:inherit;display:flex;flex-direction:column}}
+.item img{{width:100%;aspect-ratio:1;object-fit:cover;display:block;background:#eee}}
+.body{{padding:10px 11px 12px;display:flex;flex-direction:column;gap:4px;flex:1}}
+.name{{font-weight:800;font-size:14px;line-height:1.35}}
+.say{{color:var(--sub);font-size:12.5px;line-height:1.45}}
+.price{{font-weight:800;font-size:14px;margin-top:2px}}.price.muted{{color:var(--sub);font-weight:600;font-size:12px}}
+.go{{margin-top:auto;padding-top:6px;color:var(--acc);font-weight:800;font-size:12.5px}}
+.tags{{display:flex;gap:4px;flex-wrap:wrap}}.tags:empty{{display:none}}
+.tag{{font-size:10.5px;font-weight:700;color:var(--acc);border:1px solid var(--acc);border-radius:99px;padding:1px 6px}}
 .tag.soft{{color:var(--sub);border-color:var(--line)}}
-footer{{margin-top:34px;font-size:12px;color:var(--sub);line-height:1.6}}
-footer a{{color:var(--sub)}}
+footer{{margin-top:30px;font-size:12px;color:var(--sub);line-height:1.6;text-align:center}}
 </style></head><body><main>
-<span class="badge">tenpm.lab</span>
+<header>
+<div class="avatar"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="38" fill="none" stroke="#f5f5f5" stroke-width="9"/><line x1="50" y1="50" x2="50" y2="24" stroke="#f5f5f5" stroke-width="9" stroke-linecap="round"/><line x1="50" y1="50" x2="69" y2="59" stroke="#f5c400" stroke-width="9" stroke-linecap="round"/></svg></div>
 <h1>{e(SPEC['title'])}</h1>
+<div class="handle">@tenpm.lab</div>
 <p class="intro">{e(SPEC['intro'])}</p>
+<div class="links"><a href="https://www.threads.com/@tenpm.lab">쓰레드</a><a href="https://blog.naver.com/tenpmlab">블로그</a></div>
+</header>
 <p class="notice">이 페이지의 링크는 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.<br>
-'페이백'은 구매 후 리뷰 작성 대가로 구매 금액을 돌려받은 제품이에요. '비슷한 상품'은 우리가 산 게 품절이거나 물려받은 거라 비슷한 걸 걸어둔 거예요.</p>
+'페이백'은 구매 후 리뷰 작성 대가로 구매 금액을 돌려받은 제품이에요. '비슷한 상품'은 우리가 산 게 품절이거나 물려받은 거라 비슷한 걸 걸어둔 거예요. {e(SPEC.get('price_note',''))}</p>
+<nav>{"".join(f'<a href="#c{i}">{e(c["name"])}</a>' for i, c in enumerate(SPEC["cats"]))}</nav>
 {"".join(cards)}
 <footer>매일 밤 10시 실험 기록 → 쓰레드 @tenpm.lab<br>
 <a href="https://blog.naver.com/tenpmlab">블로그 · 텐피엠 퇴근 후 AI 부업</a></footer>
