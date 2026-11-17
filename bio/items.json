@@ -9,34 +9,59 @@
      "name": "층간소음 실내화",
      "say": "아랫집 연락, 그 뒤로 안 옴",
      "url": "https://www.coupang.com/vp/products/1762588356?itemId=3001866602",
-     "img": "sandal_side.jpg"
+     "img": "sandal_side.jpg",
+     "kw": [
+      "유아 층간소음 슬리퍼",
+      "아기 실내화 층간소음",
+      "키즈 층간소음 실내화"
+     ]
     },
     {
      "name": "욕실 S고리",
      "say": "청소솔, 이제 바닥에 안 둠",
      "url": "https://www.coupang.com/vp/products/8479257258?itemId=24536304841",
-     "img": "shook_one.jpg"
+     "img": "shook_one.jpg",
+     "kw": [
+      "S고리 10개",
+      "스텐 S고리",
+      "S자 고리 스테인리스"
+     ]
     },
     {
      "name": "응원 문구 칫솔",
      "say": "양치할 때마다 응원받음",
      "url": "https://www.coupang.com/vp/products/9264326605?itemId=27414149644",
      "payback": true,
-     "img": "brush_five.jpg"
+     "img": "brush_five.jpg",
+     "kw": [
+      "응원 문구 칫솔",
+      "레터링 칫솔",
+      "문구 칫솔 세트"
+     ]
     },
     {
      "name": "핸드크림",
      "say": "바르고 바로 키보드 쳐도 안 묻음",
      "url": "https://www.coupang.com/vp/products/9675642013?itemId=29141250576",
      "payback": true,
-     "img": "hc_tube.jpg"
+     "img": "hc_tube.jpg",
+     "kw": [
+      "밤쉘 퍼퓸 핸드크림",
+      "퍼퓸 핸드크림",
+      "향수 핸드크림"
+     ]
     },
     {
      "name": "자석 삼각대 셀카봉",
      "say": "요리 영상, 이걸로 다 찍음",
      "url": "https://www.coupang.com/vp/products/9719424138?itemId=29085477764",
      "payback": true,
-     "img": "tri_phone.jpg"
+     "img": "tri_phone.jpg",
+     "kw": [
+      "맥세이프 삼각대 셀카봉",
+      "자석 셀카봉 삼각대",
+      "마그네틱 셀카봉"
+     ]
     }
    ]
   },
@@ -47,7 +72,12 @@
      "name": "컴퓨터 책상 세트",
      "say": "3개월째 단점을 못 찾음",
      "url": "https://www.coupang.com/vp/products/8837525267?itemId=25754369646",
-     "img": "desk_room.jpg"
+     "img": "desk_room.jpg",
+     "kw": [
+      "컴퓨터 책상 1200",
+      "컴퓨터 책상 모니터 받침대 세트",
+      "철제 컴퓨터 책상"
+     ]
     },
     {
      "name": "2단 발받침대",
@@ -65,7 +95,12 @@
      "name": "서랍형 모니터 받침대",
      "say": "책상 위 잡동사니 싹 숨김",
      "url": "https://www.coupang.com/vp/products/9325834083?itemId=27644423676",
-     "img": "stand2_full.jpg"
+     "img": "stand2_full.jpg",
+     "kw": [
+      "서랍형 모니터 받침대",
+      "모니터 받침대 서랍",
+      "모니터 선반 서랍"
+     ]
     },
     {
      "name": "책상 매트",
@@ -95,14 +130,23 @@
      "say": "덜 찔리는 오후 3시 간식",
      "url": "https://www.coupang.com/vp/products/7759805082?itemId=27146263314",
      "payback": true,
-     "img": "chip_front.jpg"
+     "img": "chip_front.jpg",
+     "kw": [
+      "카사바칩",
+      "카사바 칩 과자"
+     ]
     },
     {
      "name": "땅콩버터",
      "say": "사과에 찍어 먹으면 끝",
      "url": "https://www.coupang.com/vp/products/9724749343?itemId=29101624583",
      "payback": true,
-     "img": "pb_jar.jpg"
+     "img": "pb_jar.jpg",
+     "kw": [
+      "무가당 땅콩버터",
+      "땅콩버터 100%",
+      "크런치 땅콩버터"
+     ]
     }
    ]
   }

@@ -15,7 +15,7 @@ KST = timezone(timedelta(hours=9))
 SPEC = json.load(open(os.path.join(HERE, "bio", "items.json"), encoding="utf-8"))
 P = os.path.join(HERE, "bio", "product_info.json")
 info = json.load(open(P, encoding="utf-8")) if os.path.exists(P) else {}
-MAX = int(os.environ.get("MAX_CALLS", "9"))
+MAX = int(os.environ.get("MAX_CALLS", "40"))
 SEARCH = "/v2/providers/affiliate_open_api/apis/openapi/v1/products/search"
 
 items = [it for c in SPEC["cats"] for it in c["items"]]
@@ -26,35 +26,37 @@ todo = [it for it in items if pid(it)]
 todo.sort(key=lambda it: (info.get(pid(it), {}).get("ok", False), info.get(pid(it), {}).get("ts", "")))  # 안 가져온 것·오래된 것 먼저
 now = datetime.now(KST).strftime("%Y-%m-%d %H:%M")
 log = []
-for it in todo[:MAX]:
+calls = 0
+stop = False
+for it in todo:
     p = pid(it)
-    kws = it.get("kw") or it["name"]
+    kws = it.get("kw") or []
     if isinstance(kws, str): kws = [kws]
-    tried = info.get(p, {}).get("tried", [])
-    # 아직 안 맞은 상품은 시도 안 한 검색어부터 (상품번호 → kw 목록 → 이름)
-    cand = [p] + list(kws) + [it["name"]]
-    if not info.get(p, {}).get("ok"):
-        cand = [k for k in cand if k not in tried] or cand
-    kw = info[p]["kw_used"] if info.get(p, {}).get("ok") and info[p].get("kw_used") else cand[0]
-    try:
-        r = call("GET", SEARCH, "keyword=" + urllib.parse.quote(kw) + "&limit=10")
-    except Exception as e:
-        log.append(f"{it['name']}: 오류 {e}"); 
-        if "429" in str(e) or "limit" in str(e).lower(): break
-        continue
-    found = None
-    for x in (r.get("data") or {}).get("productData", []) or []:
-        if str(x.get("productId")) == p:
-            found = x; break
-    prev = info.get(p, {})
-    if found:
-        info[p] = {"name": it["name"], "price": found.get("productPrice"), "image": found.get("productImage"),
-                   "title": found.get("productName"), "ts": now, "ok": True, "kw_used": kw}
-        log.append(f"{it['name']}: {found.get('productPrice')}원")
+    cur = info.get(p, {})
+    if cur.get("ok") and cur.get("kw_used"):
+        cand = [cur["kw_used"]]                      # 이미 찾은 상품은 같은 검색어로 가격만 갱신
     else:
-        prev.update({"name": it["name"], "ts": now, "ok": False, "tried": tried + [kw]})
-        info[p] = prev
-        log.append(f"{it['name']}: '{kw}' 검색 결과에 없음")
+        tried = cur.get("tried", [])
+        cand = [k for k in list(kws) + [it["name"]] if k not in tried]
+    for kw in cand:
+        if calls >= MAX or stop: break
+        calls += 1
+        try:
+            r = call("GET", SEARCH, "keyword=" + urllib.parse.quote(kw) + "&limit=10")
+        except Exception as e:
+            log.append(f"{it['name']}: 오류 {e}")
+            if "429" in str(e) or "limit" in str(e).lower(): stop = True
+            continue
+        found = next((x for x in ((r.get("data") or {}).get("productData") or []) if str(x.get("productId")) == p), None)
+        if found:
+            info[p] = {"name": it["name"], "price": found.get("productPrice"), "image": found.get("productImage"),
+                       "title": found.get("productName"), "ts": now, "ok": True, "kw_used": kw}
+            log.append(f"{it['name']}: {found.get('productPrice')}원 ('{kw}')")
+            break
+        cur = info.setdefault(p, {})
+        cur.update({"name": it["name"], "ts": now, "ok": False})
+        cur["tried"] = cur.get("tried", []) + [kw]
+        log.append(f"{it['name']}: '{kw}' 결과에 없음")
 json.dump(info, open(P, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 open(os.path.join(HERE, "bio", "fetch_log.txt"), "w", encoding="utf-8").write(now + "\n" + "\n".join(log) + "\n")
 print("\n".join(log))
