@@ -64,6 +64,28 @@ def main():
         except Exception as e:
             row["link_error"] = str(e)[:80]
         out.append(row)
+    # 가격 기록 (할인율 직접 계산용): 날짜·상품번호·이름·가격만
+    hist = os.path.join(HERE, "curate", "prices.jsonl")
+    with open(hist, "a", encoding="utf-8") as f:
+        for r in out:
+            f.write(json.dumps({"t": now.strftime("%Y-%m-%d %H:%M"), "pid": str(r.get("productId")),
+                                "name": str(r.get("productName"))[:60], "price": r.get("productPrice")},
+                               ensure_ascii=False) + "\n")
+    # 시험: 쿠팡 상품 페이지에서 원래 가격(취소선) 읽을 수 있는지 3개만 확인
+    probe = []
+    for r in out[:3]:
+        pid = str(r.get("productId"))
+        try:
+            req = urllib.request.Request(f"https://www.coupang.com/vp/products/{pid}",
+                                         headers={"User-Agent": "Mozilla/5.0", "Accept-Language": "ko-KR"})
+            with urllib.request.urlopen(req, timeout=20) as resp:
+                html = resp.read().decode("utf-8", "ignore")
+            import re
+            hits = re.findall(r'(origin-price|base-price|discount-rate|original-price)[^<]{0,80}<?[^<]{0,40}', html)[:5]
+            probe.append({"pid": pid, "status": 200, "len": len(html), "hits": hits})
+        except Exception as e:
+            probe.append({"pid": pid, "error": str(e)[:80]})
+    json.dump(probe, open(os.path.join(HERE, "curate", "probe.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
     json.dump({"fetched_at": now.strftime("%Y-%m-%d %H:%M"), "fields": keys, "items": out},
               open(OUT, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
     print(len(out), "items; fields:", keys)
