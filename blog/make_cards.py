@@ -23,6 +23,12 @@ B = "/usr/share/fonts/opentype/noto/NotoSansCJK-Black.ttc"
 R = "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc"
 BG, INK, SUB, ACC, SOFT, LINE, MINT = "#fbf4ea", "#3b2f2a", "#8c7b70", "#d9764f", "#f6dfc8", "#e9dccd", "#e6efe1"
 W = 1080
+CARD, ONACC, QBG, QTXT, ALT, FOOT = "#fff", "#fff", INK, "#fff", "#b9a48f", "#a8968a"
+# 시리즈 색 (spec 에 "palette": "threads" 등). 기본은 크림 톤(생활 정보)
+PALETTES = {
+    "threads": dict(BG="#17121f", INK="#ffffff", SUB="#b3aac4", ACC="#b69cff", SOFT="#2c2438", LINE="#3a3048", MINT="#241c30",
+                    CARD="#221a2e", ONACC="#17121f", QBG="#b69cff", QTXT="#17121f", ALT="#8f86a3", FOOT="#8f86a3"),
+}
 
 
 def F(p, s):
@@ -40,7 +46,7 @@ def base(kicker, title, source):
     d = ImageDraw.Draw(im)
     d.text((80, 80), kicker, font=fit(d, kicker, R, 38, 920), fill=SUB)
     d.text((80, 135), title, font=fit(d, title, B, 64, 920), fill=INK)
-    d.text((80, 1000), f"tenpm.lab · {source}", font=F(R, 28), fill="#a8968a")
+    d.text((80, 1000), f"tenpm.lab · {source}", font=F(R, 28), fill=FOOT)
     return im, d
 
 
@@ -59,7 +65,7 @@ def cover(c, src):
         d.text((90, y), t, font=fit(d, t, B, 92, 900), fill=INK if i < len(lines) - 1 else ACC)
         y += 125
     d.text((90, y + 30), c.get("sub", ""), font=fit(d, c.get("sub", ""), R, 42, 900), fill=SUB)
-    d.text((90, W - 130), "tenpm.lab · 생활 정보", font=F(R, 36), fill="#a8968a")
+    d.text((90, W - 130), "tenpm.lab · 생활 정보", font=F(R, 36), fill=FOOT)
     return im
 
 
@@ -69,10 +75,10 @@ def steps(c, src):
     h = min(150, int(680 / len(items)) - 30)
     y = 270
     for i, (t, s) in enumerate(items):
-        d.rounded_rectangle((80, y, 1000, y + h), radius=28, fill="#fff", outline=LINE, width=3)
+        d.rounded_rectangle((80, y, 1000, y + h), radius=28, fill=CARD, outline=LINE, width=3)
         cy = y + h // 2
         d.ellipse((110, cy - 35, 180, cy + 35), fill=ACC)
-        d.text((145, cy), str(i + 1), font=F(B, 40), fill="#fff", anchor="mm")
+        d.text((145, cy), str(i + 1), font=F(B, 40), fill=ONACC, anchor="mm")
         d.text((210, y + h * 0.15), t, font=fit(d, t, B, 44, 760), fill=INK)
         d.text((210, y + h * 0.58), s, font=fit(d, s, R, 30, 760), fill=SUB)
         if i < len(items) - 1:
@@ -85,7 +91,7 @@ def table(c, src):
     im, d = base(c.get("kicker", ""), c["title"], src)
     rows = c["rows"][:7]
     h = min(110, int(660 / len(rows)))
-    d.rounded_rectangle((80, 270, 1000, 270 + h * len(rows) + 20), radius=28, fill="#fff", outline=LINE, width=3)
+    d.rounded_rectangle((80, 270, 1000, 270 + h * len(rows) + 20), radius=28, fill=CARD, outline=LINE, width=3)
     y = 285
     for i, (a, b) in enumerate(rows):
         d.text((120, y + h / 2), a, font=fit(d, a, R, 38, 360), fill=SUB, anchor="lm")
@@ -116,12 +122,12 @@ def bars(c, src):
 def compare(c, src):
     im, d = base(c.get("kicker", ""), c["title"], src)
     q = c["question"]
-    d.rounded_rectangle((200, 290, 880, 400), radius=30, fill=INK)
-    d.text((540, 345), q, font=fit(d, q, B, 44, 640), fill="#fff", anchor="mm")
-    for cx, (lab, title, lines), col in [(300, c["left"], ACC), (780, c["right"], "#b9a48f")]:
+    d.rounded_rectangle((200, 290, 880, 400), radius=30, fill=QBG)
+    d.text((540, 345), q, font=fit(d, q, B, 44, 640), fill=QTXT, anchor="mm")
+    for cx, (lab, title, lines), col in [(300, c["left"], ACC), (780, c["right"], ALT)]:
         d.line((540, 400, cx, 520), fill=col, width=6)
         d.text((cx, 470), lab, font=F(B, 36), fill=col, anchor="mm")
-        d.rounded_rectangle((cx - 230, 530, cx + 230, 880), radius=30, fill="#fff", outline=col, width=5)
+        d.rounded_rectangle((cx - 230, 530, cx + 230, 880), radius=30, fill=CARD, outline=col, width=5)
         d.text((cx, 600), title, font=fit(d, title, B, 40, 420), fill=INK, anchor="mm")
         for i, l in enumerate(lines[:3]):
             d.text((cx, 690 + i * 64), l, font=fit(d, l, R, 34, 420), fill=SUB, anchor="mm")
@@ -135,9 +141,9 @@ def checklist(c, src):
     items = c["items"][:6]
     y = max(280, int((W + 120 - len(items) * 118) / 2))
     for t in items:
-        d.rounded_rectangle((80, y, 1000, y + 100), radius=24, fill="#fff", outline=LINE, width=3)
+        d.rounded_rectangle((80, y, 1000, y + 100), radius=24, fill=CARD, outline=LINE, width=3)
         d.rounded_rectangle((110, y + 28, 154, y + 72), radius=10, fill=ACC)
-        d.text((132, y + 50), "✓", font=F(B, 32), fill="#fff", anchor="mm")
+        d.text((132, y + 50), "✓", font=F(B, 32), fill=ONACC, anchor="mm")
         d.text((180, y + 50), t, font=fit(d, t, B, 38, 790), fill=INK, anchor="lm")
         y += 118
     return im
@@ -148,6 +154,8 @@ KINDS = {"cover": cover, "steps": steps, "table": table, "bars": bars, "compare"
 
 def main(path):
     spec = json.load(open(path, encoding="utf-8"))
+    if spec.get("palette") in PALETTES:
+        globals().update(PALETTES[spec["palette"]])
     src = spec.get("source", "출처 확인")
     n, out = 0, []
     for c in spec["cards"]:
