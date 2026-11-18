@@ -121,7 +121,7 @@ def make_image(d, out):
     dr.ellipse((30, 30, 330, 330), fill="#e53935")
     dr.text((180, 180), f"-{d['pct']}%", font=f1 if d["pct"] < 100 else f2, fill="white", anchor="mm")
     dr.rectangle((0, 900, 1080, 1080), fill=(20, 20, 20))
-    dr.text((540, 990), f"평균 {round(d['med']):,}원 → 지금 {d['price']:,}원",
+    dr.text((540, 990), f"평균 {round(d['med']):,}원 → {d['price']:,}원",
             font=f2, fill="#ffd54f", anchor="mm")
     im.save(out, quality=90)
 
@@ -146,9 +146,9 @@ def text(d, lk, photo, now, variant):
         f"사진: {photo}",
         first,
         "",
-        f"비슷한 {d['kw']} 같은 양 평균 {round(d['med']):,}원",
-        f"→ 지금 {d['price']:,}원",
+        f"평균 {round(d['med']):,}원 → 지금 {d['price']:,}원 (-{p}%)",
         "",
+        "지금! 지금! 지금!",
         "가격 언제 돌아갈지 모름",
         "어차피 사야 되는 거면 쌀 때 쟁여두기",
         "---",
