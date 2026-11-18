@@ -67,7 +67,7 @@ def cover(c, src):
         d.text((90, y), t, font=fit(d, t, B, 92, 900), fill=INK if i < len(lines) - 1 else ACC)
         y += 125
     d.text((90, y + 30), c.get("sub", ""), font=fit(d, c.get("sub", ""), R, 42, 900), fill=SUB)
-    d.text((90, W - 130), "tenpm.lab · 생활 정보", font=F(R, 36), fill=FOOT)
+    d.text((90, W - 130), "tenpm.lab · " + c.get("foot", "생활 정보"), font=F(R, 36), fill=FOOT)
     return im
 
 
