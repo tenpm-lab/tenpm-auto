@@ -27,6 +27,11 @@ jobs:
           COUPANG_ACCESS_KEY: ${{ secrets.COUPANG_ACCESS_KEY }}
           COUPANG_SECRET_KEY: ${{ secrets.COUPANG_SECRET_KEY }}
         run: python curate.py
+      - name: 시험
+        env:
+          COUPANG_ACCESS_KEY: ${{ secrets.COUPANG_ACCESS_KEY }}
+          COUPANG_SECRET_KEY: ${{ secrets.COUPANG_SECRET_KEY }}
+        run: python probe_api.py || true
       - run: |
           git config user.name "tenpm-bot"
           git config user.email "github-actions[bot]@users.noreply.github.com"
