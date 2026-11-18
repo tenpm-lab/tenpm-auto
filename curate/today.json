@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-11-18 21:25",
+ "fetched_at": "2026-11-18 22:00",
  "fields": [
   "categoryName",
   "isFreeShipping",
@@ -24,7 +24,7 @@
    "rank": 1,
    "source": "goldbox",
    "image_file": "images/curate/8156855844.jpg",
-   "short_link": "https://link.coupang.com/a/iMqar4QDZI",
+   "short_link": "https://link.coupang.com/a/iMsFvT9bTo",
    "subId": "cu111855844"
   },
   {
@@ -38,7 +38,7 @@
    "rank": 2,
    "source": "goldbox",
    "image_file": "images/curate/7821881474.jpg",
-   "short_link": "https://link.coupang.com/a/iMqau3lUxE",
+   "short_link": "https://link.coupang.com/a/iMsFxQ8G1k",
    "subId": "cu111881474"
   },
   {
@@ -52,7 +52,7 @@
    "rank": 3,
    "source": "goldbox",
    "image_file": "images/curate/6145211823.jpg",
-   "short_link": "https://link.coupang.com/a/iMqaxvOBoa",
+   "short_link": "https://link.coupang.com/a/iMsFzPG1uK",
    "subId": "cu111811823"
   },
   {
@@ -66,36 +66,8 @@
    "rank": 4,
    "source": "goldbox",
    "image_file": "images/curate/7335194861.jpg",
-   "short_link": "https://link.coupang.com/a/iMqazpkxeS",
+   "short_link": "https://link.coupang.com/a/iMsFBL2WD6",
    "subId": "cu111894861"
-  },
-  {
-   "categoryName": "생활용품",
-   "isFreeShipping": false,
-   "isRocket": true,
-   "keyword": "Gold box",
-   "productId": 320451654,
-   "productName": "탐사 국내생산 3중 단열뽁뽁이 에어캡 무지",
-   "productPrice": 8890.0,
-   "rank": 5,
-   "source": "goldbox",
-   "image_file": "images/curate/320451654.jpg",
-   "short_link": "https://link.coupang.com/a/iMqaBQ0gjA",
-   "subId": "cu111851654"
-  },
-  {
-   "categoryName": "가전디지털",
-   "isFreeShipping": false,
-   "isRocket": true,
-   "keyword": "Gold box",
-   "productId": 8551069728,
-   "productName": "티피링크 하이게인 무선 랜카드 AC1300",
-   "productPrice": 18900.0,
-   "rank": 6,
-   "source": "goldbox",
-   "image_file": "images/curate/8551069728.jpg",
-   "short_link": "https://link.coupang.com/a/iMqaD9V4fY",
-   "subId": "cu111869728"
   },
   {
    "categoryName": "생활용품",
@@ -105,10 +77,10 @@
    "productId": 9699566700,
    "productName": "홈럭스 신발 운동화 세탁망 특대형  신발 빨래망",
    "productPrice": 79900.0,
-   "rank": 7,
+   "rank": 5,
    "source": "goldbox",
    "image_file": "images/curate/9699566700.jpg",
-   "short_link": "https://link.coupang.com/a/iMqaHhN552",
+   "short_link": "https://link.coupang.com/a/iMsFEjs12y",
    "subId": "cu111866700"
   },
   {
@@ -119,25 +91,11 @@
    "productId": 9790807648,
    "productName": "[한정초특가] 하루딱100박스 큰사이즈 초고당도 대봉감 홍시 특대",
    "productPrice": 19010.0,
-   "rank": 8,
+   "rank": 6,
    "source": "goldbox",
    "image_file": "images/curate/9790807648.jpg",
-   "short_link": "https://link.coupang.com/a/iMqaIJ2fJY",
+   "short_link": "https://link.coupang.com/a/iMsFGpKUKa",
    "subId": "cu111807648"
-  },
-  {
-   "categoryName": "생활용품",
-   "isFreeShipping": false,
-   "isRocket": true,
-   "keyword": "Gold box",
-   "productId": 9745066943,
-   "productName": "하늬홈 사계절용 코팅 작업장갑",
-   "productPrice": 19800.0,
-   "rank": 9,
-   "source": "goldbox",
-   "image_file": "images/curate/9745066943.jpg",
-   "short_link": "https://link.coupang.com/a/iMqaLF3vPM",
-   "subId": "cu111866943"
   },
   {
    "categoryName": "생활용품",
@@ -147,10 +105,10 @@
    "productId": 9354349642,
    "productName": "퍼실 딥클린 초미세세탁 라벤더젤 맥스 드럼용 액체세제 리필",
    "productPrice": 19900.0,
-   "rank": 10,
+   "rank": 7,
    "source": "goldbox",
    "image_file": "images/curate/9354349642.jpg",
-   "short_link": "https://link.coupang.com/a/iMqaObzA7g",
+   "short_link": "https://link.coupang.com/a/iMsFIgx85A",
    "subId": "cu111849642"
   },
   {
@@ -161,25 +119,11 @@
    "productId": 9673782597,
    "productName": "스케쳐스 여성용 밥스 비 플렉스 슬립인스 부츠 117398",
    "productPrice": 119000.0,
-   "rank": 11,
+   "rank": 8,
    "source": "goldbox",
    "image_file": "images/curate/9673782597.jpg",
-   "short_link": "https://link.coupang.com/a/iMqaPMcqRM",
+   "short_link": "https://link.coupang.com/a/iMsFLprhEy",
    "subId": "cu111882597"
-  },
-  {
-   "categoryName": "반려/애완용품",
-   "isFreeShipping": false,
-   "isRocket": true,
-   "keyword": "Gold box",
-   "productId": 7579501715,
-   "productName": "도그아이 강아지 넥워머 패딩",
-   "productPrice": 16900.0,
-   "rank": 12,
-   "source": "goldbox",
-   "image_file": "images/curate/7579501715.jpg",
-   "short_link": "https://link.coupang.com/a/iMqaR12Knk",
-   "subId": "cu111801715"
   },
   {
    "categoryName": "생활용품",
@@ -189,11 +133,51 @@
    "productId": 7196702728,
    "productName": "펑크린 울트라겔 배수관 세정제",
    "productPrice": 10100.0,
-   "rank": 13,
+   "rank": 9,
    "source": "goldbox",
    "image_file": "images/curate/7196702728.jpg",
-   "short_link": "https://link.coupang.com/a/iMqaTDuhwa",
+   "short_link": "https://link.coupang.com/a/iMsFNmenrU",
    "subId": "cu111802728"
+  },
+  {
+   "categoryName": "반려/애완용품",
+   "isFreeShipping": false,
+   "isRocket": true,
+   "keyword": "Gold box",
+   "productId": 7579501715,
+   "productName": "도그아이 강아지 넥워머 패딩",
+   "productPrice": 16900.0,
+   "rank": 10,
+   "source": "goldbox",
+   "image_file": "images/curate/7579501715.jpg",
+   "short_link": "https://link.coupang.com/a/iMsFPT5rLE",
+   "subId": "cu111801715"
+  },
+  {
+   "categoryName": "국내투어",
+   "isFreeShipping": false,
+   "isRocket": false,
+   "keyword": "Gold box",
+   "productId": 10000002770916,
+   "productName": "수영장 이용불가/디럭스 트윈룸",
+   "productPrice": 98000.0,
+   "rank": 11,
+   "source": "goldbox",
+   "image_file": "images/curate/10000002770916.jpg"
+  },
+  {
+   "categoryName": "식품",
+   "isFreeShipping": false,
+   "isRocket": true,
+   "keyword": "Gold box",
+   "productId": 7186022517,
+   "productName": "해의락 한겨울 광천김",
+   "productPrice": 10000.0,
+   "rank": 12,
+   "source": "goldbox",
+   "image_file": "images/curate/7186022517.jpg",
+   "short_link": "https://link.coupang.com/a/iMsFTGx7cW",
+   "subId": "cu111822517"
   },
   {
    "categoryName": "국내투어",
@@ -203,7 +187,7 @@
    "productId": 102304578,
    "productName": "더 스위트 바다전망",
    "productPrice": 146250.0,
-   "rank": 14,
+   "rank": 13,
    "source": "goldbox",
    "image_file": "images/curate/102304578.jpg"
   },
@@ -215,21 +199,23 @@
    "productId": 10000011368872,
    "productName": "05. ♠디럭스 에톤/담톤랜덤",
    "productPrice": 294000.0,
-   "rank": 15,
+   "rank": 14,
    "source": "goldbox",
    "image_file": "images/curate/10000011368872.jpg"
   },
   {
-   "categoryName": "국내투어",
+   "categoryName": "생활용품",
    "isFreeShipping": false,
-   "isRocket": false,
+   "isRocket": true,
    "keyword": "Gold box",
-   "productId": 10000000581989,
-   "productName": "스탠다드/전망없음",
-   "productPrice": 76000.0,
-   "rank": 16,
+   "productId": 9745066943,
+   "productName": "하늬홈 사계절용 코팅 작업장갑",
+   "productPrice": 19800.0,
+   "rank": 15,
    "source": "goldbox",
-   "image_file": "images/curate/10000000581989.jpg"
+   "image_file": "images/curate/9745066943.jpg",
+   "short_link": "https://link.coupang.com/a/iMsFY5HZ6G",
+   "subId": "cu111866943"
   },
   {
    "categoryName": "패션의류",
@@ -239,25 +225,37 @@
    "productId": 9063992602,
    "productName": "포슈어 남녀공용 겨울용 방한 보일러 일자 패딩 양털 팬츠",
    "productPrice": 14900.0,
-   "rank": 17,
+   "rank": 16,
    "source": "goldbox",
    "image_file": "images/curate/9063992602.jpg",
-   "short_link": "https://link.coupang.com/a/iMqa1A0M56",
+   "short_link": "https://link.coupang.com/a/iMsF0tjzAP",
    "subId": "cu111892602"
   },
   {
-   "categoryName": "식품",
+   "categoryName": "국내투어",
+   "isFreeShipping": false,
+   "isRocket": false,
+   "keyword": "Gold box",
+   "productId": 10000000581989,
+   "productName": "스탠다드/전망없음",
+   "productPrice": 76000.0,
+   "rank": 17,
+   "source": "goldbox",
+   "image_file": "images/curate/10000000581989.jpg"
+  },
+  {
+   "categoryName": "생활용품",
    "isFreeShipping": false,
    "isRocket": true,
    "keyword": "Gold box",
-   "productId": 7186022517,
-   "productName": "해의락 한겨울 광천김",
-   "productPrice": 10000.0,
+   "productId": 1063848597,
+   "productName": "로로벨 와와치약",
+   "productPrice": 31000.0,
    "rank": 18,
    "source": "goldbox",
-   "image_file": "images/curate/7186022517.jpg",
-   "short_link": "https://link.coupang.com/a/iMqa3T4CEC",
-   "subId": "cu111822517"
+   "image_file": "images/curate/1063848597.jpg",
+   "short_link": "https://link.coupang.com/a/iMsF4UN3hk",
+   "subId": "cu111848597"
   },
   {
    "categoryName": "패션잡화",
@@ -270,22 +268,8 @@
    "rank": 19,
    "source": "goldbox",
    "image_file": "images/curate/9774007596.jpg",
-   "short_link": "https://link.coupang.com/a/iMqbaCJFBs",
+   "short_link": "https://link.coupang.com/a/iMsF7b70kS",
    "subId": "cu111807596"
-  },
-  {
-   "categoryName": "생활용품",
-   "isFreeShipping": false,
-   "isRocket": true,
-   "keyword": "Gold box",
-   "productId": 1063848597,
-   "productName": "로로벨 와와치약",
-   "productPrice": 31000.0,
-   "rank": 20,
-   "source": "goldbox",
-   "image_file": "images/curate/1063848597.jpg",
-   "short_link": "https://link.coupang.com/a/iMqbcIRYM8",
-   "subId": "cu111848597"
   },
   {
    "categoryName": "도서/음반",
@@ -295,11 +279,25 @@
    "productId": 9254886289,
    "productName": "아띠래빗 까꿍놀이 아기 병풍 + 토끼 거울 세트",
    "productPrice": 47900.0,
-   "rank": 21,
+   "rank": 20,
    "source": "goldbox",
    "image_file": "images/curate/9254886289.jpg",
-   "short_link": "https://link.coupang.com/a/iMqbeThOPB",
+   "short_link": "https://link.coupang.com/a/iMsF8UkgHA",
    "subId": "cu111886289"
+  },
+  {
+   "categoryName": "패션잡화",
+   "isFreeShipping": false,
+   "isRocket": true,
+   "keyword": "Gold box",
+   "productId": 5155511986,
+   "productName": "메트로시티 반지갑 + 케이스 + 쇼핑백",
+   "productPrice": 98000.0,
+   "rank": 21,
+   "source": "goldbox",
+   "image_file": "images/curate/5155511986.jpg",
+   "short_link": "https://link.coupang.com/a/iMsGaZI4iq",
+   "subId": "cu111811986"
   },
   {
    "categoryName": "뷰티",
@@ -312,22 +310,22 @@
    "rank": 22,
    "source": "goldbox",
    "image_file": "images/curate/9716350572.jpg",
-   "short_link": "https://link.coupang.com/a/iMqbhHhVy8",
+   "short_link": "https://link.coupang.com/a/iMsGcNrJKu",
    "subId": "cu111850572"
   },
   {
-   "categoryName": "패션잡화",
+   "categoryName": "완구/취미",
    "isFreeShipping": false,
    "isRocket": true,
    "keyword": "Gold box",
-   "productId": 5155511986,
-   "productName": "메트로시티 반지갑 + 케이스 + 쇼핑백",
-   "productPrice": 98000.0,
+   "productId": 9680432735,
+   "productName": "포켓몬스터 터치 스마트폰 플러스4.0",
+   "productPrice": 97900.0,
    "rank": 23,
    "source": "goldbox",
-   "image_file": "images/curate/5155511986.jpg",
-   "short_link": "https://link.coupang.com/a/iMqbj1eEvI",
-   "subId": "cu111811986"
+   "image_file": "images/curate/9680432735.jpg",
+   "short_link": "https://link.coupang.com/a/iMsGizvczc",
+   "subId": "cu111832735"
   },
   {
    "categoryName": "식품",
@@ -340,36 +338,22 @@
    "rank": 24,
    "source": "goldbox",
    "image_file": "images/curate/393797.jpg",
-   "short_link": "https://link.coupang.com/a/iMqbmiN6Hs",
+   "short_link": "https://link.coupang.com/a/iMsGk62zK0",
    "subId": "cu111893797"
   },
   {
-   "categoryName": "완구/취미",
+   "categoryName": "로켓프레시",
    "isFreeShipping": false,
    "isRocket": true,
    "keyword": "Gold box",
-   "productId": 9680432735,
-   "productName": "포켓몬스터 터치 스마트폰 플러스4.0",
-   "productPrice": 97900.0,
+   "productId": 1290671661,
+   "productName": "목우촌 국내산 소고기 세절 국거리용 (냉장)",
+   "productPrice": 13050.0,
    "rank": 25,
    "source": "goldbox",
-   "image_file": "images/curate/9680432735.jpg",
-   "short_link": "https://link.coupang.com/a/iMqbpngWYK",
-   "subId": "cu111832735"
-  },
-  {
-   "categoryName": "뷰티",
-   "isFreeShipping": false,
-   "isRocket": false,
-   "keyword": "Gold box",
-   "productId": 6660323590,
-   "productName": "멜라노씨씨 딥클리어 효소 세안",
-   "productPrice": 14250.0,
-   "rank": 26,
-   "source": "goldbox",
-   "image_file": "images/curate/6660323590.jpg",
-   "short_link": "https://link.coupang.com/a/iMqbrr8P12",
-   "subId": "cu111823590"
+   "image_file": "images/curate/1290671661.jpg",
+   "short_link": "https://link.coupang.com/a/iMsGnFqKk1",
+   "subId": "cu111871661"
   }
  ]
 }

@@ -1,0 +1,165 @@
+{
+ "goldbox": {
+  "count": 25,
+  "keys": [
+   "categoryName",
+   "isFreeShipping",
+   "isRocket",
+   "keyword",
+   "productId",
+   "productImage",
+   "productName",
+   "productPrice",
+   "productUrl",
+   "rank"
+  ],
+  "sample": {
+   "productId": 8156855844,
+   "productName": "크리넥스 4겹 천연펄프 울트라클린 고급롤화장지",
+   "productPrice": 22900.0,
+   "productImage": "https://img2a.coupangcdn.com/image/retail/images/7353963470973-6b9e0e2b-4f02-42ce-8898-63f42a38186b.png",
+   "categoryName": "생활용품",
+   "keyword": "Gold box",
+   "rank": 1,
+   "isRocket": true,
+   "isFreeShipping": false
+  },
+  "top": [
+   "data",
+   "rCode",
+   "rMessage"
+  ]
+ },
+ "best_1001": {
+  "count": 3,
+  "keys": [
+   "categoryName",
+   "isFreeShipping",
+   "isRocket",
+   "keyword",
+   "productId",
+   "productImage",
+   "productName",
+   "productPrice",
+   "productUrl",
+   "rank"
+  ],
+  "sample": {
+   "productId": 8366678245,
+   "productName": "슈페르바 저소음 큰숫자 학생 수능 아날로그 손목 시계 수능시계",
+   "productPrice": 8490.0,
+   "productImage": "https://img5c.coupangcdn.com/image/vendor_inventory/4cab/7c77123e3ad5e7c8478ba537d53d89b5647a38a22c9387617ab72483c63a.png",
+   "categoryName": "패션잡화",
+   "keyword": "여성패션",
+   "rank": 1,
+   "isRocket": true,
+   "isFreeShipping": false
+  },
+  "top": [
+   "data",
+   "rCode",
+   "rMessage"
+  ]
+ },
+ "search": {
+  "count": 3,
+  "keys": [
+   "categoryName",
+   "isFreeShipping",
+   "isRocket",
+   "keyword",
+   "productId",
+   "productImage",
+   "productName",
+   "productPrice",
+   "productUrl",
+   "rank"
+  ],
+  "sample": {
+   "productId": 261192458,
+   "productName": "코멧 순백 3겹 라벤더 바닐라 롤화장지",
+   "productPrice": 11990,
+   "productImage": "https://ads-partners.coupang.com/image1/u3c2AsKvjMox3Qyiu--ec-3ySoik1RI5rORAHgA1cwmnt_WpB2tfIG9oEWSmX1pxji4Ixps73fHuYV-4CzCqdOUcHbB0QZ-RabC6a1BWRDBCIPYnWFUIhoc2aABjEFmpcH3FwLVJqaejEtq_YQIOLUmC26H76jbfHs6CZrPxQK75mblssLOa7pEhyocmWXKbnAU5401ocaIrq1o8TYnO2GADDbftRTofx0bCzLJKK5kQ3FNQ4QlCItdj-5p6EBbdSWpYhOXxoWK7V82AtK8byVftuzo4RxBrTfnCuMWctVn0F5HcSBcjmqz06bD_EV6yay9Dsd3mmBRDNDM5O0U2hi0EcDeYU70UO4efG6czFekKw7LESK5vNrholWC8MBXVVYLjYEnc_W0nsqA7VviNlj4QY4hWYxuV_EXbttfYQlRXqjK63lqenmskUo8Lq3wu9NaCXZzVn3teems5LxHoBfJTEy-oqFU0caicIVAf6jOInANTrx3FXJcxuBrXGAhpY4e8x7hm-2h7pmt-srkIX_o9cLRx",
+   "categoryName": "생활용품",
+   "keyword": "휴지",
+   "rank": 1,
+   "isRocket": true,
+   "isFreeShipping": false
+  },
+  "top": [
+   "data",
+   "rCode",
+   "rMessage"
+  ]
+ },
+ "coupangPL": {
+  "count": 3,
+  "keys": [
+   "categoryName",
+   "isFreeShipping",
+   "isRocket",
+   "productId",
+   "productImage",
+   "productName",
+   "productPrice",
+   "productUrl"
+  ],
+  "sample": {
+   "productId": 8451304633,
+   "productName": "곰곰 양조간장",
+   "productPrice": 2900.0,
+   "productImage": "https://image1.coupangcdn.com/image/retail/images/1405655817519780-fd8189a5-241d-4446-9eb1-988c9f37709c.jpg",
+   "categoryName": "식품",
+   "isRocket": true,
+   "isFreeShipping": false
+  },
+  "top": [
+   "data",
+   "rCode",
+   "rMessage"
+  ]
+ },
+ "reco_get": {
+  "count": 20,
+  "keys": [
+   "categoryName",
+   "isRocket",
+   "keyword",
+   "productId",
+   "productImage",
+   "productName",
+   "productPrice",
+   "productUrl",
+   "rank"
+  ],
+  "sample": {
+   "productId": 8156855844,
+   "productName": "크리넥스 4겹 천연펄프 울트라클린 고급롤화장지",
+   "productPrice": 22900.0,
+   "productImage": "https://ads-partners.coupang.com/image2/5v-1a7Rf6NfhsDFg5jr-oIqytiaseRfEwm3FrVvBnFl5Db6Rl4uwcKsZRiAaQM-QuBs7tVZLVWLmYioau2PdPE5Jz9twtRPnBKDUwNtFyG01YeFyOejeD8wc6v9_ni7qOP6ECyLOpRep5ohWkSP4M9-ulX3AHd1QDuTyZVEhaDmhmj08K2oXAD-exuaeHR2XboEU3--0c-0XYRkG5whBCWfCclFEMcq9zg1I4S5o-mws4g4WPSqTpjWBHXWFM_XBjEnhZgSMCQiRkRaFCAQ47pz4KhssLoCSl0BuxYWNAkeL3ifK8OSlDlVGMK3CkTo7zMDHj-brpRKErBpA6dgxjaX8Vb8kvzco7z0Bk9bCRL2_WCADnnhvS_Q-49XpNFjwRXx6s3QqxBYZlmqIZ_CRv4kvrlk6nFwjrNEw8h04ZgTArZn0UpWa-40YnLsnq7HcFMe6TNP7V3045b2wNUY0AC86TKrw71maezmDdQ==",
+   "categoryName": "생활용품",
+   "keyword": "Gold box",
+   "rank": 1,
+   "isRocket": false
+  },
+  "top": [
+   "data",
+   "rCode",
+   "rMessage"
+  ]
+ },
+ "reco_post": {
+  "error": "(404) {\n  \"code\" : \"PRECONDITION_FAILED\",\n  \"message\" : \"No matched http method of API specification for /openapi/v1/products/reco found, did you mean to request via GET?\",\n  \"transactionId\" : \"e5e40b"
+ },
+ "pages": {
+  "mobile": {
+   "error": "HTTP Error 403: Forbidden"
+  },
+  "mobile_goldbox": {
+   "error": "HTTP Error 403: Forbidden"
+  },
+  "pc_goldbox": {
+   "error": "HTTP Error 403: Forbidden"
+  }
+ }
+}
