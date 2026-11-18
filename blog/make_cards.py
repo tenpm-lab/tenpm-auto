@@ -24,8 +24,22 @@ R = "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc"
 BG, INK, SUB, ACC, SOFT, LINE, MINT = "#fbf4ea", "#3b2f2a", "#8c7b70", "#d9764f", "#f6dfc8", "#e9dccd", "#e6efe1"
 W = 1080
 CARD, ONACC, QBG, QTXT, ALT, FOOT = "#fff", "#fff", INK, "#fff", "#b9a48f", "#a8968a"
-# 시리즈 색 (spec 에 "palette": "threads" 등). 기본은 크림 톤(생활 정보)
+DOT, BARS = "#f2a98a", ["#e9cdb6", "#f2a98a", "#d9764f", "#b85c38"]
+# 시리즈 색 (spec 에 "palette": "threads" 등). 기본은 크림 톤(4. 생활정보)
+# stock=주식, realestate=부동산, gov=정부지원사업, threads=쓰레드 가이드, affiliate=제휴 프로그램
 PALETTES = {
+    # 정보성 자료 > 2. 주식 (짙은 남색 + 빨강)
+    "stock": dict(BG="#0f1622", INK="#ffffff", SUB="#a9b4c4", ACC="#ff6b6b", SOFT="#1f2a3a", LINE="#2c3a4e", MINT="#18212f",
+                  CARD="#182231", ONACC="#0f1622", QBG="#ff6b6b", QTXT="#0f1622", ALT="#8592a5", FOOT="#8592a5",
+                  DOT="#ff6b6b", BARS=["#3a4a60", "#7a5560", "#ff8f8f", "#ff6b6b"]),
+    # 정보성 자료 > 3. 부동산 (짙은 청록 + 민트)
+    "realestate": dict(BG="#0f1d1c", INK="#ffffff", SUB="#a6c2bd", ACC="#3fd0b6", SOFT="#1d3330", LINE="#29433f", MINT="#162926",
+                       CARD="#162826", ONACC="#0f1d1c", QBG="#3fd0b6", QTXT="#0f1d1c", ALT="#7fa39d", FOOT="#7fa39d",
+                       DOT="#3fd0b6", BARS=["#2c4a46", "#3f7f73", "#36b39c", "#3fd0b6"]),
+    # 정보성 자료 > 1. 정부지원사업 (밝은 하늘 + 파랑)
+    "gov": dict(BG="#eef4fb", INK="#1f2d3d", SUB="#6b7c8f", ACC="#2f74c0", SOFT="#d6e6f7", LINE="#d5dfeb", MINT="#e3f0e8",
+                CARD="#ffffff", ONACC="#ffffff", QBG="#1f2d3d", QTXT="#ffffff", ALT="#8fa0b3", FOOT="#8a9aac",
+                DOT="#2f74c0", BARS=["#c9dcf2", "#8fb8e6", "#2f74c0", "#1f5490"]),
     "affiliate": dict(BG="#1d1512", INK="#ffffff", SUB="#c4b0a6", ACC="#ff8a5b", SOFT="#3a2a24", LINE="#4a3830", MINT="#2a1f1b",
                       CARD="#2a1f1b", ONACC="#1d1512", QBG="#ff8a5b", QTXT="#1d1512", ALT="#a8968a", FOOT="#a8968a"),
     "threads": dict(BG="#17121f", INK="#ffffff", SUB="#b3aac4", ACC="#b69cff", SOFT="#2c2438", LINE="#3a3048", MINT="#241c30",
@@ -57,9 +71,9 @@ def cover(c, src):
     d = ImageDraw.Draw(im)
     d.ellipse((W - 330, -120, W + 120, 330), fill=SOFT)
     d.ellipse((-160, W - 300, 260, W + 120), fill=MINT)
-    d.ellipse((W - 210, 120, W - 150, 180), fill="#f2a98a")
+    d.ellipse((W - 210, 120, W - 150, 180), fill=DOT)
     lab = c.get("label", "생활 정보")
-    d.rounded_rectangle((90, 130, 90 + d.textlength(lab, font=F(R, 40)) + 56, 200), radius=35, fill="#f2a98a")
+    d.rounded_rectangle((90, 130, 90 + d.textlength(lab, font=F(R, 40)) + 56, 200), radius=35, fill=DOT)
     d.text((118, 138), lab, font=F(R, 40), fill="#fff")
     y = 330
     lines = c["lines"]
@@ -109,7 +123,7 @@ def bars(c, src):
     items = c["bars"][:4]
     mx = max(v for _, v, _ in items) or 1
     y = 290
-    cols = ["#e9cdb6", "#f2a98a", "#d9764f", "#b85c38"]
+    cols = BARS
     for i, (name, v, lab) in enumerate(items):
         d.text((80, y), name, font=fit(d, name, B, 44, 900), fill=INK)
         w = int(760 * v / mx)
@@ -156,6 +170,11 @@ KINDS = {"cover": cover, "steps": steps, "table": table, "bars": bars, "compare"
 
 def main(path):
     spec = json.load(open(path, encoding="utf-8"))
+    if "palette" not in spec:  # 표지 라벨로 카테고리 색 자동 선택
+        lab = next((c.get("label", "") for c in spec.get("cards", []) if c.get("type") == "cover"), "")
+        for key, pal in (("주식", "stock"), ("부동산", "realestate"), ("정부지원", "gov")):
+            if key in lab:
+                spec["palette"] = pal
     if spec.get("palette") in PALETTES:
         globals().update(PALETTES[spec["palette"]])
     src = spec.get("source", "출처 확인")
