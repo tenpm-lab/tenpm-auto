@@ -1,0 +1,35 @@
+name: 할인 상품 후보 모으기
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "curate/request.txt"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: post-queue
+  cancel-in-progress: false
+
+jobs:
+  curate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - run: git fetch origin main && git reset --hard origin/main
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: 후보 모으기
+        env:
+          COUPANG_ACCESS_KEY: ${{ secrets.COUPANG_ACCESS_KEY }}
+          COUPANG_SECRET_KEY: ${{ secrets.COUPANG_SECRET_KEY }}
+        run: python curate.py
+      - run: |
+          git config user.name "tenpm-bot"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A curate images/curate
+          git diff --cached --quiet || git commit -m "할인 상품 후보"
+          for i in 1 2 3; do git pull --rebase -X theirs && git push && break; sleep 5; done
