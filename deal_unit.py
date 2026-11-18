@@ -84,14 +84,19 @@ def pick(kw):
         if lo <= up <= hi:
             rows.append({"pid": str(it["productId"]), "name": name, "price": int(price), "q": q,
                          "up": up, "img": it.get("productImage"), "rocket": it.get("isRocket")})
-    if len(rows) < 4:
-        return None, f"{kw}: 비교 가능한 상품 {len(rows)}개"
-    med = statistics.median(r["up"] for r in rows)
-    best = min(rows, key=lambda r: r["up"])
-    pct = round((med - best["up"]) / med * 100)
-    if not (15 <= pct <= 75):
-        return None, f"{kw}: 차이 {pct}% (범위 밖)"
-    best.update(kw=kw, unit=unit, med=med, pct=pct, n=len(rows))
+    best = None
+    for c in sorted(rows, key=lambda r: r["up"]):
+        others = [r for r in rows if r is not c and 0.5 <= r["q"] / c["q"] <= 2]
+        if len(others) < 3:
+            continue
+        ref = statistics.median(r["up"] for r in others) * c["q"]
+        pct = round((ref - c["price"]) / ref * 100)
+        if 15 <= pct <= 60:
+            best, med, n = c, ref, len(others)
+            break
+    if not best:
+        return None, f"{kw}: 비슷한 양끼리 비교할 상품 부족/차이 작음"
+    best.update(kw=kw, unit=unit, med=med, pct=pct, n=n)
     return best, "ok"
 
 
@@ -116,7 +121,7 @@ def make_image(d, out):
     dr.ellipse((30, 30, 330, 330), fill="#e53935")
     dr.text((180, 180), f"-{d['pct']}%", font=f1 if d["pct"] < 100 else f2, fill="white", anchor="mm")
     dr.rectangle((0, 900, 1080, 1080), fill=(20, 20, 20))
-    dr.text((540, 990), f"{d['unit']}당 {won(d['up'])}원 · 보통 {won(d['med'])}원",
+    dr.text((540, 990), f"평균 {round(d['med']):,}원 → 지금 {d['price']:,}원",
             font=f2, fill="#ffd54f", anchor="mm")
     im.save(out, quality=90)
 
@@ -130,25 +135,25 @@ def link(pid, sub):
 
 def text(d, lk, photo, now, variant):
     u, p = d["unit"], d["pct"]
+    p, nm = d["pct"], short(d["name"])
     first = [
-        f"🔥 {p}% 더 쌈! {short(d['name'])} (광고)",
-        f"{d['kw']} {u}당 가격 비교해보니 이게 제일 쌈, 보통보다 {p}% 싸다 (광고)",
-        f"🚨 {d['kw']} 최저 단가 떴음, 보통보다 {p}% 저렴 (광고)",
+        f"🔥 -{p}% {nm} 지금 {d['price']:,}원 (광고)",
+        f"🚨 평균보다 {p}% 쌈! {nm} (광고)",
+        f"⚡ {nm} 지금 -{p}% 가격 (광고)",
     ][variant % 3]
     body = [
         "주제: 특가",
         f"사진: {photo}",
         first,
         "",
-        f"쿠팡 {d['kw']} 검색 상위 {d['n']}개 {u}당 가격 비교함",
-        f"보통 {u}당 {won(d['med'])}원인데",
-        f"이건 {qty_text(d['q'], u)} {d['price']:,}원 → {u}당 {won(d['up'])}원",
+        f"비슷한 {d['kw']} 같은 양 평균 {round(d['med']):,}원",
+        f"→ 지금 {d['price']:,}원",
         "",
-        "가격 수시로 바뀌어서 언제 돌아갈지 모름",
+        "가격 언제 돌아갈지 모름",
         "어차피 사야 되는 거면 쌀 때 쟁여두기",
         "---",
-        f"{short(d['name'])} 👉 {lk}",
-        f"※ {now:%m/%d %H:%M} 기준 쿠팡 가격, 바뀔 수 있음",
+        f"{nm} 👉 {lk}",
+        f"※ {now:%m/%d %H:%M} 기준 쿠팡 가격. 평균은 쿠팡 검색 상위 비슷한 상품 {d['n']}개 같은 양 환산",
         "이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.",
     ]
     return "\n".join(body) + "\n"
