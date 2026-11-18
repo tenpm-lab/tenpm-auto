@@ -26,6 +26,8 @@ W = 1080
 CARD, ONACC, QBG, QTXT, ALT, FOOT = "#fff", "#fff", INK, "#fff", "#b9a48f", "#a8968a"
 # 시리즈 색 (spec 에 "palette": "threads" 등). 기본은 크림 톤(생활 정보)
 PALETTES = {
+    "affiliate": dict(BG="#1d1512", INK="#ffffff", SUB="#c4b0a6", ACC="#ff8a5b", SOFT="#3a2a24", LINE="#4a3830", MINT="#2a1f1b",
+                      CARD="#2a1f1b", ONACC="#1d1512", QBG="#ff8a5b", QTXT="#1d1512", ALT="#a8968a", FOOT="#a8968a"),
     "threads": dict(BG="#17121f", INK="#ffffff", SUB="#b3aac4", ACC="#b69cff", SOFT="#2c2438", LINE="#3a3048", MINT="#241c30",
                     CARD="#221a2e", ONACC="#17121f", QBG="#b69cff", QTXT="#17121f", ALT="#8f86a3", FOOT="#8f86a3"),
 }
