@@ -210,9 +210,28 @@ def dump(keywords):
     json.dump(out, open(os.path.join(HERE, "curate", "dump.json"), "w", encoding="utf-8"),
               ensure_ascii=False, indent=1)
 
+
+def links():
+    """deal/links.txt 의 '이름|쿠팡주소' 줄마다 짧은 파트너 링크를 만들어 curate/links.json 에 (긴 링크·코드 저장 안 함)"""
+    now = datetime.datetime.now(KST)
+    out = {}
+    for n, line in enumerate(open(os.path.join(HERE, "deal", "links.txt"), encoding="utf-8").read().splitlines()):
+        if "|" not in line:
+            continue
+        key, url = [x.strip() for x in line.split("|", 1)]
+        try:
+            res = call("POST", f"{BASE}/deeplink", body={"coupangUrls": [url], "subId": f"sv{now:%m%d}{n:02d}"})
+            d = items(res)
+            out[key] = {"link": d[0].get("shortenUrl") if d else None, "subId": f"sv{now:%m%d}{n:02d}"}
+        except Exception as e:
+            out[key] = {"error": str(e)[:80]}
+    json.dump(out, open(os.path.join(HERE, "curate", "links.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+
 if __name__ == "__main__":
     arg = sys.argv[1] if len(sys.argv) > 1 else "sample"
-    if arg == "dump":
+    if arg == "links":
+        links()
+    elif arg == "dump":
         dump([("하기스 기저귀", "기저귀"), ("하기스 기저귀 대용량", "기저귀"), ("팸퍼스 기저귀", "기저귀"),
               ("기저귀 소형 팩", "기저귀"), ("보솜이 기저귀", "기저귀")])
     elif arg == "sample":
