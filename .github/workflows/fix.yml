@@ -1,0 +1,23 @@
+name: 이어 쓰기만 달기 (일회용)
+on:
+  push:
+    paths:
+      - "fix/reply.txt"
+permissions:
+  contents: write
+concurrency:
+  group: post-queue
+  cancel-in-progress: false
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: 댓글 달기
+        env:
+          THREADS_TOKEN: ${{ secrets.THREADS_TOKEN }}
+        run: |
+          if [ -s fix/reply.txt ]; then python fix_reply.py; fi
