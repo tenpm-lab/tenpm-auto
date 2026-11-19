@@ -141,10 +141,21 @@ def publish(token, user_id, text, photos, reply_to, base, topic=""):
         print(f"   ⚠️ 주제 태그 없이 다시 올림: {e}")
         params.pop("topic_tag")
         container = call("POST", f"/{user_id}/threads", params)
-    wait_ready(token, container["id"])
-    result = call("POST", f"/{user_id}/threads_publish",
-                  {"creation_id": container["id"], "access_token": token})
-    return result["id"]
+    for attempt in range(3):
+        try:
+            time.sleep(5 if photos else 0)  # 쓰레드가 사진 묶음을 인식할 시간
+            wait_ready(token, container["id"])
+            result = call("POST", f"/{user_id}/threads_publish",
+                          {"creation_id": container["id"], "access_token": token})
+            return result["id"]
+        except RuntimeError as e:
+            # 'does not exist'(4279009)는 쓰레드 쪽 준비가 덜 된 일시 오류 → 잠시 뒤 다시
+            if "4279009" not in str(e) or attempt == 2:
+                raise
+            print(f"   ⚠️ 쓰레드 준비 덜 됨, 15초 뒤 다시 시도 ({attempt + 1}/3)")
+            time.sleep(15)
+            if len(photos) > 1:
+                container = call("POST", f"/{user_id}/threads", params)
 
 
 def notify(title, message, link=""):
