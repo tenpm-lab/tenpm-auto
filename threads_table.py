@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 """문서용 마크다운 출력.
   python threads_table.py main > /tmp/main.md   # '쓰레드 글' 탭: 한눈에 보기 + 올릴 글 표 + 올릴 글 본문
-  python threads_table.py done > /tmp/done.md   # '올린 글' 하위 탭: 올린 글 표 + 올린 글 본문
+  python threads_table.py done > /tmp/done.md   # '올린 글' 하위 탭: 올린 글 표 + 올린 글 본문 전부
+  python threads_table.py donetable             # '올린 글' 표만
+  python threads_table.py donebody 20261122     # 그 날짜(포함) 이후 올린 글 본문만 (최신순)
 """
 import csv, glob, os, collections, datetime, sys
 
@@ -80,15 +82,22 @@ if MODE == "main":
     print("\n## 📅 올릴 글 (예약)\n")
     print("| 날짜 | 카테고리 | 첫 줄 |\n|---|---|---|")
     for f, fn, c, first in q: print(f"| {d(fn)} | {c} | {esc(first)} |")
-    print("\n## 📝 올릴 글 본문\n")
+    print("\n## 📝 올릴 글 본문 (다음 7일)\n")
+    until = (datetime.datetime.now() + datetime.timedelta(days=7)).strftime("%Y%m%d")
     for f, fn, c, first in q:
+        if fn[:8] > until: continue
         print(f"### {d(fn)} · {c}\n\n{FENCE}\n{body(f)}\n{FENCE}\n")
 else:
+  since = sys.argv[2] if len(sys.argv) > 2 else "0"
+  if MODE in ("done", "donetable"):
     print(f"## ✅ 올린 글 ({today} 기준, 최신순)\n")
     print("| 날짜 | 카테고리 | 첫 줄 | 조회 | 공유 |\n|---|---|---|---|---|")
     for f, fn, c, first, s in reversed(done):
         print(f"| {d(fn)} | {c} | {esc(first)} | {int(s['views'] or 0):,} | {s['shares']} |" if s else f"| {d(fn)} | {c} | {esc(first)} | - | - |")
+  if MODE == "done":
     print("\n## 📝 올린 글 본문 (최신순)\n")
+  if MODE in ("done", "donebody"):
     for f, fn, c, first, s in reversed(done):
+        if fn[:8] < since: continue
         v = f" · 조회 {int(s['views'] or 0):,}" if s else ""
         print(f"### {d(fn)} · {c}{v}\n\n{FENCE}\n{body(f)}\n{FENCE}\n")
