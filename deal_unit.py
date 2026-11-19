@@ -199,8 +199,24 @@ def run(n, dest_dir, hhmm=None):
 
 if __name__ == "__main__":
     arg = sys.argv[1] if len(sys.argv) > 1 else "sample"
-    if arg == "sample":
+    if arg == "dump":
+        dump([("하기스 기저귀", "기저귀"), ("하기스 기저귀 대용량", "기저귀"), ("팸퍼스 기저귀", "기저귀"),
+              ("기저귀 소형 팩", "기저귀"), ("보솜이 기저귀", "기저귀")])
+    elif arg == "sample":
         os.makedirs(os.path.join(HERE, "posts", "draft"), exist_ok=True)
         run(2, os.path.join(HERE, "posts", "draft"))
     else:
         run(1, os.path.join(HERE, "posts", "queue"), arg)
+
+
+def dump(keywords):
+    """검색 결과 이름·가격·수량만 curate/dump.json 에 (링크·코드 저장 안 함)"""
+    out = {}
+    for kw, unitkw in keywords:
+        got = items(call("GET", f"{BASE}/products/search",
+                         "keyword=" + urllib.parse.quote(kw) + "&limit=10&subId=dump"))
+        out[kw] = [{"pid": str(it.get("productId")), "name": it.get("productName"),
+                    "price": it.get("productPrice"), "rocket": it.get("isRocket"),
+                    "q": qty(str(it.get("productName", "")), unitkw)} for it in got]
+    json.dump(out, open(os.path.join(HERE, "curate", "dump.json"), "w", encoding="utf-8"),
+              ensure_ascii=False, indent=1)
