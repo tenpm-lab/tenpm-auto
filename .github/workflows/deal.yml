@@ -35,6 +35,6 @@ jobs:
       - run: |
           git config user.name "tenpm-bot"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -A posts images/deal
+          git add -A posts images/deal curate
           git diff --cached --quiet || git commit -m "특가 글"
           for i in 1 2 3; do git pull --rebase -X theirs && git push && break; sleep 5; done
