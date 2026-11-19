@@ -1,0 +1,1 @@
+2026-11-19 22:01	20261119-2200_pouch.txt	올라간 부분=18127993997314842	쓰레드 API 오류 (400): {"error":{"message":"The requested resource does not exist","code":24,"type":"OAuthException","error_subcode":4279009,"is_transient":false,"error_user_msg":"The media with id 18094417109378492 cannot be found.","error_user_title":"Media Not Found","fbtrace_id":"Ae_g6QQOsR8tKnZNckImCzh"}}
