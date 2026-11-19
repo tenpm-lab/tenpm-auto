@@ -109,6 +109,19 @@ def media_params(name, base):
     return {"media_type": "IMAGE", "image_url": url}
 
 
+def already_posted(token, text):
+    """최근 내 글 5개 중 첫 줄이 같은 글이 있으면 그 id (중복 게시 방지)"""
+    try:
+        res = call("GET", "/me/threads", {"fields": "id,text,timestamp", "limit": "5", "access_token": token})
+    except RuntimeError:
+        return None
+    first = text.strip().splitlines()[0].strip() if text.strip() else ""
+    for t in res.get("data", []):
+        if first and (t.get("text") or "").strip().startswith(first):
+            return t["id"]
+    return None
+
+
 def publish(token, user_id, text, photos, reply_to, base, topic=""):
     params = {"access_token": token, "text": text}
     if topic:
@@ -149,11 +162,18 @@ def publish(token, user_id, text, photos, reply_to, base, topic=""):
                           {"creation_id": container["id"], "access_token": token})
             return result["id"]
         except RuntimeError as e:
-            # 'does not exist'(4279009)는 쓰레드 쪽 준비가 덜 된 일시 오류 → 잠시 뒤 다시
-            if "4279009" not in str(e) or attempt == 2:
+            # 'does not exist'(4279009): 오류가 나도 실제로는 올라가 있는 경우가 있음 (11/19 중복 게시)
+            # → 다시 올리기 전에 내 최근 글에 같은 글이 있는지 먼저 확인
+            if "4279009" not in str(e):
                 raise
-            print(f"   ⚠️ 쓰레드 준비 덜 됨, 15초 뒤 다시 시도 ({attempt + 1}/3)")
             time.sleep(15)
+            found = already_posted(token, text)
+            if found:
+                print(f"   ⚠️ 오류가 났지만 이미 올라가 있음 → 그 글로 처리 ({found})")
+                return found
+            if attempt == 2:
+                raise
+            print(f"   ⚠️ 쓰레드 준비 덜 됨, 다시 시도 ({attempt + 1}/3)")
             if len(photos) > 1:
                 container = call("POST", f"/{user_id}/threads", params)
 
