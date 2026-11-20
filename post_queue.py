@@ -242,6 +242,12 @@ def parse_file(path):
         add = "\n\n써본 거 전부 모아둔 곳 👉 " + HUB_URL
         if "coupang.com" in last["text"] and len(last["text"]) + len(add) <= 500:
             last["text"] += add
+    # 쿠팡 링크 글: 본문 끝에 '링크는 이어쓰기에' 안내 (11/21 클릭 0 → 링크가 있는 줄 모르는 문제)
+    if len(parts) > 1 and "(광고)" in parts[0]["text"] and "👇" not in parts[0]["text"] \
+            and any("link.coupang.com" in p["text"] for p in parts[1:]):
+        add = "\n\n👇 링크는 이어쓰기(댓글)에 있음"
+        if len(parts[0]["text"]) + len(add) <= 500:
+            parts[0]["text"] += add
     return parts
 
 
