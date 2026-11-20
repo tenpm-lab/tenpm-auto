@@ -41,6 +41,10 @@ def body(path):
 
 def cat(fn, topic, first):
     if "_save_" in fn: return "💰 싸게 사는 법"
+    if "_tech_" in fn: return "🛠 테크"
+    if "_side_" in fn: return "💸 돈·부업 정보"
+    if "_result_" in fn: return "📢 결과 공유"
+    if "_luck_" in fn or "_kkiri" in fn: return "🍀 행운·끼리끼리"
     if "(광고)" in first: return "🛒 상품"
     if "_am_" in fn: return "☀️ 아침 공감"
     if "weekly" in fn or first.startswith("[AI한테"): return "📈 주간 정리"
