@@ -38,6 +38,15 @@ jobs:
         run: |
           if [ "${{ github.event.inputs.mode }}" = "알림테스트" ]; then python post_queue.py 알림테스트; else python post_queue.py; fi
 
+      - name: 쿠팡 전용 계정 글 올리기 (토큰 있을 때만)
+        if: always()
+        env:
+          THREADS_TOKEN: ${{ secrets.THREADS_TOKEN_DEAL }}
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+          ACCOUNT: deal
+        run: |
+          if [ -n "$THREADS_TOKEN" ] && [ -d posts/deal/queue ]; then python post_queue.py; else echo "쿠팡 계정 미설정 - 건너뜀"; fi
+
       - name: 팔로워 수 기록 (바뀌었을 때만)
         if: always()
         env:

@@ -35,10 +35,13 @@ from datetime import datetime, timedelta, timezone
 API = "https://graph.threads.net/v1.0"
 KST = timezone(timedelta(hours=9))
 HERE = os.path.dirname(os.path.abspath(__file__))
-QUEUE = os.path.join(HERE, "posts", "queue")
-DONE = os.path.join(HERE, "posts", "done")
+# ACCOUNT=deal 이면 쿠팡 전용 계정(posts/deal/...)으로 동작
+ACC = os.environ.get("ACCOUNT", "").strip()
+PBASE = os.path.join(HERE, "posts", ACC) if ACC else os.path.join(HERE, "posts")
+QUEUE = os.path.join(PBASE, "queue")
+DONE = os.path.join(PBASE, "done")
 IMAGES = os.path.join(HERE, "images")
-LOG = os.path.join(HERE, "posts", "posted_log.txt")
+LOG = os.path.join(PBASE, "posted_log.txt")
 
 
 # ---------- 설정 ----------
