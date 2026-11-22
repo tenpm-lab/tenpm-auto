@@ -20,7 +20,8 @@ from datetime import datetime, timedelta, timezone
 API = "https://graph.threads.net/v1.0"
 KST = timezone(timedelta(hours=9))
 HERE = os.path.dirname(os.path.abspath(__file__))
-STATS = os.path.join(HERE, "stats")
+STATS = os.path.join(HERE, "stats", os.environ["ACCOUNT"]) if os.environ.get("ACCOUNT") else os.path.join(HERE, "stats")
+os.makedirs(STATS, exist_ok=True)
 POST_METRICS = "views,likes,replies,reposts,quotes,shares"
 
 

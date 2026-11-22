@@ -31,6 +31,13 @@ jobs:
           NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
           NOTIFY_SUMMARY: ${{ github.event_name == 'schedule' && '1' || '0' }}
         run: python insights.py
+      - name: 부계정 성과 수집 (토큰 있을 때만)
+        continue-on-error: true
+        env:
+          THREADS_TOKEN: ${{ secrets.THREADS_TOKEN_DEAL }}
+          ACCOUNT: deal
+          NOTIFY_SUMMARY: "0"
+        run: if [ -n "$THREADS_TOKEN" ]; then python insights.py; fi
       - name: 쿠팡 수집
         continue-on-error: true
         env:
