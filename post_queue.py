@@ -303,6 +303,12 @@ def preview():
 def run():
     now = datetime.now(KST)
     due = [f for f in queue_files() if (due_time(f) or now + timedelta(days=999)) <= now]
+    if ACC:
+        # 쿠파스 부계정: 3시간 넘게 밀린 글은 한꺼번에 올리지 않는다 (계정 연결 전 쌓인 글 방지, 일요일 작업이 날짜 다시 잡음)
+        stale = [f for f in due if now - due_time(f) > timedelta(hours=3)]
+        if stale:
+            print("밀린 글은 건너뜀:", ", ".join(os.path.basename(f) for f in stale))
+        due = [f for f in due if f not in stale]
     if not due:
         print(f"{now:%m/%d %H:%M} 올릴 시간이 된 글이 없어요.")
         return
