@@ -211,6 +211,33 @@ def dump(keywords):
               ensure_ascii=False, indent=1)
 
 
+def save_image(key, tag):
+    """'싸게 사는 법' 글용 사진: 쿠팡 검색 1위 상품 대표 사진을 정사각형으로 (글자·가격 없이) images/deal/<tag>.jpg"""
+    try:
+        from PIL import Image
+        got = items(call("GET", f"{BASE}/products/search",
+                         "keyword=" + urllib.parse.quote(key + " 대용량") + "&limit=5&subId=img"))
+        src = next((it.get("productImage") for it in got if it.get("productImage")), None)
+        if not src:
+            return None
+        os.makedirs(os.path.join(HERE, "images", "deal"), exist_ok=True)
+        out = os.path.join(HERE, "images", "deal", tag + ".jpg")
+        req = urllib.request.Request(src, headers={"User-Agent": "Mozilla/5.0"})
+        with urllib.request.urlopen(req, timeout=30) as r, open(out + ".src", "wb") as f:
+            f.write(r.read())
+        im = Image.open(out + ".src").convert("RGB")
+        w, h = im.size
+        side = max(w, h)
+        bg = Image.new("RGB", (side, side), "white")
+        bg.paste(im, ((side - w) // 2, (side - h) // 2))
+        bg.resize((1080, 1080)).save(out, quality=90)
+        os.remove(out + ".src")
+        return f"deal/{tag}.jpg"
+    except Exception as e:
+        print("사진 실패", key, str(e)[:80])
+        return None
+
+
 def links():
     """deal/links.txt 의 '이름|쿠팡주소' 줄마다 짧은 파트너 링크를 만들어 curate/links.json 에 (긴 링크·코드 저장 안 함)"""
     now = datetime.datetime.now(KST)
@@ -223,6 +250,9 @@ def links():
             res = call("POST", f"{BASE}/deeplink", body={"coupangUrls": [url], "subId": f"sv{now:%m%d}{n:02d}"})
             d = items(res)
             out[key] = {"link": d[0].get("shortenUrl") if d else None, "subId": f"sv{now:%m%d}{n:02d}"}
+            img = save_image(key, f"sv{now:%m%d}{n:02d}")
+            if img:
+                out[key]["image"] = img
         except Exception as e:
             out[key] = {"error": str(e)[:80]}
     json.dump(out, open(os.path.join(HERE, "curate", "links.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
