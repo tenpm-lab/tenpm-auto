@@ -25,7 +25,8 @@ jobs:
         env:
           COUPANG_ACCESS_KEY: ${{ secrets.COUPANG_ACCESS_KEY }}
           COUPANG_SECRET_KEY: ${{ secrets.COUPANG_SECRET_KEY }}
-        run: python coupang_links.py $(cat links_mode.txt 2>/dev/null)
+        run: |
+          ACCOUNT=$(sed -n 2p links_mode.txt) python coupang_links.py $(sed -n 1p links_mode.txt)
       - name: 저장
         if: always()
         run: |

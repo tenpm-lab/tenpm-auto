@@ -56,7 +56,7 @@ def main():
         try:
             sub = "cu" + now.strftime("%m%d") + pid[-5:]
             res = call("POST", f"{BASE}/deeplink",
-                       body={"coupangUrls": [f"https://www.coupang.com/vp/products/{pid}"], "subId": sub})
+                       body={"coupangUrls": [f"https://www.coupang.com/vp/products/{pid}"], "subId": "ssageitem01"})
             d = items_of(res)
             if d:
                 row["short_link"] = d[0].get("shortenUrl")

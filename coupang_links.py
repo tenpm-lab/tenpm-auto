@@ -15,7 +15,9 @@ import urllib.request
 from coupang_stats import BASE, call
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-QUEUE = os.path.join(HERE, "posts", "queue")
+QUEUE = os.path.join(HERE, "posts", *([os.environ["ACCOUNT"]] if os.environ.get("ACCOUNT") else []), "queue")
+# 쿠팡에 등록한 채널 아이디만 클릭·정산이 잡힘 (미등록 subId 는 정산 제외) — 11/22 등록
+REG = {"ssagesave01", "ssageitem01", "tenpmblog01"}
 OUT = os.path.join(HERE, "stats", "links.csv")
 SHORT = re.compile(r"https://link\.coupang\.com/a/[A-Za-z0-9]+")
 
@@ -47,6 +49,12 @@ def resolve(short):
 
 
 def sub_id(name):
+    if os.environ.get("ACCOUNT") == "deal":
+        return "ssagesave01" if "_save_" in name else "ssageitem01"
+    return "tenpmblog01"
+
+
+def _old_sub_id(name):
     m = re.match(r"\d{4}(\d{4})-(\d{2})\d{2}_(\w+)\.txt", name)
     if not m:
         return re.sub(r"[^A-Za-z0-9]", "", name)[:20]
@@ -60,7 +68,7 @@ def main(apply):
         with open(OUT, encoding="utf-8-sig") as f:
             for r in list(csv.DictReader(f)):
                 done[(r["파일"], r["원래링크"])] = r
-    made = {r.get("새링크") for r in done.values() if r.get("새링크")}
+    made = {r.get("새링크") for r in done.values() if r.get("새링크") and r.get("subId") in REG}
     for name in sorted(os.listdir(QUEUE)):
         path = os.path.join(QUEUE, name)
         text = open(path, encoding="utf-8").read()
@@ -69,7 +77,7 @@ def main(apply):
             if short in made:  # 이미 꼬리표 붙은 링크는 다시 안 엶 (클릭 수 부풀리기 방지)
                 continue
             key = (name, short)
-            if key in done and done[key].get("새링크"):
+            if key in done and done[key].get("새링크") and done[key].get("subId") == sub_id(name):
                 new = done[key]["새링크"]
             else:
                 sid = sub_id(name)

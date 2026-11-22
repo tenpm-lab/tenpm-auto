@@ -184,7 +184,7 @@ def run(n, dest_dir, hhmm=None):
         os.makedirs(os.path.join(HERE, "images", "deal"), exist_ok=True)
         photo = f"deal/{d['pid']}.jpg"
         make_image(d, os.path.join(HERE, "images", photo))
-        lk = link(d["pid"], "dl" + now.strftime("%m%d") + d["pid"][-5:])
+        lk = link(d["pid"], "ssageitem01")
         if not lk:
             notes.append(f"{kw}: 링크 실패")
             continue
@@ -238,7 +238,7 @@ def save_image(key, tag):
         bg.paste(im, ((side - w) // 2, (side - h) // 2))
         bg.resize((1080, 1080)).save(out, quality=90)
         os.remove(out + ".src")
-        return f"deal/{tag}.jpg", link(str(it["productId"]), tag + "p")
+        return f"deal/{tag}.jpg", link(str(it["productId"]), "ssagesave01")
     except Exception as e:
         print("사진 실패", key, str(e)[:80])
         return None, None
@@ -253,9 +253,9 @@ def links():
             continue
         key, url = [x.strip() for x in line.split("|", 1)]
         try:
-            res = call("POST", f"{BASE}/deeplink", body={"coupangUrls": [url], "subId": f"sv{now:%m%d}{n:02d}"})
+            res = call("POST", f"{BASE}/deeplink", body={"coupangUrls": [url], "subId": "ssagesave01"})
             d = items(res)
-            out[key] = {"link": d[0].get("shortenUrl") if d else None, "subId": f"sv{now:%m%d}{n:02d}"}
+            out[key] = {"link": d[0].get("shortenUrl") if d else None, "subId": "ssagesave01"}
             img, item = save_image(key, f"sv{now:%m%d}{n:02d}")
             if img:
                 out[key]["image"] = img

@@ -9,7 +9,7 @@ from coupang_links import resolve
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SPEC = json.load(open(os.path.join(HERE, "bio", "items.json"), encoding="utf-8"))
-CACHE_P = os.path.join(HERE, "bio", "links_bio.json")
+CACHE_P = os.path.join(HERE, "bio", "links_bio2.json")
 cache = json.load(open(CACHE_P, encoding="utf-8")) if os.path.exists(CACHE_P) else {}
 opened = 0
 errors = []
@@ -24,7 +24,7 @@ for cat in SPEC["cats"]:
             url = it.get("url")
             if not url:
                 url = resolve(it["short"]); opened += 1
-            res = call("POST", f"{BASE}/deeplink", body={"coupangUrls": [url], "subId": "bio"})
+            res = call("POST", f"{BASE}/deeplink", body={"coupangUrls": [url], "subId": "tenpmblog01"})
             link = (res.get("data") or [{}])[0].get("shortenUrl", "")
             if not link:
                 raise RuntimeError(str(res)[:200])
