@@ -8,6 +8,7 @@
 import csv, glob, os, collections, datetime, sys
 
 MODE = sys.argv[1] if len(sys.argv) > 1 else "main"
+if MODE == "donetable" and os.environ.get("ACCOUNT"): MODE = "done"  # 부계정은 올린 글 표 + 본문 같이
 HERE = os.path.dirname(os.path.abspath(__file__))
 P = lambda *a: os.path.join(HERE, *a)
 FENCE = "`" * 3
@@ -86,6 +87,10 @@ if MODE == "main":
     print("\n## 📅 올릴 글 (예약)\n")
     print("| 날짜 | 카테고리 | 첫 줄 |\n|---|---|---|")
     for f, fn, c, first in q: print(f"| {d(fn)} | {c} | {esc(first)} |")
+    if os.environ.get("ACCOUNT"):  # 부계정 탭: 올릴 글 본문 전부 (일요일 작업이 '## 📝' 이하를 잘라도 남도록 다른 머리말)
+        print("\n## 🗒️ 올릴 글 본문\n")
+        for f, fn, c, first in q:
+            print(f"### {d(fn)} · {c}\n\n{FENCE}\n{body(f)}\n{FENCE}\n")
     print("\n## 📝 올릴 글 본문 (다음 7일)\n")
     until = (datetime.datetime.now() + datetime.timedelta(days=7)).strftime("%Y%m%d")
     for f, fn, c, first in q:
