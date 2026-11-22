@@ -1,0 +1,13 @@
+name: 부계정 토큰 확인
+on:
+  push:
+    paths: [".github/workflows/whoami.yml"]
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          T: ${{ secrets.THREADS_TOKEN_DEAL }}
+        run: |
+          curl -s "https://graph.threads.net/v1.0/me?fields=username&access_token=$T" | python3 -c "import sys,json;d=json.load(sys.stdin);print('계정:',d.get('username') or d.get('error',{}).get('message'))"
+          curl -s "https://graph.threads.net/v1.0/debug_token?input_token=$T&access_token=$T" | python3 -c "import sys,json,datetime;d=json.load(sys.stdin).get('data',{});e=d.get('expires_at');print('만료:',datetime.datetime.fromtimestamp(e) if e else d)" || true
