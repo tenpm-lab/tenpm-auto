@@ -59,11 +59,11 @@ def d(fn): return f"{fn[4:6]}/{fn[6:8]} {fn[9:11]}:{fn[11:13]}"
 
 
 done, q = [], []
-for f in sorted(glob.glob(P("posts", "done", "*.txt"))):
+for f in sorted(glob.glob(P("posts", *([os.environ["ACCOUNT"]] if os.environ.get("ACCOUNT") else []), "done", "*.txt"))):
     fn = os.path.basename(f); topic, first = parse(f)
     if first and not first.startswith("[1/"):
         done.append((f, fn, cat(fn, topic, first), first, stats.get(first)))
-for f in sorted(glob.glob(P("posts", "queue", "*.txt"))):
+for f in sorted(glob.glob(P("posts", *([os.environ["ACCOUNT"]] if os.environ.get("ACCOUNT") else []), "queue", "*.txt"))):
     fn = os.path.basename(f); topic, first = parse(f)
     q.append((f, fn, cat(fn, topic, first), first))
 
