@@ -220,7 +220,7 @@ def save_image(key, tag):
     try:
         from PIL import Image
         got = items(call("GET", f"{BASE}/products/search",
-                         "keyword=" + urllib.parse.quote(key + " 대용량") + "&limit=10&subId=img"))
+                         "keyword=" + urllib.parse.quote(key) + "&limit=10&subId=img"))
         it = next((x for x in got if x.get("productImage")
                    and not any(b in str(x.get("productName", "")) for b in BAD)
                    and not re.search(r"(1[5-9]|[2-9]\d)\s*L", str(x.get("productName", "")))), None)
