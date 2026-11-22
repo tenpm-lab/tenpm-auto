@@ -44,7 +44,7 @@ def resolve(short):
             break
     u = urllib.parse.urlparse(url)
     q = urllib.parse.parse_qs(u.query)
-    keep = {k: q[k][0] for k in ("itemId", "vendorItemId") if k in q}
+    keep = {k: q[k][0] for k in ("itemId", "vendorItemId", "q") if k in q}
     return urllib.parse.urlunparse(("https", "www.coupang.com", u.path, "", urllib.parse.urlencode(keep), ""))
 
 
