@@ -34,8 +34,16 @@ jobs:
           GH_SECRETS_PAT: ${{ secrets.GH_SECRETS_PAT }}
           NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
         run: python token_refresh.py
+      - name: 쿠파스 부계정 연장 (토큰 있을 때만)
+        if: always()
+        env:
+          THREADS_TOKEN: ${{ secrets.THREADS_TOKEN_DEAL }}
+          SECRET_NAME: THREADS_TOKEN_DEAL
+          GH_SECRETS_PAT: ${{ secrets.GH_SECRETS_PAT }}
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+        run: python token_refresh.py
       - name: 기록 저장
-        if: success()
+        if: always()
         run: |
           git config user.name "tenpm-bot"
           git config user.email "github-actions[bot]@users.noreply.github.com"

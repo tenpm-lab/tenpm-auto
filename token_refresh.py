@@ -47,8 +47,11 @@ def fail(msg):
 
 
 def main():
+    SECRET = os.environ.get("SECRET_NAME", "THREADS_TOKEN").strip()
     old = os.environ.get("THREADS_TOKEN", "").strip()
     if not old:
+        if SECRET != "THREADS_TOKEN":
+            print("부계정 토큰 없음 - 건너뜀"); return
         fail("THREADS_TOKEN 없음")
     if not os.environ.get("GH_SECRETS_PAT", "").strip():
         fail("GH_SECRETS_PAT 없음 (GitHub 비밀값에 넣어야 함)")
@@ -75,7 +78,7 @@ def main():
         key = gh("GET", f"/repos/{REPO}/actions/secrets/public-key")
         box = public.SealedBox(public.PublicKey(key["key"].encode(), encoding.Base64Encoder()))
         enc = base64.b64encode(box.encrypt(new.encode())).decode()
-        gh("PUT", f"/repos/{REPO}/actions/secrets/THREADS_TOKEN", {"encrypted_value": enc, "key_id": key["key_id"]})
+        gh("PUT", f"/repos/{REPO}/actions/secrets/" + SECRET, {"encrypted_value": enc, "key_id": key["key_id"]})
     except urllib.error.HTTPError as e:
         fail(f"GitHub 비밀값 교체 실패 ({e.code}) — GH_SECRETS_PAT 권한 확인")
 
@@ -83,7 +86,7 @@ def main():
     print("✅", msg)
     notify("🔑 쓰레드 토큰 연장 완료", msg)
     with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "posts", "token_log.txt"), "a", encoding="utf-8") as f:
-        f.write(f"{datetime.now(KST):%Y-%m-%d %H:%M}\t연장 성공\t만료 {until:%Y-%m-%d}\n")
+        f.write(f"{datetime.now(KST):%Y-%m-%d %H:%M}\t{SECRET} 연장 성공\t만료 {until:%Y-%m-%d}\n")
 
 
 if __name__ == "__main__":
