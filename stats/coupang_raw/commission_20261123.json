@@ -19,6 +19,15 @@
    "order": 0,
    "cancel": 0,
    "click": 1
+  },
+  {
+   "date": "20261122",
+   "subId": "ssagesave01",
+   "commission": 0.0,
+   "gmv": 0.0,
+   "order": 0,
+   "cancel": 0,
+   "click": 1
   }
  ]
 }
