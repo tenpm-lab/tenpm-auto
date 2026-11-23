@@ -44,6 +44,10 @@ PALETTES = {
                       CARD="#2a1f1b", ONACC="#1d1512", QBG="#ff8a5b", QTXT="#1d1512", ALT="#a8968a", FOOT="#a8968a", DOT="#ff8a5b"),
     "threads": dict(BG="#17121f", INK="#ffffff", SUB="#b3aac4", ACC="#b69cff", SOFT="#2c2438", LINE="#3a3048", MINT="#241c30",
                     CARD="#221a2e", ONACC="#17121f", QBG="#b69cff", QTXT="#17121f", ALT="#8f86a3", FOOT="#8f86a3", DOT="#b69cff", BARS=["#3a3048", "#6b5a96", "#9a82e0", "#b69cff"]),
+    # AI 무료 활용 가이드 (make_thumb.py ai 와 같은 남색 + 하늘색)
+    "ai": dict(BG="#0e1a24", INK="#ffffff", SUB="#a3b8c6", ACC="#4fd1ff", SOFT="#1c2e3c", LINE="#1f3140", MINT="#142330",
+               CARD="#142330", ONACC="#0e1a24", QBG="#4fd1ff", QTXT="#0e1a24", ALT="#7f97a8", FOOT="#7f97a8", DOT="#4fd1ff",
+               BARS=["#1f3140", "#2f6f8f", "#3aa8d8", "#4fd1ff"]),
     # 쿠팡파트너스 가이드 (make_thumb.py coupang 과 같은 남색 + 노랑). 표지는 make_thumb.py 로
     "coupang": dict(BG="#12141b", INK="#ffffff", SUB="#aab0bd", ACC="#f5c400", SOFT="#22262f", LINE="#2a2e3a", MINT="#1a1d25",
                     CARD="#1a1d25", ONACC="#12141b", QBG="#f5c400", QTXT="#12141b", ALT="#8a909c", FOOT="#8a909c", DOT="#f5c400", BARS=["#2a2e3a", "#7a6a20", "#c9a300", "#f5c400"]),

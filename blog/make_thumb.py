@@ -2,7 +2,7 @@
 """
 블로그 대표 이미지 (시리즈마다 색이 다름)
   python blog/make_thumb.py 출력.jpg "라벨" "윗줄|아랫줄" "부제" [시리즈]
-시리즈: coupang(쿠팡파트너스 가이드) / affiliate(제휴 프로그램 가이드, 코랄) / threads(쓰레드 가이드) / desk(직장인템 가이드) / ep(AI가 시키는 대로 연재)
+시리즈: ai(AI 무료 활용 가이드, 하늘색) / coupang(쿠팡파트너스 가이드) / affiliate(제휴 프로그램 가이드, 코랄) / threads(쓰레드 가이드) / desk(직장인템 가이드) / ep(AI가 시키는 대로 연재)
 시리즈를 안 주면 라벨 글자로 알아서 고름. 일상·생활 정보는 make_thumb_life.py / make_cards.py (크림 톤)
 """
 import sys
@@ -17,6 +17,7 @@ SERIES = {
     "threads": dict(bg="#17121f", acc="#b69cff", lab_txt="#17121f", ink="#ffffff", sub="#b3aac4", line="#2c2438", clock="#f5f5f5", foot="tenpm.lab · 쓰레드 가이드"),
     "desk":    dict(bg="#0f1d1a", acc="#5fd3a5", lab_txt="#0f1d1a", ink="#ffffff", sub="#a3bdb5", line="#21352f", clock="#f5f5f5", foot="tenpm.lab · 직장인템"),
     "affiliate": dict(bg="#1d1512", acc="#ff8a5b", lab_txt="#1d1512", ink="#ffffff", sub="#c4b0a6", line="#3a2a24", clock="#f5f5f5", foot="tenpm.lab · 제휴 프로그램 가이드"),
+    "ai":      dict(bg="#0e1a24", acc="#4fd1ff", lab_txt="#0e1a24", ink="#ffffff", sub="#a3b8c6", line="#1f3140", clock="#f5f5f5", foot="tenpm.lab · AI 무료 활용"),
     "ep":      dict(bg="#f4efe6", acc="#e2463a", lab_txt="#ffffff", ink="#1c1c1c", sub="#6b645b", line="#ddd4c6", clock="#1c1c1c", foot="tenpm.lab · AI가 시키는 대로 연재"),
 }
 
@@ -26,6 +27,8 @@ def f(p, s):
 
 
 def guess(label):
+    if "AI" in label:
+        return "ai"
     if "EP" in label or "시키는 대로" in label:
         return "ep"
     if "쓰레드" in label:
