@@ -277,7 +277,43 @@ def goldbox():
     json.dump(out, open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "curate", "goldbox.json"), "w"), ensure_ascii=False, indent=1)
     print("골드박스", out["count"], out["keys"])
 
+
+GOLD_OK = ("생활용품", "식품", "뷰티", "출산", "유아", "주방", "반려", "세제", "헬스")
+GOLD_EMOJI = {"생활용품": "🧻", "식품": "🍽", "뷰티": "🧴", "출산": "👶", "유아": "👶", "주방": "🍳", "반려": "🐾", "헬스": "💪"}
+
+
+def goldpost():
+    """부계정 '오늘의 골드박스' 글 (매일 아침 자동). 할인율은 API에 없어서 안 씀 — '하루 특가'라는 사실만."""
+    now = datetime.datetime.utcnow() + datetime.timedelta(hours=9)
+    q = os.path.join(os.path.dirname(os.path.abspath(__file__)), "posts", "deal", "queue")
+    fn = os.path.join(q, f"{now:%Y%m%d}-0900_gold.txt")
+    if os.path.exists(fn):
+        print("이미 있음"); return
+    res = call("GET", f"{BASE}/products/goldbox", "subId=ssageitem01&imageSize=512x512")
+    data = res.get("data") or []
+    pick = [d for d in data if any(k in (d.get("categoryName") or "") for k in GOLD_OK)]
+    pick = (pick + [d for d in data if d not in pick])[:3]
+    if len(pick) < 3:
+        print("골드박스 상품 부족", len(data)); return
+    rows = []
+    for d in pick:
+        lk = link(str(d["productId"]), "ssageitem01")
+        if not lk:
+            print("링크 실패"); return
+        em = next((v for k, v in GOLD_EMOJI.items() if k in (d.get("categoryName") or "")), "🛒")
+        rows.append((em, short(d["productName"]), lk))
+    body = ["주제: 생활꿀템", "오늘 쿠팡 골드박스에 생필품 뭐 떴는지 앎? (광고)", ""]
+    body += [f"{em} {nm}" for em, nm, _ in rows]
+    body += ["", "골드박스는 하루 특가라 내일이면 바뀜", "필요한 거 있으면 오늘 보기", "---"]
+    for i, (em, nm, lk) in enumerate(rows, 1):
+        body += [f"{i}. {nm}", f"👉 {lk}", ""]
+    body += ["가격은 링크에서 꼭 확인!", "", "이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다."]
+    open(fn, "w").write("\n".join(body) + "\n")
+    print("골드박스 글", fn, [r[1] for r in rows])
+
 if __name__ == "__main__":
+    if len(sys.argv) > 1 and sys.argv[1] == "goldpost":
+        goldpost(); sys.exit()
     if len(sys.argv) > 1 and sys.argv[1] == "goldbox":
         goldbox(); sys.exit()
     arg = sys.argv[1] if len(sys.argv) > 1 else "sample"
