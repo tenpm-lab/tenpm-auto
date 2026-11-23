@@ -232,7 +232,7 @@ def pretty(im):
     px = list(t.getdata())
     white = sum(1 for r, g, b in px if r > 240 and g > 240 and b > 240) / len(px)
     big = min(1.0, min(im.size) / 800)
-    return round((1 - white) * 0.8 + big * 0.2, 3)
+    return round(0.5 + (1 - white) * 0.3 + big * 0.2, 3)
 
 
 def text_words(im):
@@ -284,7 +284,7 @@ def save_image(key, tag):
                 continue
             pr = pretty(im)
             tw = text_words(im)
-            pr = round(pr - (0.4 if tw >= 4 else 0.1 if tw >= 2 else 0), 3)  # 글자 많은 배너·스펙표는 감점
+            pr = round(pr - (0.6 if tw >= 4 else 0.15 if tw >= 2 else 0), 3)  # 글자 많은 배너·스펙표는 감점
             x["_pretty"] = pr
             x["_rank"] = pr + 0.25 * (score(x) - need)  # 검색어가 더 많이 맞으면 조금 가산
             scored.append((x, im))
@@ -298,6 +298,7 @@ def save_image(key, tag):
         global LAST_NAME
         LAST_NAME = str(it.get("productName", ""))
         os.makedirs(os.path.join(HERE, "images", "deal"), exist_ok=True)
+        tag = f"{tag}_{it['productId']}"
         out = os.path.join(HERE, "images", "deal", tag + ".jpg")
         w, h = im.size
         side = max(w, h)
@@ -307,8 +308,15 @@ def save_image(key, tag):
         # 괜찮은 사진 여러 장 (11/23 Ssuii: "괜찮은 사진 여러장을 넣어도 되지않아? 독자들이 보고 판단할 수 있게")
         # 1등 말고도 점수 0.45 이상인 다른 상품 최대 2개 → 넘겨보기 2·3번. 사진마다 자기 상품 링크
         MORE.clear()
-        rest = sorted([z for z in scored if z[0] is not it and z[0]["_rank"] >= 0.45], key=lambda z: -z[0]["_rank"])
-        for j, (x, xim) in enumerate(rest[:2], start=2):
+        rest = sorted([z for z in scored if z[0] is not it and z[0]["_pretty"] >= 0.75], key=lambda z: -z[0]["_rank"])
+        seen = {str(it.get("productName", ""))[:15]}
+        uniq = []
+        for z in rest:  # 이름이 같은 상품(색상만 다른 것)은 한 번만
+            nm = str(z[0].get("productName", ""))[:15]
+            if nm not in seen:
+                seen.add(nm)
+                uniq.append(z)
+        for j, (x, xim) in enumerate(uniq[:2], start=2):
             w, h = xim.size
             side = max(w, h)
             bg = Image.new("RGB", (side, side), "white")
