@@ -47,6 +47,14 @@ jobs:
         run: |
           if [ -n "$THREADS_TOKEN" ] && [ -d posts/deal/queue ]; then python post_queue.py; else echo "쿠팡 계정 미설정 - 건너뜀"; fi
 
+      - name: 부계정 댓글 자동 답장 ("어디서 사요?" 같은 댓글에 링크)
+        if: always()
+        continue-on-error: true
+        env:
+          THREADS_TOKEN: ${{ secrets.THREADS_TOKEN_DEAL }}
+          ACCOUNT: deal
+        run: python autoreply.py
+
       - name: 팔로워 수 기록 (바뀌었을 때만)
         if: always()
         env:
@@ -58,6 +66,6 @@ jobs:
         run: |
           git config user.name "tenpm-bot"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -A posts stats/followers.csv
+          git add -A posts stats/followers.csv stats/deal/replied.txt 2>/dev/null || git add -A posts stats/followers.csv
           git diff --cached --quiet || git commit -m "자동 게시 기록"
           for i in 1 2 3 4 5; do git pull --rebase -X theirs && git push && break; sleep 5; done
