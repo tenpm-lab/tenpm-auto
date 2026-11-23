@@ -1,8 +1,10 @@
 {
- "트리플모니터": {
-  "link": "https://link.coupang.com/a/iUtT7habro",
-  "subId": "ssagesave01",
-  "image": "deal/sv112300.jpg",
-  "item_link": "https://link.coupang.com/a/iUtUlg92u4"
+ "테스트A": {
+  "link": "https://link.coupang.com/a/iUt7EXLnZk",
+  "subId": "ssagesave01"
+ },
+ "테스트B": {
+  "link": "https://link.coupang.com/a/iUt7JQSCVo",
+  "subId": "ssagesave01"
  }
 }
