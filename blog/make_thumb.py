@@ -17,7 +17,7 @@ SERIES = {
     "threads": dict(bg="#17121f", acc="#b69cff", lab_txt="#17121f", ink="#ffffff", sub="#b3aac4", line="#2c2438", clock="#f5f5f5", foot="tenpm.lab · 쓰레드 가이드"),
     "desk":    dict(bg="#0f1d1a", acc="#5fd3a5", lab_txt="#0f1d1a", ink="#ffffff", sub="#a3bdb5", line="#21352f", clock="#f5f5f5", foot="tenpm.lab · 직장인템"),
     "affiliate": dict(bg="#1d1512", acc="#ff8a5b", lab_txt="#1d1512", ink="#ffffff", sub="#c4b0a6", line="#3a2a24", clock="#f5f5f5", foot="tenpm.lab · 제휴 프로그램 가이드"),
-    "ai":      dict(bg="#0e1a24", acc="#4fd1ff", lab_txt="#0e1a24", ink="#ffffff", sub="#a3b8c6", line="#1f3140", clock="#f5f5f5", foot="tenpm.lab · AI 무료 활용"),
+    "ai":      dict(bg="#0e1a24", acc="#4fd1ff", lab_txt="#0e1a24", ink="#ffffff", sub="#a3b8c6", line="#1f3140", clock="#f5f5f5", foot="tenpm.lab · AI 정보"),
     "ep":      dict(bg="#f4efe6", acc="#e2463a", lab_txt="#ffffff", ink="#1c1c1c", sub="#6b645b", line="#ddd4c6", clock="#1c1c1c", foot="tenpm.lab · AI가 시키는 대로 연재"),
 }
 
@@ -47,6 +47,7 @@ def fit(d, text, path, size, maxw):
 
 
 def make(out, label, lines, sub, series=None):
+    label = label.replace("AI 무료 활용", "AI 정보")  # 11/23 Ssuii: 시리즈 이름은 "AI 정보"
     c = SERIES[series or guess(label)]
     W = 1080
     im = Image.new("RGB", (W, W), c["bg"])
