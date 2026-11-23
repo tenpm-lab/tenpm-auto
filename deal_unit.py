@@ -9,6 +9,7 @@
 """
 import datetime, glob, json, os, re, statistics, sys, urllib.parse, urllib.request, zlib
 LAST_NAME = ""
+VIDEO_ON = False  # 11/23 확대 영상 품질 별로 → 끔. 더 나은 영상 방식 정해지면 켜기
 from coupang_stats import BASE, call
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -272,7 +273,7 @@ def links():
                 out[key]["image"] = img
                 out[key]["item_name"] = LAST_NAME[:60]  # 글 쓸 때 상품이 맞는지 보라고
                 # 사진 1장 vs 영상+사진 넘겨보기 실험 (11/23): 두 번째 키마다 "영상, 사진" 2장 묶음. 글의 '사진:' 줄에 그대로 쓰면 됨
-                if n % 2 == 1:
+                if VIDEO_ON and n % 2 == 1:
                     vid = make_video(img)
                     if vid:
                         out[key]["photo"] = img
