@@ -289,6 +289,8 @@ def goldpost():
     fn = os.path.join(q, f"{now:%Y%m%d}-0900_gold.txt")
     if os.path.exists(fn):
         print("이미 있음"); return
+    if f"{now:%Y%m%d}" < "20261126":  # 부계정 워밍업(링크 없이) 기간
+        print("워밍업 기간 - 쉼"); return
     res = call("GET", f"{BASE}/products/goldbox", "subId=ssageitem01&imageSize=512x512")
     data = res.get("data") or []
     pick = [d for d in data if any(k in (d.get("categoryName") or "") for k in GOLD_OK)]
