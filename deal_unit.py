@@ -271,12 +271,12 @@ def links():
             if img:
                 out[key]["image"] = img
                 out[key]["item_name"] = LAST_NAME[:60]  # 글 쓸 때 상품이 맞는지 보라고
-                # 사진 vs 짧은 영상 실험 (11/23): 두 번째 키마다 사진 대신 6초 영상. 글의 '사진:' 줄에 그대로 쓰면 영상으로 올라감
+                # 사진 1장 vs 영상+사진 넘겨보기 실험 (11/23): 두 번째 키마다 "영상, 사진" 2장 묶음. 글의 '사진:' 줄에 그대로 쓰면 됨
                 if n % 2 == 1:
                     vid = make_video(img)
                     if vid:
                         out[key]["photo"] = img
-                        out[key]["image"] = vid
+                        out[key]["image"] = f"{vid}, {img}"
             if item:
                 out[key]["item_link"] = item
         except Exception as e:
