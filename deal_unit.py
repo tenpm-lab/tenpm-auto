@@ -271,12 +271,35 @@ def links():
             if img:
                 out[key]["image"] = img
                 out[key]["item_name"] = LAST_NAME[:60]  # 글 쓸 때 상품이 맞는지 보라고
+                # 사진 vs 짧은 영상 실험 (11/23): 두 번째 키마다 사진 대신 6초 영상. 글의 '사진:' 줄에 그대로 쓰면 영상으로 올라감
+                if n % 2 == 1:
+                    vid = make_video(img)
+                    if vid:
+                        out[key]["photo"] = img
+                        out[key]["image"] = vid
             if item:
                 out[key]["item_link"] = item
         except Exception as e:
             out[key] = {"error": str(e)[:80]}
     json.dump(out, open(os.path.join(HERE, "curate", "links.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
     made(out.values())
+
+
+def make_video(img):
+    """상품 사진 → 6초 천천히 다가가는 영상 (1080x1080, 무음 오디오 포함). 반환 'deal/xxx.mp4'"""
+    import subprocess
+    src = os.path.join(HERE, "images", img)
+    dst = src.rsplit(".", 1)[0] + ".mp4"
+    vf = ("scale=1440:1440,zoompan=z='min(zoom+0.0006,1.10)':d=180:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)'"
+          ":s=1080x1080:fps=30,format=yuv420p")
+    try:
+        subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-loop", "1", "-i", src, "-f", "lavfi", "-i", "anullsrc=r=44100:cl=stereo",
+                        "-vf", vf, "-t", "6", "-c:v", "libx264", "-preset", "veryfast", "-crf", "23", "-c:a", "aac", "-b:a", "64k",
+                        "-shortest", "-movflags", "+faststart", dst], check=True, timeout=120)
+        return img.rsplit(".", 1)[0] + ".mp4"
+    except Exception as e:
+        print("영상 실패", str(e)[:80])
+        return None
 
 
 def made(vals):

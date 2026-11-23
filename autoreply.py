@@ -6,7 +6,7 @@
 - 답글에도 광고 표시.
 post.yml 이 15분마다 부를 때 같이 돈다 (THREADS_TOKEN = 부계정 토큰, ACCOUNT=deal).
 """
-import os, re, sys
+import os, random, re, sys
 from datetime import datetime, timedelta, timezone
 
 os.environ.setdefault("ACCOUNT", "deal")
@@ -21,6 +21,16 @@ LINK = re.compile(r"https://link\.coupang\.com/a/\w+")
 WANT = ("링크", "ㄹㅋ", "어디서", "어디 ", "어디꺼", "어디거", "어디서사", "제품명", "상품명", "모델명", "정보", "구매", "살 수", "사고싶", "사고 싶",
         "주문", "판매", "얼마", "가격", "알려주", "공유", "브랜드", "이름이", "뭐예요", "뭐에요", "뭔가요", "궁금")
 MAX_PER_RUN = 5
+# 답글은 매번 조금씩 다르게 (11/23 Ssuii: "답변도 매번 조금씩 다르게 하는거지?")
+REPLIES = [
+    "여기 있음 👉 {l}",
+    "링크 여기! 👉 {l}",
+    "이거임 👇\n{l}",
+    "요기서 보면 됨 👉 {l}",
+    "바로 가는 링크 👉 {l}",
+    "찾던 거 여기 있음 👀\n{l}",
+    "여기서 가격까지 볼 수 있음 👉 {l}",
+]
 
 
 def post_links():
@@ -67,7 +77,7 @@ def main():
                 continue
             if not any(w in text.replace("  ", " ") for w in WANT):
                 continue
-            reply = f"여기 있음 👉 {links[post['id']]}\n(쿠팡 파트너스 활동으로 수수료를 받을 수 있음)"
+            reply = random.choice(REPLIES).format(l=links[post['id']]) + "\n(쿠팡 파트너스 활동으로 수수료를 받을 수 있음)"
             try:
                 publish(token, me["id"], reply, [], cid, "")
                 sent += 1
