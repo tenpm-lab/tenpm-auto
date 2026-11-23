@@ -279,17 +279,48 @@ def goldbox():
 
 
 GOLD_OK = ("생활용품", "식품", "뷰티", "출산", "유아", "주방", "반려", "세제", "헬스")
-GOLD_EMOJI = {"생활용품": "🧻", "식품": "🍽", "뷰티": "🧴", "출산": "👶", "유아": "👶", "주방": "🍳", "반려": "🐾", "헬스": "💪"}
+# 종류별 "그 사람의 순간" 첫 줄 (11/23 Ssuii가 ④ 콕 집어 부르기 고름, ① 가격 맞히기와 번갈아 실험)
+GOLD_HOOK = [
+    (("화장지", "휴지", "물티슈", "키친타월"), "{n} 떨어질 때마다 급하게 사는 사람 손 🙋"),
+    (("세제", "유연제", "세탁"), "빨래할 때마다 {n} 얼마 남았나 보는 사람 손 🙋"),
+    (("식품", "음료", "커피", "두유", "콜라", "생수"), "냉장고에 {n} 떨어지면 불안한 사람 손 🙋"),
+    (("뷰티", "로션", "크림", "샴푸", "바디"), "겨울마다 {n} 통째로 바르는 사람 손 🙋"),
+    (("출산", "유아", "기저귀", "분유"), "{n} 한 달에 몇 통씩 쓰는 집 손 🙋"),
+]
+
+
+def gold_photo(d, tag):
+    try:
+        from PIL import Image
+        out = os.path.join(os.path.dirname(os.path.abspath(__file__)), "images", "deal", f"{tag}.jpg")
+        req = urllib.request.Request(d["productImage"], headers={"User-Agent": "Mozilla/5.0"})
+        open(out + ".src", "wb").write(urllib.request.urlopen(req, timeout=20).read())
+        im = Image.open(out + ".src").convert("RGB")
+        side = max(im.size)
+        bg = Image.new("RGB", (side, side), "white")
+        bg.paste(im, ((side - im.size[0]) // 2, (side - im.size[1]) // 2))
+        bg.resize((1080, 1080)).save(out, quality=90)
+        os.remove(out + ".src")
+        return f"deal/{tag}.jpg"
+    except Exception as e:
+        print("사진 실패", e)
+        return None
 
 
 def goldpost():
-    """부계정 '오늘의 골드박스' 글 (매일 아침 자동). 할인율은 API에 없어서 안 씀 — '하루 특가'라는 사실만."""
+    """부계정 '오늘의 골드박스' 글 (매일 아침 자동, 09:00). 할인율은 API에 없어서 안 씀.
+    형식은 날짜 홀짝으로 번갈아: 짝수 = ④ 콕 집어 부르기 / 홀수 = ① 가격 맞히기. 일요일 리포트에서 클릭 비교."""
     now = datetime.datetime.utcnow() + datetime.timedelta(hours=9)
     q = os.path.join(os.path.dirname(os.path.abspath(__file__)), "posts", "deal", "queue")
-    fn = os.path.join(q, f"{now:%Y%m%d}-0900_gold.txt")
-    if os.path.exists(fn):
+    fmt = "call" if now.day % 2 == 0 else "price"
+    fn = os.path.join(q, f"{now:%Y%m%d}-0900_gold_{fmt}.txt")
+    test = os.environ.get("GOLD_TEST")  # 테스트: 두 형식 모두 curate/ 에만 써봄
+    if test:
+        fmt = test
+        fn = os.path.join(os.path.dirname(q), "..", "..", "curate", f"gold_test_{fmt}.txt")
+    elif glob.glob(os.path.join(q, f"{now:%Y%m%d}-0900_gold*")):
         print("이미 있음"); return
-    if f"{now:%Y%m%d}" < "20261126":  # 부계정 워밍업(링크 없이) 기간
+    elif f"{now:%Y%m%d}" < "20261126":  # 부계정 워밍업(링크 없이) 기간
         print("워밍업 기간 - 쉼"); return
     res = call("GET", f"{BASE}/products/goldbox", "subId=ssageitem01&imageSize=512x512")
     data = res.get("data") or []
@@ -302,16 +333,26 @@ def goldpost():
         lk = link(str(d["productId"]), "ssageitem01")
         if not lk:
             print("링크 실패"); return
-        em = next((v for k, v in GOLD_EMOJI.items() if k in (d.get("categoryName") or "")), "🛒")
-        rows.append((em, short(d["productName"]), lk))
-    body = ["주제: 생활꿀템", "오늘 쿠팡 골드박스에 생필품 뭐 떴는지 앎? (광고)", ""]
-    body += [f"{em} {nm}" for em, nm, _ in rows]
-    body += ["", "골드박스는 하루 특가라 내일이면 바뀜", "필요한 거 있으면 오늘 보기", "---"]
-    for i, (em, nm, lk) in enumerate(rows, 1):
-        body += [f"{i}. {nm}", f"👉 {lk}", ""]
-    body += ["가격은 링크에서 꼭 확인!", "", "이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다."]
+        rows.append((short(d["productName"]), lk, d))
+    top_nm, top_lk, top = rows[0]
+    word = top_nm.split()[0] if fmt == "call" else top_nm
+    hay = top_nm + " " + (top.get("categoryName") or "")
+    hook = next((h for keys, h in GOLD_HOOK if any(k in hay for k in keys)), "{n} 쟁여두는 사람 손 🙋")
+    photo = gold_photo(top, f"gold_{now:%Y%m%d}")
+    body = ["주제: 생활꿀템"] + ([f"사진: {photo}"] if photo else [])
+    if fmt == "call":
+        body += [hook.format(n=word) + " (광고)", "", "오늘 쿠팡 하루 특가에 떴음", "내일 아침이면 목록에서 빠짐", "", "같이 뜬 생필품 2개 더 있음 👀", "---",
+                 f"{top_nm}", f"👉 {top_lk}", ""]
+    else:
+        body += [f"이거 오늘 얼마일 것 같아? (광고)", "", f"{top_nm}", "", "생각한 가격 하나 정하고 이어쓰기 열어보기 👀", "---",
+                 f"정답: {int(top['productPrice']):,}원", f"(오늘 아침 쿠팡 골드박스 기준, 내일이면 바뀜)", f"👉 {top_lk}", ""]
+    body += ["같이 뜬 거"]
+    for nm, lk, _ in rows[1:]:
+        body += [f"· {nm}", f"👉 {lk}"]
+    body += ["", "가격은 링크에서 꼭 확인!", "", "이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다."]
     open(fn, "w").write("\n".join(body) + "\n")
-    print("골드박스 글", fn, [r[1] for r in rows])
+    print("골드박스 글", fmt, fn, [r[0] for r in rows])
+
 
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == "goldpost":
