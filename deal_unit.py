@@ -269,7 +269,13 @@ def save_image(key, tag):
             nm = str(x.get("productName", "")).replace(" ", "")
             return sum(t.replace(" ", "") in nm for t in toks)
         need = min(2, len(toks))
-        cands = sorted([x for x in ok if score(x) >= need], key=score, reverse=True)
+        # 숫자 든 낱말(3화면, 2구, 10m 등)은 꼭 맞아야 함 (11/23 '3화면' 검색에 일반 모니터 사진 걸림)
+        SYN = {"3화면": ("3화면", "트리플", "3면"), "2화면": ("2화면", "듀얼", "2면")}
+        must = [t for t in toks if re.search(r"\d", t)]
+        def has_must(x):
+            nm = str(x.get("productName", "")).replace(" ", "")
+            return all(any(a in nm for a in SYN.get(t, (t,))) for t in must)
+        cands = sorted([x for x in ok if score(x) >= need and has_must(x)], key=score, reverse=True)
         if not cands:
             print("검색어와 맞는 상품 없음", key, ok and ok[0].get("productName"))
             return None, None
