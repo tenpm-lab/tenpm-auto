@@ -9,6 +9,7 @@
 """
 import datetime, glob, json, os, re, statistics, sys, urllib.parse, urllib.request, zlib
 LAST_NAME = ""
+SHEET = None  # imgtest 때만 후보 사진 모음
 VIDEO_ON = False  # 11/23 확대 영상 품질 별로 → 끔. 더 나은 영상 방식 정해지면 켜기
 from coupang_stats import BASE, call
 
@@ -216,6 +217,23 @@ def dump(keywords):
 BAD = ("업소용", "업소", "식당", "말통", "드럼", "대형마트용", "pallet")
 
 
+def fetch_img(url):
+    from PIL import Image
+    import io
+    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+    with urllib.request.urlopen(req, timeout=30) as r:
+        return Image.open(io.BytesIO(r.read())).convert("RGB")
+
+
+def pretty(im):
+    """0~1. 흰 배경이 적고(실사용 장면), 해상도가 크고, 색이 너무 단조롭지 않을수록 높음"""
+    t = im.resize((120, 120))
+    px = list(t.getdata())
+    white = sum(1 for r, g, b in px if r > 240 and g > 240 and b > 240) / len(px)
+    big = min(1.0, min(im.size) / 800)
+    return round((1 - white) * 0.8 + big * 0.2, 3)
+
+
 def save_image(key, tag):
     """'싸게 사는 법' 글용 사진 + 그 상품 링크: 쿠팡 검색(품목 대용량) 상위 중 가정용 상품 하나.
     사진은 글자·가격 없이 정사각형으로 images/deal/<tag>.jpg. 반환 (사진경로, 상품 짧은 링크)"""
@@ -231,25 +249,38 @@ def save_image(key, tag):
         def score(x):
             nm = str(x.get("productName", "")).replace(" ", "")
             return sum(t.replace(" ", "") in nm for t in toks)
-        it = max(ok, key=score) if ok else None
         need = min(2, len(toks))
-        if not it or score(it) < need:
-            print("검색어와 맞는 상품 없음", key, it and it.get("productName"))
+        cands = sorted([x for x in ok if score(x) >= need], key=score, reverse=True)
+        if not cands:
+            print("검색어와 맞는 상품 없음", key, ok and ok[0].get("productName"))
             return None, None
+        # 예쁜 사진 고르기 (11/23 Ssuii: "불러올때 이쁜 사진을 좀 불러오자"):
+        # 검색어가 맞는 상품들 사진을 다 받아서, 흰 배경 단독컷보다 실제 쓰는 장면(배경 있는 사진)을 우선
+        best = None
+        for x in cands[:8]:
+            try:
+                im = fetch_img(x["productImage"])
+            except Exception:
+                continue
+            pr = pretty(im)
+            x["_pretty"] = pr
+            x["_rank"] = pr + 0.25 * (score(x) - need)  # 검색어가 더 많이 맞으면 조금 가산
+            if best is None or x["_rank"] > best[0]["_rank"]:
+                best = (x, im, pr)
+            if SHEET is not None:
+                SHEET.append((im, f'{pr:.2f} / {score(x)}'))
+        if not best:
+            return None, None
+        it, im, _ = best
         global LAST_NAME
         LAST_NAME = str(it.get("productName", ""))
         os.makedirs(os.path.join(HERE, "images", "deal"), exist_ok=True)
         out = os.path.join(HERE, "images", "deal", tag + ".jpg")
-        req = urllib.request.Request(it["productImage"], headers={"User-Agent": "Mozilla/5.0"})
-        with urllib.request.urlopen(req, timeout=30) as r, open(out + ".src", "wb") as f:
-            f.write(r.read())
-        im = Image.open(out + ".src").convert("RGB")
         w, h = im.size
         side = max(w, h)
         bg = Image.new("RGB", (side, side), "white")
         bg.paste(im, ((side - w) // 2, (side - h) // 2))
         bg.resize((1080, 1080)).save(out, quality=90)
-        os.remove(out + ".src")
         return f"deal/{tag}.jpg", link(str(it["productId"]), "ssagesave01")
     except Exception as e:
         print("사진 실패", key, str(e)[:80])
@@ -350,7 +381,6 @@ def gold_photo(d, tag):
         bg = Image.new("RGB", (side, side), "white")
         bg.paste(im, ((side - im.size[0]) // 2, (side - im.size[1]) // 2))
         bg.resize((1080, 1080)).save(out, quality=90)
-        os.remove(out + ".src")
         return f"deal/{tag}.jpg"
     except Exception as e:
         print("사진 실패", e)
@@ -413,6 +443,23 @@ if __name__ == "__main__":
     arg = sys.argv[1] if len(sys.argv) > 1 else "sample"
     if arg == "links":
         links()
+    elif arg == "imgtest":
+        # deal/links.txt 키마다 후보 사진 모음판 → curate/imgtest_N.jpg (링크는 안 만듦)
+        from PIL import Image, ImageDraw
+        keys = [l.split("|")[0].strip() for l in open(os.path.join(HERE, "deal", "links.txt"), encoding="utf-8") if "|" in l]
+        os.makedirs(os.path.join(HERE, "curate"), exist_ok=True)
+        global_link = link
+        link = lambda *a, **k: None  # noqa: E731  테스트라 파트너 링크는 안 만듦
+        for i, k in enumerate(keys):
+            SHEET = []
+            img, _ = save_image(k, f"test_{i}")
+            sheet = Image.new("RGB", (4 * 300, 2 * 330), "white")
+            d = ImageDraw.Draw(sheet)
+            for j, (im, lab) in enumerate(SHEET[:8]):
+                sheet.paste(im.resize((290, 290)), ((j % 4) * 300 + 5, (j // 4) * 330 + 5))
+                d.text(((j % 4) * 300 + 10, (j // 4) * 330 + 300), lab, fill="black")
+            sheet.save(os.path.join(HERE, "curate", f"imgtest_{i}.jpg"), quality=85)
+            print(k, "→", img, LAST_NAME[:40])
     elif arg == "dump":
         dump([("하기스 기저귀", "기저귀"), ("하기스 기저귀 대용량", "기저귀"), ("팸퍼스 기저귀", "기저귀"),
               ("기저귀 소형 팩", "기저귀"), ("보솜이 기저귀", "기저귀")])
