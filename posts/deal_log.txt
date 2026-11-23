@@ -4,3 +4,4 @@
 2026-11-22 | save | 물티슈 | sv112200 | 20261124-2200_save_wipes.txt
 2026-11-22 | save | 세탁세제 | sv112201 | 20261126-2200_save_detergent.txt
 2026-11-22 | save | 키친타월 | sv112202 | 20261128-2200_save_kitchentowel.txt
+2026-11-23 | find | 노트북 트리플 모니터 | ssagesave01 | 20261130-2200_find_triple.txt
