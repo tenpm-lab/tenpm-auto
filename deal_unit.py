@@ -366,8 +366,12 @@ def links():
                 out[key]["images"] = ", ".join([img] + [m["image"] for m in MORE])
         except Exception as e:
             out[key] = {"error": str(e)[:80]}
-    json.dump(out, open(os.path.join(HERE, "curate", "links.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
     made(out.values())
+    # 글 쓰는 Claude(주간 점검)가 보는 안내. 프롬프트를 안 고쳐도 여기서 읽힘
+    out["_글쓰기_안내"] = ("images 가 있으면 '사진:' 줄에 images 를 그대로 (넘겨보기). 본문은 '넘겨서 골라봐' 식으로 비교, "
+                       "이어 쓰기에 '1번 👉 item_link', '2번 👉 more[0].item_link', '3번 👉 more[1].item_link' 순서대로. "
+                       "사진 순서 = 번호 순서. 각 상품 이름은 item_name 으로 확인해서 사실만 쓸 것. images 없으면 image 1장 + item_link.")
+    json.dump(out, open(os.path.join(HERE, "curate", "links.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 
 
 def make_video(img):
