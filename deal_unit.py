@@ -9,6 +9,7 @@
 """
 import datetime, glob, json, os, re, statistics, sys, urllib.parse, urllib.request, zlib
 LAST_NAME = ""
+MORE = []  # save_image 가 고른 2·3번 사진 (다른 상품)
 SHEET = None  # imgtest 때만 후보 사진 모음
 VIDEO_ON = False  # 11/23 확대 영상 품질 별로 → 끔. 더 나은 영상 방식 정해지면 켜기
 from coupang_stats import BASE, call
@@ -275,6 +276,7 @@ def save_image(key, tag):
         # 예쁜 사진 고르기 (11/23 Ssuii: "불러올때 이쁜 사진을 좀 불러오자"):
         # 검색어가 맞는 상품들 사진을 다 받아서, 흰 배경 단독컷보다 실제 쓰는 장면(배경 있는 사진)을 우선
         best = None
+        scored = []
         for x in cands[:8]:
             try:
                 im = fetch_img(x["productImage"])
@@ -285,6 +287,7 @@ def save_image(key, tag):
             pr = round(pr - (0.4 if tw >= 4 else 0.1 if tw >= 2 else 0), 3)  # 글자 많은 배너·스펙표는 감점
             x["_pretty"] = pr
             x["_rank"] = pr + 0.25 * (score(x) - need)  # 검색어가 더 많이 맞으면 조금 가산
+            scored.append((x, im))
             if best is None or x["_rank"] > best[0]["_rank"]:
                 best = (x, im, pr)
             if SHEET is not None:
@@ -301,6 +304,18 @@ def save_image(key, tag):
         bg = Image.new("RGB", (side, side), "white")
         bg.paste(im, ((side - w) // 2, (side - h) // 2))
         bg.resize((1080, 1080)).save(out, quality=90)
+        # 괜찮은 사진 여러 장 (11/23 Ssuii: "괜찮은 사진 여러장을 넣어도 되지않아? 독자들이 보고 판단할 수 있게")
+        # 1등 말고도 점수 0.45 이상인 다른 상품 최대 2개 → 넘겨보기 2·3번. 사진마다 자기 상품 링크
+        MORE.clear()
+        rest = sorted([z for z in scored if z[0] is not it and z[0]["_rank"] >= 0.45], key=lambda z: -z[0]["_rank"])
+        for j, (x, xim) in enumerate(rest[:2], start=2):
+            w, h = xim.size
+            side = max(w, h)
+            bg = Image.new("RGB", (side, side), "white")
+            bg.paste(xim, ((side - w) // 2, (side - h) // 2))
+            bg.resize((1080, 1080)).save(os.path.join(HERE, "images", "deal", f"{tag}_{j}.jpg"), quality=90)
+            MORE.append({"image": f"deal/{tag}_{j}.jpg", "item_link": link(str(x["productId"]), "ssagesave01"),
+                         "item_name": str(x.get("productName", ""))[:60]})
         return f"deal/{tag}.jpg", link(str(it["productId"]), "ssagesave01")
     except Exception as e:
         print("사진 실패", key, str(e)[:80])
@@ -331,6 +346,10 @@ def links():
                         out[key]["image"] = f"{vid}, {img}"
             if item:
                 out[key]["item_link"] = item
+            if img and MORE:
+                # 넘겨보기용: images 를 '사진:' 줄에 그대로, 이어 쓰기에 1번·2번·3번 링크를 순서대로
+                out[key]["more"] = list(MORE)
+                out[key]["images"] = ", ".join([img] + [m["image"] for m in MORE])
         except Exception as e:
             out[key] = {"error": str(e)[:80]}
     json.dump(out, open(os.path.join(HERE, "curate", "links.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
@@ -365,6 +384,9 @@ def made(vals):
             for k in ("link", "item_link"):
                 if v.get(k):
                     w.write(f"{datetime.date.today():%Y%m%d},{v.get('subId', '')},{v[k]}\n")
+            for m in v.get("more", []):
+                if m.get("item_link"):
+                    w.write(f"{datetime.date.today():%Y%m%d},{v.get('subId', '')},{m['item_link']}\n")
 
 
 def goldbox():
