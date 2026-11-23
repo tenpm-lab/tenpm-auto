@@ -7,7 +7,8 @@
 '보통(중간값)보다 몇 % 싼지'를 첫 줄에 넣는다. 숫자는 전부 API 가격 그대로.
 원본 응답·긴 링크(AF 코드)는 저장하지 않는다.
 """
-import datetime, glob, json, os, re, statistics, sys, urllib.parse, urllib.request
+import datetime, glob, json, os, re, statistics, sys, urllib.parse, urllib.request, zlib
+LAST_NAME = ""
 from coupang_stats import BASE, call
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -221,11 +222,21 @@ def save_image(key, tag):
         from PIL import Image
         got = items(call("GET", f"{BASE}/products/search",
                          "keyword=" + urllib.parse.quote(key) + "&limit=10&subId=img"))
-        it = next((x for x in got if x.get("productImage")
-                   and not any(b in str(x.get("productName", "")) for b in BAD)
-                   and not re.search(r"(1[5-9]|[2-9]\d)\s*L", str(x.get("productName", "")))), None)
-        if not it:
+        ok = [x for x in got if x.get("productImage")
+              and not any(b in str(x.get("productName", "")) for b in BAD)
+              and not re.search(r"(1[5-9]|[2-9]\d)\s*L", str(x.get("productName", "")))]
+        # 사진이 검색어랑 맞는 상품인지: 검색어 낱말이 상품명에 가장 많이 든 것 (11/23 '노트북 확장 모니터' → 일반 노트북 사진 사고)
+        toks = [t for t in re.split(r"\s+", key) if len(t) >= 2 and t not in ("대용량", "추천", "가정용")]
+        def score(x):
+            nm = str(x.get("productName", "")).replace(" ", "")
+            return sum(t.replace(" ", "") in nm for t in toks)
+        it = max(ok, key=score) if ok else None
+        need = min(2, len(toks))
+        if not it or score(it) < need:
+            print("검색어와 맞는 상품 없음", key, it and it.get("productName"))
             return None, None
+        global LAST_NAME
+        LAST_NAME = str(it.get("productName", ""))
         os.makedirs(os.path.join(HERE, "images", "deal"), exist_ok=True)
         out = os.path.join(HERE, "images", "deal", tag + ".jpg")
         req = urllib.request.Request(it["productImage"], headers={"User-Agent": "Mozilla/5.0"})
@@ -256,9 +267,10 @@ def links():
             res = call("POST", f"{BASE}/deeplink", body={"coupangUrls": [url], "subId": "ssagesave01"})
             d = items(res)
             out[key] = {"link": d[0].get("shortenUrl") if d else None, "subId": "ssagesave01"}
-            img, item = save_image(key, f"sv{now:%m%d}{n:02d}")
+            img, item = save_image(key, f"sv{now:%m%d}_{zlib.crc32(key.encode()) % 100000:05d}")
             if img:
                 out[key]["image"] = img
+                out[key]["item_name"] = LAST_NAME[:60]  # 글 쓸 때 상품이 맞는지 보라고
             if item:
                 out[key]["item_link"] = item
         except Exception as e:
