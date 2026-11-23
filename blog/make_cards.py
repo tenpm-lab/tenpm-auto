@@ -43,10 +43,10 @@ PALETTES = {
     "affiliate": dict(BG="#1d1512", INK="#ffffff", SUB="#c4b0a6", ACC="#ff8a5b", SOFT="#3a2a24", LINE="#4a3830", MINT="#2a1f1b",
                       CARD="#2a1f1b", ONACC="#1d1512", QBG="#ff8a5b", QTXT="#1d1512", ALT="#a8968a", FOOT="#a8968a", DOT="#ff8a5b"),
     "threads": dict(BG="#17121f", INK="#ffffff", SUB="#b3aac4", ACC="#b69cff", SOFT="#2c2438", LINE="#3a3048", MINT="#241c30",
-                    CARD="#221a2e", ONACC="#17121f", QBG="#b69cff", QTXT="#17121f", ALT="#8f86a3", FOOT="#8f86a3", DOT="#b69cff"),
+                    CARD="#221a2e", ONACC="#17121f", QBG="#b69cff", QTXT="#17121f", ALT="#8f86a3", FOOT="#8f86a3", DOT="#b69cff", BARS=["#3a3048", "#6b5a96", "#9a82e0", "#b69cff"]),
     # 쿠팡파트너스 가이드 (make_thumb.py coupang 과 같은 남색 + 노랑). 표지는 make_thumb.py 로
     "coupang": dict(BG="#12141b", INK="#ffffff", SUB="#aab0bd", ACC="#f5c400", SOFT="#22262f", LINE="#2a2e3a", MINT="#1a1d25",
-                    CARD="#1a1d25", ONACC="#12141b", QBG="#f5c400", QTXT="#12141b", ALT="#8a909c", FOOT="#8a909c", DOT="#f5c400"),
+                    CARD="#1a1d25", ONACC="#12141b", QBG="#f5c400", QTXT="#12141b", ALT="#8a909c", FOOT="#8a909c", DOT="#f5c400", BARS=["#2a2e3a", "#7a6a20", "#c9a300", "#f5c400"]),
 }
 
 
