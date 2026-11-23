@@ -234,6 +234,24 @@ def pretty(im):
     return round((1 - white) * 0.8 + big * 0.2, 3)
 
 
+def text_words(im):
+    """사진 속 글자 덩어리 수 (스펙표·광고 배너 거르기). tesseract 없으면 0"""
+    import subprocess, tempfile
+    try:
+        with tempfile.NamedTemporaryFile(suffix=".png") as f:
+            im.convert("L").resize((900, 900)).save(f.name)
+            out = subprocess.run(["tesseract", f.name, "-", "-l", "kor+eng", "--psm", "11", "tsv"],
+                                 capture_output=True, text=True, timeout=60).stdout.splitlines()[1:]
+    except Exception:
+        return 0
+    n = 0
+    for line in out:
+        c = line.split("\t")
+        if len(c) == 12 and len(c[11].strip()) >= 2 and float(c[10]) > 70:
+            n += 1
+    return n
+
+
 def save_image(key, tag):
     """'싸게 사는 법' 글용 사진 + 그 상품 링크: 쿠팡 검색(품목 대용량) 상위 중 가정용 상품 하나.
     사진은 글자·가격 없이 정사각형으로 images/deal/<tag>.jpg. 반환 (사진경로, 상품 짧은 링크)"""
@@ -263,6 +281,8 @@ def save_image(key, tag):
             except Exception:
                 continue
             pr = pretty(im)
+            tw = text_words(im)
+            pr = round(pr - (0.4 if tw >= 4 else 0.1 if tw >= 2 else 0), 3)  # 글자 많은 배너·스펙표는 감점
             x["_pretty"] = pr
             x["_rank"] = pr + 0.25 * (score(x) - need)  # 검색어가 더 많이 맞으면 조금 가산
             if best is None or x["_rank"] > best[0]["_rank"]:
