@@ -42,8 +42,9 @@ def good_links():
             ok.add(r["링크"])
     try:
         for v in json.load(open(P("curate", "links.json"), encoding="utf-8")).values():
-            if v.get("subId") in REG:
+            if isinstance(v, dict) and v.get("subId") in REG:
                 ok.update(x for x in (v.get("link"), v.get("item_link")) if x)
+                ok.update(m["item_link"] for m in v.get("more", []) if m.get("item_link"))
     except Exception:
         pass
     for f in glob.glob(P("curate", "links_bio2.json")):
