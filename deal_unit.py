@@ -265,7 +265,21 @@ def links():
             out[key] = {"error": str(e)[:80]}
     json.dump(out, open(os.path.join(HERE, "curate", "links.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 
+
+def goldbox():
+    """골드박스 테스트: 할인율·원래 가격이 오는지 필드만 확인 (주소·코드는 저장 안 함)"""
+    res = call("GET", f"{BASE}/products/goldbox", "subId=ssageitem01&imageSize=512x512")
+    data = res.get("data") or []
+    if isinstance(data, dict):
+        data = data.get("productData") or []
+    out = {"count": len(data), "keys": sorted(set(k for d in data for k in d)) if data else [], "rCode": res.get("rCode"), "rMessage": res.get("rMessage"),
+           "sample": [{k: v for k, v in d.items() if "url" not in k.lower() and "image" not in k.lower() and "tracking" not in k.lower()} for d in data[:8]]}
+    json.dump(out, open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "curate", "goldbox.json"), "w"), ensure_ascii=False, indent=1)
+    print("골드박스", out["count"], out["keys"])
+
 if __name__ == "__main__":
+    if len(sys.argv) > 1 and sys.argv[1] == "goldbox":
+        goldbox(); sys.exit()
     arg = sys.argv[1] if len(sys.argv) > 1 else "sample"
     if arg == "links":
         links()
