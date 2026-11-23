@@ -276,6 +276,20 @@ def links():
         except Exception as e:
             out[key] = {"error": str(e)[:80]}
     json.dump(out, open(os.path.join(HERE, "curate", "links.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+    made(out.values())
+
+
+def made(vals):
+    """만든 쿠팡 링크 장부 (daily_check.py 가 '등록 채널로 만든 링크'인지 볼 때 씀)"""
+    f = os.path.join(HERE, "stats", "links_made.csv")
+    new = not os.path.exists(f)
+    with open(f, "a", encoding="utf-8") as w:
+        if new:
+            w.write("만든날,subId,링크\n")
+        for v in vals:
+            for k in ("link", "item_link"):
+                if v.get(k):
+                    w.write(f"{datetime.date.today():%Y%m%d},{v.get('subId', '')},{v[k]}\n")
 
 
 def goldbox():
@@ -346,6 +360,7 @@ def goldpost():
         if not lk:
             print("링크 실패"); return
         rows.append((short(d["productName"]), lk, d))
+        made([{"link": lk, "subId": "ssageitem01"}])
     top_nm, top_lk, top = rows[0]
     word = top_nm.split()[0] if fmt == "call" else top_nm
     hay = top_nm + " " + (top.get("categoryName") or "")

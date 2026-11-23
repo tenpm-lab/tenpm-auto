@@ -46,10 +46,19 @@ jobs:
           NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
           NOTIFY_SUMMARY: ${{ github.event_name == 'schedule' && '1' || '0' }}
         run: python coupang_stats.py
+      - name: 부계정 매일 점검 (조회는 있는데 클릭 0이면 원인 찾기·조치)
+        continue-on-error: true
+        env:
+          COUPANG_ACCESS_KEY: ${{ secrets.COUPANG_ACCESS_KEY }}
+          COUPANG_SECRET_KEY: ${{ secrets.COUPANG_SECRET_KEY }}
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+        run: |
+          python daily_check.py
+          if [ -f stats/deal/relink.flag ]; then ACCOUNT=deal python coupang_links.py 적용 && rm stats/deal/relink.flag; fi
       - name: 기록 저장
         if: success()
         run: |
           git config user.name "tenpm-bot"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add stats
+          git add stats posts/deal
           git diff --cached --quiet || (git commit -m "성과 수집" && git pull --rebase && git push)
