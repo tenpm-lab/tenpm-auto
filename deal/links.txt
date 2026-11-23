@@ -1,2 +1,2 @@
-테스트A|https://www.coupang.com/np/search?q=%EB%85%B8%ED%8A%B8%EB%B6%81%20%ED%99%95%EC%9E%A5%20%EB%AA%A8%EB%8B%88%ED%84%B0%203%ED%99%94%EB%A9%B4
-테스트B|https://www.coupang.com/np/search?q=%EC%A0%91%EC%9D%B4%EC%8B%9D%20%ED%82%A4%EB%B3%B4%EB%93%9C
+노트북 확장 모니터 3화면|https://www.coupang.com/np/search?q=%EB%85%B8%ED%8A%B8%EB%B6%81%20%ED%99%95%EC%9E%A5%20%EB%AA%A8%EB%8B%88%ED%84%B0%203%ED%99%94%EB%A9%B4
+접이식 키보드|https://www.coupang.com/np/search?q=%EC%A0%91%EC%9D%B4%EC%8B%9D%20%ED%82%A4%EB%B3%B4%EB%93%9C
