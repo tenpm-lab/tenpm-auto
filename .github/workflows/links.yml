@@ -26,7 +26,7 @@ jobs:
           COUPANG_ACCESS_KEY: ${{ secrets.COUPANG_ACCESS_KEY }}
           COUPANG_SECRET_KEY: ${{ secrets.COUPANG_SECRET_KEY }}
         run: |
-          ACCOUNT=$(sed -n 2p links_mode.txt) python coupang_links.py $(sed -n 1p links_mode.txt)
+          if [ "$(sed -n 1p links_mode.txt)" = "새로" ]; then ACCOUNT=deal python relink_fresh.py; else ACCOUNT=$(sed -n 2p links_mode.txt) python coupang_links.py $(sed -n 1p links_mode.txt); fi
       - name: 저장
         if: always()
         run: |
