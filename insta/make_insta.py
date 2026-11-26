@@ -53,7 +53,15 @@ def rich(d, xy, text, fnt, ink, acc):
         x += d.textlength(part, font=fnt)
 
 
-def wrap_rich(d, text, fnt, maxw):
+def fit_lines(d, text, path, size, maxw, minsize=34):
+    """\n 기준 줄 그대로. 가장 긴 줄이 maxw 안에 들어갈 때까지 글씨를 줄임"""
+    lines = text.split("\n")
+    while size > minsize and max(d.textlength(l.replace("**", ""), font=font(path, size)) for l in lines) > maxw:
+        size -= 2
+    return lines, font(path, size), size
+
+
+def wrap_rich_old(d, text, fnt, maxw):
     """강조 표시를 유지한 채 줄바꿈 (강조 구간이 줄을 넘으면 양쪽에 ** 다시 붙임)"""
     lines = wrap(d, text.replace("**", "\u0001"), fnt, maxw) if False else None
     plain = text.replace("**", "")
@@ -111,6 +119,15 @@ def frame(c, i, n):
     return im, d
 
 
+def block(d, x, y, text, path, size, maxw, ink, acc, lh=1.32):
+    """\n 으로 나눈 줄을 끊지 않고 그림 (넘치면 글씨 크기를 줄임). 다음 y 반환"""
+    lines, fnt, sz = fit_lines(d, text, path, size, maxw)
+    for line in lines:
+        rich(d, (x, y), line, fnt, ink, acc)
+        y += int(sz * lh)
+    return y
+
+
 def make(spec, outdir):
     c = PAL[spec.get("series", "ai")]
     cards = spec["cards"]
@@ -126,97 +143,78 @@ def make(spec, outdir):
         if t == "cover":
             fk = font(B, 40)
             kw = d.textlength(cd["kicker"], font=fk)
-            d.rounded_rectangle((PAD, 300, PAD + kw + 56, 376), radius=38, fill=c["acc"])
-            d.text((PAD + 28, 310), cd["kicker"], font=fk, fill=c["acc_ink"])
-            if cd.get("badge"):
-                fb = font(B, 40)
-                bw = d.textlength(cd["badge"], font=fb)
-                bx = PAD + kw + 80
-                d.rounded_rectangle((bx, 300, bx + bw + 56, 376), radius=38, fill=c["warn"])
-                d.text((bx + 28, 310), cd["badge"], font=fb, fill=c["bg"])
-            y = 450
-            for k, line in enumerate(cd["title"]):
-                fs = 124
-                while d.textlength(line, font=font(B, fs)) > maxw:
-                    fs -= 6
-                d.text((PAD, y), line, font=font(B, fs), fill=c["acc"] if k == len(cd["title"]) - 1 else c["ink"])
-                y += int(fs * 1.28)
-            for line in wrap(d, cd.get("sub", ""), font(M, 46), maxw):
-                d.text((PAD, y + 30), line, font=font(M, 46), fill=c["sub"])
-                y += 62
+            d.rounded_rectangle((PAD, 0, PAD + kw + 56, 76), radius=38, fill=c["acc"])
+            d.text((PAD + 28, 10), cd["kicker"], font=fk, fill=c["acc_ink"])
+            y = 150
+            title = "\n".join(cd["title"][:-1] + ["**" + cd["title"][-1] + "**"])
+            y = block(d, PAD, y, title, B, 128, maxw, c["ink"], c["acc"], 1.25)
+            y = block(d, PAD, y + 30, cd.get("sub", ""), M, 48, maxw, c["sub"], c["acc"])
             hint = "넘겨서 보기  →"
             fh = font(B, 38)
             d0.text((W - PAD - d0.textlength(hint, font=fh), H - PAD - 120), hint, font=fh, fill=c["acc"])
         elif t == "point":
-            y = 250
+            y = 0
             if cd.get("num"):
                 d.text((PAD, y), cd["num"], font=font(B, 150), fill=c["acc"])
                 y += 210
-            for line in wrap_rich(d, cd["title"], font(B, 92), maxw):
-                rich(d, (PAD, y), line, font(B, 92), c["ink"], c["acc"])
-                y += 118
+            y = block(d, PAD, y, cd["title"], B, 92, maxw, c["ink"], c["acc"], 1.28)
             d.line((PAD, y + 30, PAD + 120, y + 30), fill=c["acc"], width=8)
-            y += 90
-            for line in wrap_rich(d, cd["body"], font(M, 56), maxw):
-                rich(d, (PAD, y), line, font(M, 56), c["sub"], c["acc"])
-                y += 84
+            y = block(d, PAD, y + 90, cd["body"], M, 56, maxw, c["sub"], c["acc"], 1.5)
         elif t == "warn":
-            # 노란 경고 카드: 흐름 끊고 멈추게
-            box_top = 0
             tri(d, PAD, 0, 130, c["warn"], c["bg"])
-            y = 180
-            for line in wrap_rich(d, cd["title"], font(B, 92), maxw):
-                rich(d, (PAD, y), line, font(B, 92), c["ink"], c["warn"])
-                y += 118
-            y += 40
-            for line in wrap_rich(d, cd["body"], font(M, 56), maxw):
-                rich(d, (PAD, y), line, font(M, 56), c["sub"], c["warn"])
-                y += 84
-        elif t == "vs":
-            y = 0
-            for line in wrap_rich(d, cd["title"], font(B, 92), maxw):
-                rich(d, (PAD, y), line, font(B, 92), c["ink"], c["acc"])
-                y += 118
-            y += 50
-            colw = (maxw - 40) // 2
-            for k, side in enumerate(cd["sides"]):
-                x = PAD + k * (colw + 40)
-                new = k == 1
-                d.rounded_rectangle((x, y, x + colw, y + 700), radius=32, fill=c["acc"] if new else c["card"])
-                ink = c["acc_ink"] if new else c["sub"]
-                d.text((x + 40, y + 40), side["tag"], font=font(M, 40), fill=ink)
-                d.text((x + 40, y + 100), side["name"], font=font(B, 88), fill=c["acc_ink"] if new else c["ink"])
-                yy = y + 250
-                for item in side["items"]:
-                    for line in wrap(d, item, font(B, 42), colw - 70):
-                        d.text((x + 40, yy), line, font=font(B, 42), fill=ink)
-                        yy += 56
-                    yy += 30
+            y = block(d, PAD, 180, cd["title"], B, 92, maxw, c["ink"], c["warn"], 1.28)
+            y = block(d, PAD, y + 40, cd["body"], M, 56, maxw, c["sub"], c["warn"], 1.5)
+        elif t == "flow":
+            # 한눈에: [옛것] → [새것] 큰 알약 + 아래 날짜 타임라인
+            y = block(d, PAD, 0, cd["title"], B, 92, maxw, c["ink"], c["acc"], 1.28)
+            y += 70
+            fo = font(B, 80)
+            old, new = cd["from"], cd["to"]
+            ow, nw = d.textlength(old, font=fo), d.textlength(new, font=fo)
+            pw_o, pw_n = ow + 110, nw + 110
+            gap = 180
+            x0 = (W - (pw_o + gap + pw_n)) / 2
+            d.rounded_rectangle((x0, y, x0 + pw_o, y + 150), radius=75, fill=c["card"])
+            d.text((x0 + 55, y + 22), old, font=fo, fill=c["sub"])
+            ax = x0 + pw_o + 35
+            d.line((ax, y + 75, ax + gap - 80, y + 75), fill=c["acc"], width=10)
+            d.polygon([(ax + gap - 70, y + 75), (ax + gap - 100, y + 50), (ax + gap - 100, y + 100)], fill=c["acc"])
+            x1 = x0 + pw_o + gap
+            d.rounded_rectangle((x1, y, x1 + pw_n, y + 150), radius=75, fill=c["acc"])
+            d.text((x1 + 55, y + 22), new, font=fo, fill=c["acc_ink"])
+            y += 260
+            # 타임라인 (세로)
+            steps = cd["steps"]
+            lx = PAD + 30
+            d.line((lx, y + 30, lx, y + 30 + 170 * (len(steps) - 1)), fill=c["line"], width=8)
+            for k, st in enumerate(steps):
+                cy = y + 30 + 170 * k
+                hot = st.get("hot")
+                col = c["warn"] if hot else c["acc"]
+                d.ellipse((lx - 26, cy - 26, lx + 26, cy + 26), fill=col)
+                d.text((lx + 70, cy - 52), st["date"], font=font(B, 52), fill=col)
+                d.text((lx + 70, cy + 12), st["text"], font=font(M, 46), fill=c["ink"])
         elif t == "check":
-            y = 250
-            for line in wrap_rich(d, cd["title"], font(B, 92), maxw):
-                rich(d, (PAD, y), line, font(B, 92), c["ink"], c["acc"])
-                y += 118
+            y = block(d, PAD, 0, cd["title"], B, 92, maxw, c["ink"], c["acc"], 1.28)
             y += 50
             for item in cd["items"]:
                 d.rounded_rectangle((PAD, y, W - PAD, y + 150), radius=28, fill=c["card"])
                 d.rounded_rectangle((PAD + 36, y + 47, PAD + 92, y + 103), radius=12, outline=c["acc"], width=6)
                 d.line((PAD + 48, y + 75, PAD + 60, y + 89), fill=c["acc"], width=7)
                 d.line((PAD + 60, y + 89, PAD + 82, y + 58), fill=c["acc"], width=7)
-                lines = wrap(d, item, font(B, 50), maxw - 170)
-                yy = y + 75 - len(lines) * 30
-                for line in lines:
-                    d.text((PAD + 130, yy), line, font=font(B, 50), fill=c["ink"])
-                    yy += 58
+                lines, fnt, sz = fit_lines(d, item, B, 50, maxw - 170)
+                rich(d, (PAD + 130, y + 75 - sz * 0.62), lines[0], fnt, c["ink"], c["acc"])
                 y += 180
         elif t == "end":
-            clock(d, W // 2, 420, 90, c["ink"])
-            y = 600
-            for line in wrap(d, cd["title"], font(B, 72), maxw):
-                d.text(((W - d.textlength(line, font=font(B, 72))) / 2, y), line, font=font(B, 72), fill=c["ink"])
+            clock(d, W // 2, 90, 90, c["ink"])
+            y = 270
+            fe = font(B, 72)
+            for line in cd["title"].split("\n"):
+                d.text(((W - d.textlength(line, font=fe)) / 2, y), line, font=fe, fill=c["ink"])
                 y += 96
-            for line in wrap(d, cd.get("sub", ""), font(M, 46), maxw):
-                d.text(((W - d.textlength(line, font=font(M, 46))) / 2, y + 20), line, font=font(M, 46), fill=c["sub"])
+            fs = font(M, 46)
+            for line in cd.get("sub", "").split("\n"):
+                d.text(((W - d.textlength(line, font=fs)) / 2, y + 20), line, font=fs, fill=c["sub"])
                 y += 64
             h = cd.get("handle", "")
             fh = font(B, 52)
@@ -226,13 +224,11 @@ def make(spec, outdir):
             if cd.get("note"):
                 fn = font(M, 30)
                 d0.text(((W - d0.textlength(cd["note"], font=fn)) / 2, H - PAD - 110), cd["note"], font=fn, fill=c["sub"])
-        # 내용이 있는 범위만 잘라 화면 가운데(위아래 여백 사이)에 붙이기
-        bg = Image.new("RGB", layer.size, c["bg"])
+        # 내용이 있는 범위만 잘라 화면 가운데에 붙이기
         from PIL import ImageChops
-        box = ImageChops.difference(layer, bg).getbbox()
+        box = ImageChops.difference(layer, Image.new("RGB", layer.size, c["bg"])).getbbox()
         if box:
-            top, bot = box[1], box[3]
-            part = layer.crop((0, top, W, bot))
+            part = layer.crop((0, box[1], W, box[3]))
             area_top, area_bot = 190, H - 190
             y0 = area_top + max(0, (area_bot - area_top - part.height) // 2)
             if t == "cover":
