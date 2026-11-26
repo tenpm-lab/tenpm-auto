@@ -55,7 +55,7 @@ def make(out, label, lines, sub, series=None):
     cx, cy, r = W - 150, 150, 62
     d.ellipse((cx - r, cy - r, cx + r, cy + r), outline=c["clock"], width=10)
     d.line((cx, cy, cx, cy - 38), fill=c["clock"], width=10)
-    d.line((cx, cy, cx + 30, cy + 14), fill=c["acc"], width=10)
+    d.line((cx, cy, cx + 30, cy + 14), fill="#f5c400", width=10)  # 실제 로고처럼 짧은 바늘은 노랑
     lf = fit(d, label, R, 40, 720)
     d.rounded_rectangle((90, 120, 90 + d.textlength(label, font=lf) + 56, 190), radius=35, fill=c["acc"])
     d.text((118, 128), label, font=lf, fill=c["lab_txt"])

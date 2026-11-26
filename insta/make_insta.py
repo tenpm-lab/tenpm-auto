@@ -108,10 +108,18 @@ def clock(d, cx, cy, r, c):
     d.line((cx, cy, cx + r * 0.45, cy + r * 0.25), fill=c, width=max(4, r // 7))
 
 
+LOGO = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logo.png")  # 실제 프로필 로고 (docs/icon.png)
+
+
+def logo(im, cx, cy, size):
+    lg = Image.open(LOGO).convert("RGBA").resize((size, size), Image.LANCZOS)
+    im.paste(lg, (int(cx - size / 2), int(cy - size / 2)), lg)
+
+
 def frame(c, i, n):
     im = Image.new("RGB", (W, H), c["bg"])
     d = ImageDraw.Draw(im)
-    clock(d, W - PAD - 26, PAD + 26, 26, c["sub"])
+    logo(im, W - PAD - 32, PAD + 32, 64)
     d.text((PAD, H - PAD - 30), "tenpm.lab", font=font(M, 30), fill=c["sub"])
     pg = f"{i}/{n}"
     fp = font(M, 30)
@@ -206,7 +214,7 @@ def make(spec, outdir):
                 rich(d, (PAD + 130, y + 75 - sz * 0.62), lines[0], fnt, c["ink"], c["acc"])
                 y += 180
         elif t == "end":
-            clock(d, W // 2, 90, 90, c["ink"])
+            logo(layer, W // 2, 90, 180)
             y = 270
             fe = font(B, 72)
             for line in cd["title"].split("\n"):
