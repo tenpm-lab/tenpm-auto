@@ -1,4 +1,4 @@
-사진: office_1.jpg
+사진: office_1.mp4, office_1.jpg
 주제: AI 부업
 퇴근 후에 내 쓰레드 굴려주는 AI 직원들 사무실을 만들어봄
 
