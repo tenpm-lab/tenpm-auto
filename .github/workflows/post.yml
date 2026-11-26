@@ -65,6 +65,13 @@ jobs:
           ACCOUNT: deal
         run: python autoreply.py
 
+      - name: 본계정 키트 신청 댓글 자동 답장
+        if: always()
+        continue-on-error: true
+        env:
+          THREADS_TOKEN: ${{ secrets.THREADS_TOKEN }}
+        run: python kit_reply.py
+
       - name: 팔로워 수 기록 (바뀌었을 때만)
         if: always()
         env:
