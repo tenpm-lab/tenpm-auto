@@ -7,134 +7,144 @@
 <link rel="icon" href="../favicon.png">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
 <style>
-:root{
-  --bg:#12131a; --floor:#191b24; --tile:#1d2030; --line:#262a3b;
-  --ink:#f4f1ea; --sub:#9aa1b5; --dim:#5d6378;
-  --yellow:#f5b940; --green:#4ade80; --red:#f87171; --blue:#60a5fa;
-}
+:root{--bg:#12131a;--ink:#f4f1ea;--sub:#9aa1b5;--dim:#5d6378;--y:#f5b940;--g:#4ade80;--r:#f87171;--line:#262a3b}
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--ink);font-family:Pretendard,-apple-system,"Noto Sans KR",sans-serif;min-height:100vh}
-.wrap{max-width:1120px;margin:0 auto;padding:28px 20px 60px}
-
-/* 머리 */
-header{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
-header img{width:56px;height:56px;border-radius:50%}
-header h1{font-size:26px;font-weight:800;letter-spacing:-.5px}
-header h1 b{color:var(--yellow)}
-header p{color:var(--sub);font-size:14px;margin-top:2px}
-.clock{margin-left:auto;text-align:right;color:var(--sub);font-size:13px}
-.clock strong{display:block;color:var(--ink);font-size:22px;font-variant-numeric:tabular-nums}
-
-.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:22px 0 26px}
-.kpi{background:var(--floor);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
-.kpi span{color:var(--sub);font-size:12px}
-.kpi strong{display:block;font-size:26px;font-weight:800;margin-top:4px;font-variant-numeric:tabular-nums}
-.kpi strong.y{color:var(--yellow)}
-
-/* 사무실 바닥 */
-.office{background:
-  repeating-linear-gradient(0deg,transparent 0 47px,rgba(255,255,255,.025) 47px 48px),
-  repeating-linear-gradient(90deg,transparent 0 47px,rgba(255,255,255,.025) 47px 48px),var(--floor);
-  border:1px solid var(--line);border-radius:22px;padding:22px;display:grid;
-  grid-template-columns:1.25fr 1fr;grid-template-areas:"post ana" "ai key" "wait wait";gap:18px;align-items:start}
-.room{background:rgba(18,19,26,.55);border:1px dashed var(--line);border-radius:16px;padding:14px 14px 16px;position:relative}
-.room h2{font-size:13px;color:var(--sub);font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:6px}
-.room h2 i{font-style:normal;color:var(--dim);font-weight:500}
-#r-post{grid-area:post} #r-ana{grid-area:ana} #r-ai{grid-area:ai} #r-key{grid-area:key} #r-wait{grid-area:wait}
-#r-wait .bench .seat{max-width:340px}
-#r-ai{border-color:rgba(245,185,64,.35);background:rgba(245,185,64,.04)}
-.desks{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
-
-/* 책상 = 직원 카드 */
-.desk{background:var(--tile);border:1px solid var(--line);border-radius:14px;padding:12px 12px 12px;display:grid;grid-template-columns:54px 1fr;gap:10px;position:relative;transition:border-color .3s}
-.desk.working{border-color:rgba(74,222,128,.55)}
-.desk.fresh{border-color:rgba(245,185,64,.45)}
-.desk.error{border-color:rgba(248,113,113,.6)}
-.bot{width:54px;height:54px;border-radius:14px;background:#262a3b;position:relative;display:flex;align-items:center;justify-content:center}
-.bot .face{width:38px;height:26px;border-radius:9px;background:#0d0e13;display:flex;gap:8px;align-items:center;justify-content:center}
-.bot .face i{width:6px;height:8px;border-radius:3px;background:var(--ink);display:block}
-.desk.idle .bot .face i{height:2px;margin-top:3px}          /* 눈 감음 = 쉬는 중 */
-.desk.working .bot .face i{background:var(--green);animation:blink 2.4s infinite}
-.desk.error .bot .face i{background:var(--red)}
-.bot.ai{background:linear-gradient(145deg,#3a2f14,#262a3b)}
-.bot.ai .face i{background:var(--yellow)}
-.bot .ant{position:absolute;top:-7px;left:50%;width:2px;height:8px;background:#3a3f55;transform:translateX(-50%)}
-.bot .ant::after{content:"";position:absolute;top:-5px;left:-3px;width:8px;height:8px;border-radius:50%;background:#3a3f55}
-.desk.working .bot .ant::after{background:var(--green);box-shadow:0 0 10px var(--green)}
-.desk.fresh .bot .ant::after{background:var(--yellow)}
-.desk.error .bot .ant::after{background:var(--red);box-shadow:0 0 10px var(--red)}
-.zzz{position:absolute;right:-4px;top:-10px;font-size:11px;color:var(--dim);font-weight:800;animation:zz 3s infinite}
-.desk:not(.idle) .zzz{display:none}
-.name{font-weight:800;font-size:15px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.tag{font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:99px;background:#2a2e40;color:var(--sub)}
-.working .tag{background:rgba(74,222,128,.15);color:var(--green)}
-.fresh .tag{background:rgba(245,185,64,.15);color:var(--yellow)}
-.error .tag{background:rgba(248,113,113,.15);color:var(--red)}
-.role{color:var(--sub);font-size:12px;margin-top:2px}
-.did{font-size:13px;margin-top:8px;line-height:1.45}
-.note{font-size:12px;color:var(--sub);margin-top:3px}
-.meta{display:flex;justify-content:space-between;color:var(--dim);font-size:11px;margin-top:8px;gap:8px;white-space:nowrap}
-.typing{display:none;gap:3px;margin-left:2px}
-.working .typing{display:inline-flex}
-.typing b{width:4px;height:4px;border-radius:50%;background:var(--green);animation:type 1s infinite}
-.typing b:nth-child(2){animation-delay:.15s}.typing b:nth-child(3){animation-delay:.3s}
-
-/* 대기실 */
-.bench{display:flex;gap:10px;flex-wrap:wrap}
-.seat{display:flex;align-items:center;gap:10px;background:var(--tile);border:1px solid var(--line);border-radius:12px;padding:9px 12px;flex:1;min-width:150px}
-.seat .bot{width:38px;height:38px;border-radius:10px}
-.seat .bot .face{width:26px;height:18px;border-radius:6px;gap:5px}
-.seat .bot .face i{width:4px;height:5px}
-.seat.working{border-color:rgba(74,222,128,.55)}
-.seat small{display:block;color:var(--sub);font-size:11px}
-
-footer{color:var(--dim);font-size:12px;margin-top:18px;line-height:1.7}
-footer a{color:var(--sub)}
-.legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:14px;color:var(--sub);font-size:12px}
+body{background:var(--bg);color:var(--ink);font-family:Pretendard,-apple-system,"Noto Sans KR",sans-serif}
+.wrap{max-width:1240px;margin:0 auto;padding:22px 16px 40px}
+header{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+header img{width:48px;height:48px;border-radius:50%}
+header h1{font-size:24px;font-weight:800}
+header h1 b{color:var(--y)}
+header p{color:var(--sub);font-size:13px}
+.kpis{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+.kpi{background:#1a1c26;border:1px solid var(--line);border-radius:12px;padding:8px 14px;text-align:center;min-width:92px}
+.kpi span{display:block;color:var(--sub);font-size:11px}
+.kpi strong{font-size:19px;font-weight:800;font-variant-numeric:tabular-nums}
+.kpi strong.y{color:var(--y)}
+.stage{position:relative;border-radius:22px;overflow:hidden;border:1px solid var(--line);background:#1b1d27}
+svg{display:block;width:100%;height:auto}
+.label{font:700 11px Pretendard,sans-serif;fill:#e9e6df;paint-order:stroke;stroke:#12131a;stroke-width:3px}
+.room-t{font:800 13px Pretendard,sans-serif;fill:#c9ccd8}
+.room-s{font:600 10.5px Pretendard,sans-serif;fill:#7d8399}
+.person{cursor:pointer}
+.person .legs rect{transform-box:fill-box;transform-origin:top center}
+.walking .legs rect:first-child{animation:legA .36s infinite alternate}
+.walking .legs rect:last-child{animation:legB .36s infinite alternate}
+.walking .body{animation:bob .36s infinite alternate}
+.sitting .legs{display:none}
+.sitting .body{transform:translateY(6px)}
+@keyframes legA{from{transform:rotate(18deg)}to{transform:rotate(-18deg)}}
+@keyframes legB{from{transform:rotate(-18deg)}to{transform:rotate(18deg)}}
+@keyframes bob{from{transform:translateY(0)}to{transform:translateY(-1.5px)}}
+.bubble rect{fill:#fff}
+.bubble text{font:800 11px Pretendard,sans-serif;fill:#12131a}
+.typing circle{fill:#12131a;animation:dot 1s infinite}
+.typing circle:nth-of-type(2){animation-delay:.15s}.typing circle:nth-of-type(3){animation-delay:.3s}
+@keyframes dot{0%,100%{opacity:.25}50%{opacity:1}}
+.zz{font:900 13px Pretendard,sans-serif;fill:#9aa1b5;animation:zz 2.4s infinite}
+@keyframes zz{0%{opacity:0;transform:translate(0,4px)}40%{opacity:1}100%{opacity:0;transform:translate(8px,-10px)}}
+.screen.on{fill:#7dd3fc;animation:glow 1.6s infinite alternate}
+@keyframes glow{from{opacity:.7}to{opacity:1}}
+.panel{position:absolute;left:14px;bottom:14px;max-width:340px;background:rgba(18,19,26,.94);border:1px solid #33384d;border-radius:14px;padding:12px 14px;display:none}
+.panel.show{display:block}
+.panel b{font-size:15px}
+.panel .st{font-size:11px;font-weight:700;padding:2px 7px;border-radius:99px;margin-left:6px}
+.panel p{font-size:12.5px;color:var(--sub);margin-top:4px;line-height:1.5}
+.panel .did{color:var(--ink);font-size:13.5px;margin-top:8px}
+.panel .x{position:absolute;right:10px;top:8px;color:var(--dim);cursor:pointer;font-size:16px}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px;color:var(--sub);font-size:12px}
 .legend span::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;background:var(--c)}
-
-@keyframes blink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.15)}}
-@keyframes zz{0%{opacity:0;transform:translate(0,4px)}40%{opacity:1}100%{opacity:0;transform:translate(6px,-8px)}}
-@keyframes type{0%,100%{opacity:.3;transform:translateY(0)}50%{opacity:1;transform:translateY(-2px)}}
-
-@media (max-width:820px){
-  .office{grid-template-columns:1fr;grid-template-areas:"post" "ana" "ai" "key" "wait";padding:14px}
-  .kpis{grid-template-columns:repeat(2,1fr)}
-  .clock{margin-left:0;text-align:left}
-}
+footer{color:var(--dim);font-size:12px;margin-top:10px;line-height:1.7}
+footer a{color:var(--sub)}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
     <img src="../icon.png" alt="">
-    <div>
-      <h1>텐피엠 <b>AI 사무실</b></h1>
-      <p>퇴근 후 부업을 대신 하는 AI 직원들 · 실제로 일하는 기록 그대로</p>
+    <div><h1>텐피엠 <b>AI 사무실</b></h1><p>퇴근 후 부업을 대신 하는 AI 직원들 · 실제로 일하는 기록 그대로 · 직원을 눌러보세요</p></div>
+    <div class="kpis">
+      <div class="kpi"><span>지금</span><strong id="now">--:--</strong></div>
+      <div class="kpi"><span>올린 글</span><strong id="k-posts">-</strong></div>
+      <div class="kpi"><span>팔로워</span><strong id="k-fol">-</strong></div>
+      <div class="kpi"><span>쿠팡 수익</span><strong class="y" id="k-earn">-</strong></div>
     </div>
-    <div class="clock"><strong id="now">--:--</strong>한국 시간</div>
   </header>
 
-  <section class="kpis">
-    <div class="kpi"><span>정규 직원</span><strong id="k-staff">10명</strong></div>
-    <div class="kpi"><span>지금까지 올린 글</span><strong id="k-posts">-</strong></div>
-    <div class="kpi"><span>본계정 팔로워</span><strong id="k-fol">-</strong></div>
-    <div class="kpi"><span>쿠팡 수익</span><strong class="y" id="k-earn">-</strong></div>
-  </section>
+  <div class="stage">
+    <svg id="scene" viewBox="0 0 1200 760" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <pattern id="wood" width="80" height="20" patternUnits="userSpaceOnUse">
+          <rect width="80" height="20" fill="#2a2620"/><rect width="80" height="1" y="19" fill="#231f1a"/><rect width="1" height="20" x="40" fill="#231f1a"/>
+        </pattern>
+        <pattern id="tile" width="40" height="40" patternUnits="userSpaceOnUse">
+          <rect width="40" height="40" fill="#22252f"/><rect width="20" height="20" fill="#252836"/><rect x="20" y="20" width="20" height="20" fill="#252836"/>
+        </pattern>
+        <pattern id="carpet" width="16" height="16" patternUnits="userSpaceOnUse">
+          <rect width="16" height="16" fill="#25304a"/><circle cx="8" cy="8" r="1.2" fill="#2c3856"/>
+        </pattern>
+        <filter id="sh" x="-20%" y="-20%" width="140%" height="160%"><feDropShadow dx="0" dy="3" stdDeviation="2" flood-color="#000" flood-opacity=".35"/></filter>
+      </defs>
 
-  <main class="office">
-    <section class="room" id="r-post"><h2>📮 게시팀 <i>· 글 올리고 댓글 받기</i></h2><div class="desks"></div></section>
-    <section class="room" id="r-ana"><h2>📊 분석팀 <i>· 숫자 모으고 고치기</i></h2><div class="desks"></div></section>
-    <section class="room" id="r-ai"><h2>🧠 AI 회의실 <i>· 기획하고 글 쓰는 Claude</i></h2><div class="desks"></div></section>
-    <section class="room" id="r-key"><h2>🔑 관리실</h2><div class="desks"></div></section>
-    <section class="room" id="r-wait"><h2>🛋️ 대기실 <i>· 부르면 출근</i></h2><div class="bench"></div></section>
-  </main>
+      <rect width="1200" height="760" fill="url(#wood)"/>
+      <rect width="1200" height="56" fill="#1e2130"/>
+      <g fill="#2b4a6b" opacity=".85">
+        <rect x="80" y="12" width="120" height="30" rx="4"/><rect x="240" y="12" width="120" height="30" rx="4"/>
+        <rect x="400" y="12" width="120" height="30" rx="4"/><rect x="700" y="12" width="120" height="30" rx="4"/>
+        <rect x="860" y="12" width="120" height="30" rx="4"/><rect x="1020" y="12" width="120" height="30" rx="4"/>
+      </g>
+      <circle cx="1080" cy="27" r="8" fill="#f5b940" opacity=".25"/>
+      <!-- 벽시계 = 로고 (밤 10시) -->
+      <g transform="translate(600,28)">
+        <circle r="18" fill="#12131a"/><circle r="13" fill="none" stroke="#f4f1ea" stroke-width="3"/>
+        <line x1="0" y1="0" x2="-7" y2="-4" stroke="#f5b940" stroke-width="2.8" stroke-linecap="round"/>
+        <line x1="0" y1="0" x2="0" y2="-9" stroke="#f4f1ea" stroke-width="2.6" stroke-linecap="round"/>
+        <circle r="2.2" fill="#f4f1ea"/>
+      </g>
+
+      <rect x="30" y="76" width="560" height="320" rx="14" fill="url(#tile)" stroke="#33384d"/>
+      <text class="room-t" x="48" y="100">📮 게시팀</text><text class="room-s" x="122" y="100">글 올리고 댓글 받기</text>
+      <rect x="620" y="76" width="550" height="230" rx="14" fill="url(#tile)" stroke="#33384d"/>
+      <text class="room-t" x="638" y="100">📊 분석팀</text><text class="room-s" x="712" y="100">숫자 모으고 고치기</text>
+      <rect x="620" y="330" width="550" height="230" rx="14" fill="url(#carpet)" stroke="#f5b940" stroke-opacity=".55" stroke-width="2"/>
+      <text class="room-t" x="638" y="354" style="fill:#f5d38a">🧠 AI 회의실</text><text class="room-s" x="734" y="354">Claude 둘이 기획하는 곳</text>
+      <rect x="30" y="420" width="250" height="300" rx="14" fill="url(#tile)" stroke="#33384d"/>
+      <text class="room-t" x="48" y="444">🔑 관리실</text>
+      <rect x="300" y="420" width="290" height="300" rx="14" fill="#2b2a33" stroke="#33384d"/>
+      <text class="room-t" x="318" y="444">🛋️ 대기실</text><text class="room-s" x="384" y="444">부르면 출근</text>
+      <rect x="620" y="584" width="550" height="136" rx="14" fill="url(#tile)" stroke="#33384d"/>
+      <text class="room-t" x="638" y="608">☕ 탕비실</text>
+
+      <!-- 회의 테이블, 화이트보드 -->
+      <rect x="730" y="420" width="330" height="70" rx="20" fill="#5a4630" filter="url(#sh)"/>
+      <rect x="742" y="430" width="306" height="50" rx="14" fill="#6b5338"/>
+      <rect x="770" y="442" width="34" height="22" rx="3" fill="#1b1d27"/><rect x="960" y="442" width="34" height="22" rx="3" fill="#1b1d27"/>
+      <rect x="1084" y="372" width="70" height="110" rx="6" fill="#e8e6e0"/>
+      <rect x="1092" y="384" width="54" height="3" fill="#60a5fa"/><rect x="1092" y="394" width="38" height="3" fill="#f87171"/><rect x="1092" y="404" width="46" height="3" fill="#9aa1b5"/><rect x="1092" y="414" width="30" height="3" fill="#4ade80"/>
+      <text x="1094" y="466" font-size="9" fill="#555" font-weight="800">다음 주 계획</text>
+      <!-- 관리실 금고 -->
+      <rect x="190" y="460" width="70" height="80" rx="8" fill="#3a3f55" filter="url(#sh)"/><circle cx="225" cy="500" r="15" fill="#2a2e40" stroke="#9aa1b5" stroke-width="2"/><text x="214" y="506" font-size="16">🔑</text>
+      <!-- 대기실 소파, 화분, 책장 -->
+      <rect x="330" y="610" width="230" height="56" rx="18" fill="#3b4a7a" filter="url(#sh)"/><rect x="330" y="596" width="230" height="26" rx="12" fill="#4a5b92"/>
+      <text x="316" y="500" font-size="30">🪴</text><text x="550" y="500" font-size="30">🪴</text>
+      <rect x="400" y="470" width="90" height="46" rx="10" fill="#5a4630"/><text x="428" y="500" font-size="18">📚</text>
+      <!-- 탕비실 -->
+      <rect x="660" y="626" width="60" height="70" rx="8" fill="#3a3f55" filter="url(#sh)"/><text x="674" y="668" font-size="26">☕</text>
+      <rect x="760" y="626" width="46" height="70" rx="8" fill="#cfe3f3" filter="url(#sh)"/><rect x="768" y="632" width="30" height="24" rx="6" fill="#7dd3fc"/>
+      <rect x="1040" y="636" width="110" height="46" rx="10" fill="#5a4630"/><text x="1056" y="666" font-size="20">🍩🍪</text>
+      <text x="584" y="410" font-size="26">🪴</text><text x="1146" y="300" font-size="24">🪴</text>
+
+      <g id="desks"></g>
+      <g id="people"></g>
+    </svg>
+    <div class="panel" id="panel"><span class="x" id="px">✕</span><div id="pbody"></div></div>
+  </div>
 
   <div class="legend">
-    <span style="--c:var(--green)">일하는 중</span>
-    <span style="--c:var(--yellow)">방금 일 끝냄 (30분 안)</span>
-    <span style="--c:#3a3f55">쉬는 중</span>
-    <span style="--c:var(--red)">문제 생김</span>
+    <span style="--c:var(--g)">자리에서 일하는 중</span>
+    <span style="--c:var(--y)">방금 일 끝내고 커피 타임</span>
+    <span style="--c:#7d8399">쉬는 중 (돌아다님·소파에서 졸기)</span>
+    <span style="--c:var(--r)">문제 생김</span>
   </div>
   <footer>
     상태는 GitHub 실행 기록에서 실시간으로 읽고, 한 일은 저장소 기록에서 가져와요. <span id="upd"></span><br>
@@ -144,89 +154,209 @@ footer a{color:var(--sub)}
 
 <script>
 const REPO = "tenpm-lab/tenpm-auto";
-const TEAM = {poster:"r-post", deal:"r-post", reply:"r-post", gold:"r-post",
-              stats:"r-ana", check:"r-ana", weekly:"r-ana", key:"r-key", planner:"r-ai", editor:"r-ai"};
+const NS = "http://www.w3.org/2000/svg";
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
+// 책상(왼쪽 위 기준)과 앉는 자리
+const DESKS = { poster:[70,130], deal:[330,130], reply:[70,262], gold:[330,262],
+                stats:[650,128], check:[830,128], weekly:[1010,128], key:[60,560] };
+const SEAT = id => { const [x,y] = DESKS[id]; return [x+55, y+96]; };
+const SPARE = [[475,392],[200,392],[475,250]];                 // 호출된 대기실 직원이 서서 일하는 자리
+const MEET = { planner:[820,520], editor:[1000,520] };
+const SOFA = [[370,640],[445,640],[520,640]];
+const SPOTS = { coffee:[690,716], water:[783,716], snack:[1095,712], plant:[600,420], lounge1:[360,710],
+  lounge2:[500,710], hall1:[605,570], hall2:[300,408], hall3:[900,318], board:[1060,520], shelf:[445,540] };
+const WANDER = Object.keys(SPOTS);
+const LINES = ["오늘 몇 개 올라갔지?","클릭 언제 나와…","스트레칭~","간식 뭐 있지","퇴근하고 싶다","팔로워 늘었나?","0원 탈출 가즈아","커피 한 잔?"];
+
+// 생김새: 몸 색, 머리 색, 머리 모양(0 짧은, 1 가르마, 2 단발, 3 AI 헤드셋)
+const LOOK = { poster:["#60a5fa","#2b2118",0], deal:["#f97316","#5b3a1e",1], reply:["#a78bfa","#111",2], gold:["#facc15","#7c4a1e",1],
+  stats:["#34d399","#222",0], check:["#f87171","#3b2a1e",2], weekly:["#38bdf8","#5b3a1e",0], key:["#94a3b8","#222",1],
+  planner:["#f5b940","#f4f1ea",3], editor:["#e879f9","#f4f1ea",3],
+  links:["#64748b","#3b2a1e",0], photo:["#fb7185","#111",2], verify:["#22d3ee","#5b3a1e",1] };
+
+function el(tag, attrs, parent){ const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; }
+
+function drawDesks(){
+  const g = document.getElementById("desks");
+  for (const id in DESKS){
+    const [x,y] = DESKS[id], d = el("g", {transform:`translate(${x},${y})`, filter:"url(#sh)"}, g);
+    el("rect", {x:0, y:20, width:110, height:46, rx:6, fill:"#6b5338"}, d);
+    el("rect", {x:34, y:0, width:42, height:30, rx:4, fill:"#1b1d27"}, d);
+    el("rect", {x:37, y:3, width:36, height:22, rx:2, fill:"#2a3550", class:"screen", id:"scr-"+id}, d);
+    el("rect", {x:52, y:30, width:6, height:6, fill:"#1b1d27"}, d);
+    el("rect", {x:12, y:40, width:16, height:10, rx:2, fill:"#e8e6e0"}, d);
+    el("circle", {cx:92, cy:42, r:6, fill:"#f4f1ea"}, d);
+    el("rect", {x:40, y:76, width:30, height:16, rx:7, fill:"#2b2e3d"}, d);
+  }
+}
+
+class Person {
+  constructor(info, idx){
+    this.info = info; this.id = info.id;
+    this.home = DESKS[info.id] ? SEAT(info.id) : (MEET[info.id] || SOFA[idx % 3]);
+    this.base = this.home;
+    [this.x, this.y] = jit(this.home); this.target = null; this.wait = Math.random()*2;
+    this.state = "idle"; this.mode = ""; this.build();
+  }
+  build(){
+    const [body, hair, style] = LOOK[this.id] || ["#9aa1b5","#222",0];
+    const g = this.g = el("g", {class:"person"}, document.getElementById("people"));
+    g.addEventListener("click", () => showPanel(this));
+    el("ellipse", {cx:0, cy:2, rx:13, ry:4, fill:"#000", opacity:.3}, g);
+    const legs = el("g", {class:"legs"}, g);
+    el("rect", {x:-7, y:-12, width:5, height:13, rx:2, fill:"#2b2e3d"}, legs);
+    el("rect", {x:2, y:-12, width:5, height:13, rx:2, fill:"#2b2e3d"}, legs);
+    const b = el("g", {class:"body"}, g);
+    el("rect", {x:-11, y:-34, width:22, height:24, rx:8, fill:body}, b);
+    el("circle", {cx:0, cy:-45, r:12, fill:"#f3d2b3"}, b);
+    if (style === 3){
+      el("path", {d:"M-12,-47 Q0,-64 12,-47 L12,-50 Q0,-60 -12,-50Z", fill:hair}, b);
+      el("rect", {x:-15, y:-49, width:5, height:10, rx:2, fill:"#12131a"}, b);
+      el("rect", {x:10, y:-49, width:5, height:10, rx:2, fill:"#12131a"}, b);
+      el("text", {x:-6, y:-18, "font-size":9, "font-weight":900, fill:"#12131a"}, b).textContent = "AI";
+    } else if (style === 1){
+      el("path", {d:"M-12,-46 Q-12,-60 0,-59 Q12,-60 12,-46 Q6,-52 0,-51 Q-6,-52 -12,-46Z", fill:hair}, b);
+    } else if (style === 2){
+      el("path", {d:"M-13,-44 Q-14,-61 0,-60 Q14,-61 13,-44 L13,-38 L9,-46 Q0,-50 -9,-46 L-13,-38Z", fill:hair}, b);
+    } else {
+      el("path", {d:"M-12,-47 Q-10,-59 0,-58 Q10,-59 12,-47 Q4,-53 -12,-47Z", fill:hair}, b);
+    }
+    el("circle", {cx:-4, cy:-45, r:1.6, fill:"#222"}, b); el("circle", {cx:4, cy:-45, r:1.6, fill:"#222"}, b);
+    el("path", {d:"M-3,-40 Q0,-38 3,-40", stroke:"#a0634a", "stroke-width":1.3, fill:"none"}, b);
+    this.dot = el("circle", {cx:15, cy:-58, r:4, fill:"#7d8399", stroke:"#12131a", "stroke-width":1.5}, g);
+    el("text", {class:"label", x:0, y:16, "text-anchor":"middle"}, g).textContent = this.info.name;
+    this.bub = el("g", {class:"bubble", transform:"translate(0,-74)"}, g);
+    this.zz = el("text", {class:"zz", x:10, y:-60}, g); this.zz.textContent = "z"; this.zz.style.display = "none";
+    this.place();
+  }
+  say(text, typing){
+    this.bub.innerHTML = "";
+    if (typing){
+      const g = el("g", {class:"typing"}, this.bub);
+      el("rect", {x:-17, y:-12, width:34, height:18, rx:9}, g);
+      [-7,0,7].forEach(cx => el("circle", {cx, cy:-3, r:2.4}, g));
+      return;
+    }
+    if (!text) return;
+    const w = [...text].length * 11 + 16;
+    el("rect", {x:-w/2, y:-12, width:w, height:20, rx:10}, this.bub);
+    el("text", {x:0, y:2, "text-anchor":"middle"}, this.bub).textContent = text;
+    clearTimeout(this.sayT); this.sayT = setTimeout(() => { if (this.state !== "error") this.bub.innerHTML = ""; }, 4000);
+  }
+  setState(state, when){
+    this.state = state; this.when = when;
+    this.dot.setAttribute("fill", {working:"#4ade80", fresh:"#f5b940", error:"#f87171", idle:"#7d8399"}[state]);
+    const scr = document.getElementById("scr-"+this.id);
+    if (scr) scr.classList.toggle("on", state === "working");
+    this.wait = 0; this.target = null; this.mode = "";
+  }
+  go(p){ this.target = p.slice(); this.g.classList.add("walking"); this.g.classList.remove("sitting"); this.zz.style.display = "none"; }
+  sit(){ this.g.classList.add("sitting"); this.g.classList.remove("walking"); }
+  decide(){
+    const s = this.state, home = this.home;
+    if (s === "working"){
+      if (dist(this, home) > 3){ this.go(home); this.bub.innerHTML = ""; return 1; }
+      this.sit(); this.say("", true); return 8;
+    }
+    if (s === "error"){
+      if (dist(this, home) > 3){ this.go(home); return 1; }
+      this.sit(); this.say("❗ 문제 생김"); return 8;
+    }
+    if (s === "fresh"){
+      if (this.mode !== "coffee"){ this.mode = "coffee"; this.go(jit(SPOTS.coffee)); this.say("☕ 일 끝!"); return 1; }
+      this.mode = "rest"; this.go(home); return 1;
+    }
+    const r = Math.random();
+    if (r < .3 && !this.info.ai){ this.mode = "nap"; this.go(jit(SOFA[Math.floor(Math.random()*3)])); return 1; }
+    if (r < .5){ this.mode = "rest"; this.go(home); return 1; }
+    this.mode = ""; this.go(jit(SPOTS[WANDER[Math.floor(Math.random()*WANDER.length)]]));
+    if (Math.random() < .3) this.say(LINES[Math.floor(Math.random()*LINES.length)]);
+    return 1;
+  }
+  arrive(){
+    this.g.classList.remove("walking");
+    if (this.mode === "nap" || this.mode === "rest" || this.state === "working"){
+      this.sit(); if (this.state === "idle" && this.mode === "nap") this.zz.style.display = "";
+    }
+    this.wait = this.state === "working" ? 0.2 : 4 + Math.random()*6;
+  }
+  step(dt){
+    if (this.target){
+      const dx = this.target[0]-this.x, dy = this.target[1]-this.y, d = Math.hypot(dx, dy), sp = 75*dt;
+      if (d <= sp){ [this.x, this.y] = this.target; this.target = null; this.arrive(); }
+      else { this.x += dx/d*sp; this.y += dy/d*sp; }
+      this.place();
+    } else if ((this.wait -= dt) <= 0) this.wait = this.decide();
+  }
+  place(){ this.g.setAttribute("transform", `translate(${this.x.toFixed(1)},${this.y.toFixed(1)})`); }
+}
+const dist = (a, p) => Math.hypot(a.x-p[0], a.y-p[1]);
+const jit = p => [p[0] + Math.random()*20-10, p[1] + Math.random()*8-4];
+
 function kstNow(){ return new Date(Date.now() + (new Date().getTimezoneOffset() + 540) * 60000); }
-function ago(iso){
-  const m = Math.round((Date.now() - new Date(iso)) / 60000);
-  if (m < 1) return "방금";
-  if (m < 60) return m + "분 전";
-  if (m < 60*24) return Math.round(m/60) + "시간 전";
-  return Math.round(m/1440) + "일 전";
-}
-
-// Claude 직원은 실행 기록이 없어서 근무 시간으로 상태를 정함
-function aiState(id){
-  const t = kstNow(), d = t.getDay(), hm = t.getHours()*60 + t.getMinutes();
-  if (id === "planner" && d >= 1 && d <= 5 && hm >= 16*60+47 && hm < 17*60+20) return "working";
-  if (id === "editor" && d === 0 && hm >= 19*60+23 && hm < 20*60) return "working";
-  return "idle";
-}
-
+function ago(iso){ const m = Math.round((Date.now()-new Date(iso))/60000);
+  return m < 1 ? "방금" : m < 60 ? m+"분 전" : m < 1440 ? Math.round(m/60)+"시간 전" : Math.round(m/1440)+"일 전"; }
+function aiState(id){ const t = kstNow(), d = t.getDay(), hm = t.getHours()*60+t.getMinutes();
+  if (id === "planner" && d>=1 && d<=5 && hm>=16*60+47 && hm<17*60+20) return ["working","지금 기획 회의 중"];
+  if (id === "editor" && d===0 && hm>=19*60+23 && hm<20*60) return ["working","지금 주간 회의 중"];
+  return ["idle", id === "planner" ? "평일 16:47 출근" : "일요일 19:23 출근"]; }
 function runState(run){
-  if (!run) return ["idle", "기록 없음"];
-  if (run.status !== "completed") return ["working", "일하는 중"];
-  if (run.conclusion === "failure") return ["error", "문제 생김 · " + ago(run.updated_at)];
-  const fresh = Date.now() - new Date(run.updated_at) < 30*60000;
-  return [fresh ? "fresh" : "idle", (fresh ? "방금 일 끝냄 · " : "마지막 근무 ") + ago(run.updated_at)];
+  if (!run) return ["idle","기록 없음"];
+  if (run.status !== "completed") return ["working","일하는 중"];
+  if (run.conclusion === "failure") return ["error","문제 생김 · "+ago(run.updated_at)];
+  const fresh = Date.now()-new Date(run.updated_at) < 30*60000;
+  return [fresh ? "fresh" : "idle", (fresh ? "방금 일 끝냄 · " : "마지막 근무 ")+ago(run.updated_at)];
 }
 
-function deskHTML(e, state, when){
-  const label = {working:"일하는 중", fresh:"방금 끝냄", error:"문제", idle:"쉬는 중"}[state];
-  return `<article class="desk ${state}">
-    <div class="bot ${e.ai ? "ai" : ""}"><span class="ant"></span><span class="face"><i></i><i></i></span><span class="zzz">z</span></div>
-    <div>
-      <div class="name">${esc(e.name)} <span class="tag">${label}</span><span class="typing"><b></b><b></b><b></b></span></div>
-      <div class="role">${esc(e.role)}</div>
-      <div class="did">${esc(e.did)}</div>
-      ${e.note ? `<div class="note">${esc(e.note)}</div>` : ""}
-      <div class="meta"><span>🕘 ${esc(e.when)}</span><span>${esc(e.count || when || "")}</span></div>
-    </div></article>`;
+const people = {};
+function showPanel(p){
+  const i = p.info, lab = {working:["일하는 중","#4ade80"], fresh:["방금 끝냄","#f5b940"], error:["문제","#f87171"], idle:["쉬는 중","#9aa1b5"]}[p.state];
+  document.getElementById("pbody").innerHTML =
+    `<b>${esc(i.name)}</b><span class="st" style="background:${lab[1]}22;color:${lab[1]}">${lab[0]}</span>
+     <p>${esc(i.role)} · 🕘 ${esc(i.when || "")}</p>
+     ${i.did ? `<div class="did">${esc(i.did)}</div>` : ""}
+     ${i.note ? `<p>${esc(i.note)}</p>` : ""}${i.count ? `<p>${esc(i.count)}</p>` : ""}
+     <p>${esc(p.when || "")}</p>`;
+  document.getElementById("panel").classList.add("show");
 }
+document.getElementById("px").onclick = () => document.getElementById("panel").classList.remove("show");
 
 async function load(){
-  let data = null, runs = [];
-  try {
-    const r = await fetch(`https://raw.githubusercontent.com/${REPO}/main/office/status.json?t=${Date.now()}`);
-    data = await r.json();
-  } catch (e) { return; }
-  try {
-    const r = await fetch(`https://api.github.com/repos/${REPO}/actions/runs?per_page=60`);
-    runs = (await r.json()).workflow_runs || [];
-  } catch (e) {}
+  let data, runs = [];
+  try { data = await (await fetch(`https://raw.githubusercontent.com/${REPO}/main/office/status.json?t=${Date.now()}`)).json(); } catch(e){ return; }
+  try { runs = (await (await fetch(`https://api.github.com/repos/${REPO}/actions/runs?per_page=60`)).json()).workflow_runs || []; } catch(e){}
   const latest = {};
-  for (const run of runs) {
-    const f = (run.path || "").split("/").pop();
-    if (f && !latest[f]) latest[f] = run;
-  }
-  document.querySelectorAll(".room .desks").forEach(d => d.innerHTML = "");
-  for (const e of data.staff) {
-    let state, when;
-    if (e.ai) { state = aiState(e.id); when = state === "working" ? "지금 회의 중" : ""; }
-    else { [state, when] = runState(latest[e.wf]); }
-    document.querySelector(`#${TEAM[e.id]} .desks`).insertAdjacentHTML("beforeend", deskHTML(e, state, when));
-  }
-  document.querySelector("#r-wait .bench").innerHTML = data.waiting.map(w => {
-    const [st, when] = runState(latest[w.wf]);
-    return `<div class="seat ${st === "working" ? "working" : ""}"><div class="bot"><span class="face"><i></i><i></i></span></div>
-      <div><b>${esc(w.name)}</b><small>${esc(w.role)} · ${esc(when)}</small></div></div>`;
-  }).join("");
+  for (const r of runs){ const f = (r.path||"").split("/").pop(); if (f && !latest[f]) latest[f] = r; }
+  const all = data.staff.concat(data.waiting.map(w => ({...w, waiting:true, when:"부르면 출근"})));
+  all.forEach((info, idx) => {
+    if (!people[info.id]) people[info.id] = new Person(info, idx);
+    const p = people[info.id]; p.info = info;
+    const [st, when] = info.ai ? aiState(info.id) : runState(latest[info.wf]);
+    if (info.waiting) p.home = st === "working" ? SPARE[idx % 3] : p.base;   // 호출되면 빈 자리로 출근
+    if (p.state !== st) p.setState(st, when); else p.when = when;
+  });
   const t = data.top;
-  document.getElementById("k-posts").textContent = t.posts_total + "개";
-  document.getElementById("k-fol").textContent = t.followers + "명";
-  document.getElementById("k-earn").textContent = (t.earn || 0).toLocaleString() + "원";
+  document.getElementById("k-posts").textContent = t.posts_total+"개";
+  document.getElementById("k-fol").textContent = t.followers+"명";
+  document.getElementById("k-earn").textContent = (t.earn||0).toLocaleString()+"원";
   document.getElementById("upd").textContent = data.updated ? `(기록 갱신 ${data.updated})` : "";
 }
 
-function tick(){
-  const t = kstNow();
-  document.getElementById("now").textContent =
-    String(t.getHours()).padStart(2,"0") + ":" + String(t.getMinutes()).padStart(2,"0");
-}
-tick(); setInterval(tick, 10000);
+function tick(){ const t = kstNow(); document.getElementById("now").textContent = String(t.getHours()).padStart(2,"0")+":"+String(t.getMinutes()).padStart(2,"0"); }
+drawDesks(); tick(); setInterval(tick, 10000);
 load(); setInterval(load, 120000);
+let last = performance.now(), lastOrder = "";
+function loop(now){
+  const dt = Math.min(.1, (now-last)/1000); last = now;
+  const list = Object.values(people);
+  list.forEach(p => p.step(dt));
+  list.sort((a,b) => a.y-b.y);
+  const order = list.map(p => p.id).join();
+  if (order !== lastOrder){ lastOrder = order; list.forEach(p => p.g.parentNode.appendChild(p.g)); }  // 아래쪽 사람이 앞에
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
 </script>
 </body>
 </html>
