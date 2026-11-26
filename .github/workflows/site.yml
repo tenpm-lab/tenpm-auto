@@ -2,11 +2,7 @@ name: 써본 것 모음 페이지
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - "bio/items.json"
-      - "make_site.py"
-      - "bio/run.py"
+  # push 트리거 끔 (11/26: 모음 페이지 내림)
 
 permissions:
   contents: write

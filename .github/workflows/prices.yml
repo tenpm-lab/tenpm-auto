@@ -2,8 +2,7 @@ name: 모음 페이지 가격 갱신
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "37 18 * * *"   # 매일 03:37 KST
+  # schedule 끔 (11/26: 모음 페이지 내림 — 돌면 docs/index.html 을 다시 만듦)
 
 permissions:
   contents: write
