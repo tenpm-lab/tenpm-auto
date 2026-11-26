@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>텐피엠 AI 사무실</title>
+<link rel="icon" href="../favicon.png">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+<style>
+:root{
+  --bg:#12131a; --floor:#191b24; --tile:#1d2030; --line:#262a3b;
+  --ink:#f4f1ea; --sub:#9aa1b5; --dim:#5d6378;
+  --yellow:#f5b940; --green:#4ade80; --red:#f87171; --blue:#60a5fa;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:Pretendard,-apple-system,"Noto Sans KR",sans-serif;min-height:100vh}
+.wrap{max-width:1120px;margin:0 auto;padding:28px 20px 60px}
+
+/* 머리 */
+header{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+header img{width:56px;height:56px;border-radius:50%}
+header h1{font-size:26px;font-weight:800;letter-spacing:-.5px}
+header h1 b{color:var(--yellow)}
+header p{color:var(--sub);font-size:14px;margin-top:2px}
+.clock{margin-left:auto;text-align:right;color:var(--sub);font-size:13px}
+.clock strong{display:block;color:var(--ink);font-size:22px;font-variant-numeric:tabular-nums}
+
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:22px 0 26px}
+.kpi{background:var(--floor);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.kpi span{color:var(--sub);font-size:12px}
+.kpi strong{display:block;font-size:26px;font-weight:800;margin-top:4px;font-variant-numeric:tabular-nums}
+.kpi strong.y{color:var(--yellow)}
+
+/* 사무실 바닥 */
+.office{background:
+  repeating-linear-gradient(0deg,transparent 0 47px,rgba(255,255,255,.025) 47px 48px),
+  repeating-linear-gradient(90deg,transparent 0 47px,rgba(255,255,255,.025) 47px 48px),var(--floor);
+  border:1px solid var(--line);border-radius:22px;padding:22px;display:grid;
+  grid-template-columns:1.25fr 1fr;grid-template-areas:"post ana" "ai key" "wait wait";gap:18px;align-items:start}
+.room{background:rgba(18,19,26,.55);border:1px dashed var(--line);border-radius:16px;padding:14px 14px 16px;position:relative}
+.room h2{font-size:13px;color:var(--sub);font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.room h2 i{font-style:normal;color:var(--dim);font-weight:500}
+#r-post{grid-area:post} #r-ana{grid-area:ana} #r-ai{grid-area:ai} #r-key{grid-area:key} #r-wait{grid-area:wait}
+#r-wait .bench .seat{max-width:340px}
+#r-ai{border-color:rgba(245,185,64,.35);background:rgba(245,185,64,.04)}
+.desks{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+
+/* 책상 = 직원 카드 */
+.desk{background:var(--tile);border:1px solid var(--line);border-radius:14px;padding:12px 12px 12px;display:grid;grid-template-columns:54px 1fr;gap:10px;position:relative;transition:border-color .3s}
+.desk.working{border-color:rgba(74,222,128,.55)}
+.desk.fresh{border-color:rgba(245,185,64,.45)}
+.desk.error{border-color:rgba(248,113,113,.6)}
+.bot{width:54px;height:54px;border-radius:14px;background:#262a3b;position:relative;display:flex;align-items:center;justify-content:center}
+.bot .face{width:38px;height:26px;border-radius:9px;background:#0d0e13;display:flex;gap:8px;align-items:center;justify-content:center}
+.bot .face i{width:6px;height:8px;border-radius:3px;background:var(--ink);display:block}
+.desk.idle .bot .face i{height:2px;margin-top:3px}          /* 눈 감음 = 쉬는 중 */
+.desk.working .bot .face i{background:var(--green);animation:blink 2.4s infinite}
+.desk.error .bot .face i{background:var(--red)}
+.bot.ai{background:linear-gradient(145deg,#3a2f14,#262a3b)}
+.bot.ai .face i{background:var(--yellow)}
+.bot .ant{position:absolute;top:-7px;left:50%;width:2px;height:8px;background:#3a3f55;transform:translateX(-50%)}
+.bot .ant::after{content:"";position:absolute;top:-5px;left:-3px;width:8px;height:8px;border-radius:50%;background:#3a3f55}
+.desk.working .bot .ant::after{background:var(--green);box-shadow:0 0 10px var(--green)}
+.desk.fresh .bot .ant::after{background:var(--yellow)}
+.desk.error .bot .ant::after{background:var(--red);box-shadow:0 0 10px var(--red)}
+.zzz{position:absolute;right:-4px;top:-10px;font-size:11px;color:var(--dim);font-weight:800;animation:zz 3s infinite}
+.desk:not(.idle) .zzz{display:none}
+.name{font-weight:800;font-size:15px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.tag{font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:99px;background:#2a2e40;color:var(--sub)}
+.working .tag{background:rgba(74,222,128,.15);color:var(--green)}
+.fresh .tag{background:rgba(245,185,64,.15);color:var(--yellow)}
+.error .tag{background:rgba(248,113,113,.15);color:var(--red)}
+.role{color:var(--sub);font-size:12px;margin-top:2px}
+.did{font-size:13px;margin-top:8px;line-height:1.45}
+.note{font-size:12px;color:var(--sub);margin-top:3px}
+.meta{display:flex;justify-content:space-between;color:var(--dim);font-size:11px;margin-top:8px;gap:8px;white-space:nowrap}
+.typing{display:none;gap:3px;margin-left:2px}
+.working .typing{display:inline-flex}
+.typing b{width:4px;height:4px;border-radius:50%;background:var(--green);animation:type 1s infinite}
+.typing b:nth-child(2){animation-delay:.15s}.typing b:nth-child(3){animation-delay:.3s}
+
+/* 대기실 */
+.bench{display:flex;gap:10px;flex-wrap:wrap}
+.seat{display:flex;align-items:center;gap:10px;background:var(--tile);border:1px solid var(--line);border-radius:12px;padding:9px 12px;flex:1;min-width:150px}
+.seat .bot{width:38px;height:38px;border-radius:10px}
+.seat .bot .face{width:26px;height:18px;border-radius:6px;gap:5px}
+.seat .bot .face i{width:4px;height:5px}
+.seat.working{border-color:rgba(74,222,128,.55)}
+.seat small{display:block;color:var(--sub);font-size:11px}
+
+footer{color:var(--dim);font-size:12px;margin-top:18px;line-height:1.7}
+footer a{color:var(--sub)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:14px;color:var(--sub);font-size:12px}
+.legend span::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;background:var(--c)}
+
+@keyframes blink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.15)}}
+@keyframes zz{0%{opacity:0;transform:translate(0,4px)}40%{opacity:1}100%{opacity:0;transform:translate(6px,-8px)}}
+@keyframes type{0%,100%{opacity:.3;transform:translateY(0)}50%{opacity:1;transform:translateY(-2px)}}
+
+@media (max-width:820px){
+  .office{grid-template-columns:1fr;grid-template-areas:"post" "ana" "ai" "key" "wait";padding:14px}
+  .kpis{grid-template-columns:repeat(2,1fr)}
+  .clock{margin-left:0;text-align:left}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <img src="../icon.png" alt="">
+    <div>
+      <h1>텐피엠 <b>AI 사무실</b></h1>
+      <p>퇴근 후 부업을 대신 하는 AI 직원들 · 실제로 일하는 기록 그대로</p>
+    </div>
+    <div class="clock"><strong id="now">--:--</strong>한국 시간</div>
+  </header>
+
+  <section class="kpis">
+    <div class="kpi"><span>정규 직원</span><strong id="k-staff">10명</strong></div>
+    <div class="kpi"><span>지금까지 올린 글</span><strong id="k-posts">-</strong></div>
+    <div class="kpi"><span>본계정 팔로워</span><strong id="k-fol">-</strong></div>
+    <div class="kpi"><span>쿠팡 수익</span><strong class="y" id="k-earn">-</strong></div>
+  </section>
+
+  <main class="office">
+    <section class="room" id="r-post"><h2>📮 게시팀 <i>· 글 올리고 댓글 받기</i></h2><div class="desks"></div></section>
+    <section class="room" id="r-ana"><h2>📊 분석팀 <i>· 숫자 모으고 고치기</i></h2><div class="desks"></div></section>
+    <section class="room" id="r-ai"><h2>🧠 AI 회의실 <i>· 기획하고 글 쓰는 Claude</i></h2><div class="desks"></div></section>
+    <section class="room" id="r-key"><h2>🔑 관리실</h2><div class="desks"></div></section>
+    <section class="room" id="r-wait"><h2>🛋️ 대기실 <i>· 부르면 출근</i></h2><div class="bench"></div></section>
+  </main>
+
+  <div class="legend">
+    <span style="--c:var(--green)">일하는 중</span>
+    <span style="--c:var(--yellow)">방금 일 끝냄 (30분 안)</span>
+    <span style="--c:#3a3f55">쉬는 중</span>
+    <span style="--c:var(--red)">문제 생김</span>
+  </div>
+  <footer>
+    상태는 GitHub 실행 기록에서 실시간으로 읽고, 한 일은 저장소 기록에서 가져와요. <span id="upd"></span><br>
+    직장인이 퇴근 후 AI한테 부업을 통째로 맡겨보는 실험 · <a href="https://www.threads.com/@tenpm.lab">쓰레드 @tenpm.lab</a> · <a href="https://blog.naver.com/tenpmlab">블로그</a>
+  </footer>
+</div>
+
+<script>
+const REPO = "tenpm-lab/tenpm-auto";
+const TEAM = {poster:"r-post", deal:"r-post", reply:"r-post", gold:"r-post",
+              stats:"r-ana", check:"r-ana", weekly:"r-ana", key:"r-key", planner:"r-ai", editor:"r-ai"};
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function kstNow(){ return new Date(Date.now() + (new Date().getTimezoneOffset() + 540) * 60000); }
+function ago(iso){
+  const m = Math.round((Date.now() - new Date(iso)) / 60000);
+  if (m < 1) return "방금";
+  if (m < 60) return m + "분 전";
+  if (m < 60*24) return Math.round(m/60) + "시간 전";
+  return Math.round(m/1440) + "일 전";
+}
+
+// Claude 직원은 실행 기록이 없어서 근무 시간으로 상태를 정함
+function aiState(id){
+  const t = kstNow(), d = t.getDay(), hm = t.getHours()*60 + t.getMinutes();
+  if (id === "planner" && d >= 1 && d <= 5 && hm >= 16*60+47 && hm < 17*60+20) return "working";
+  if (id === "editor" && d === 0 && hm >= 19*60+23 && hm < 20*60) return "working";
+  return "idle";
+}
+
+function runState(run){
+  if (!run) return ["idle", "기록 없음"];
+  if (run.status !== "completed") return ["working", "일하는 중"];
+  if (run.conclusion === "failure") return ["error", "문제 생김 · " + ago(run.updated_at)];
+  const fresh = Date.now() - new Date(run.updated_at) < 30*60000;
+  return [fresh ? "fresh" : "idle", (fresh ? "방금 일 끝냄 · " : "마지막 근무 ") + ago(run.updated_at)];
+}
+
+function deskHTML(e, state, when){
+  const label = {working:"일하는 중", fresh:"방금 끝냄", error:"문제", idle:"쉬는 중"}[state];
+  return `<article class="desk ${state}">
+    <div class="bot ${e.ai ? "ai" : ""}"><span class="ant"></span><span class="face"><i></i><i></i></span><span class="zzz">z</span></div>
+    <div>
+      <div class="name">${esc(e.name)} <span class="tag">${label}</span><span class="typing"><b></b><b></b><b></b></span></div>
+      <div class="role">${esc(e.role)}</div>
+      <div class="did">${esc(e.did)}</div>
+      ${e.note ? `<div class="note">${esc(e.note)}</div>` : ""}
+      <div class="meta"><span>🕘 ${esc(e.when)}</span><span>${esc(e.count || when || "")}</span></div>
+    </div></article>`;
+}
+
+async function load(){
+  let data = null, runs = [];
+  try {
+    const r = await fetch(`https://raw.githubusercontent.com/${REPO}/main/office/status.json?t=${Date.now()}`);
+    data = await r.json();
+  } catch (e) { return; }
+  try {
+    const r = await fetch(`https://api.github.com/repos/${REPO}/actions/runs?per_page=60`);
+    runs = (await r.json()).workflow_runs || [];
+  } catch (e) {}
+  const latest = {};
+  for (const run of runs) {
+    const f = (run.path || "").split("/").pop();
+    if (f && !latest[f]) latest[f] = run;
+  }
+  document.querySelectorAll(".room .desks").forEach(d => d.innerHTML = "");
+  for (const e of data.staff) {
+    let state, when;
+    if (e.ai) { state = aiState(e.id); when = state === "working" ? "지금 회의 중" : ""; }
+    else { [state, when] = runState(latest[e.wf]); }
+    document.querySelector(`#${TEAM[e.id]} .desks`).insertAdjacentHTML("beforeend", deskHTML(e, state, when));
+  }
+  document.querySelector("#r-wait .bench").innerHTML = data.waiting.map(w => {
+    const [st, when] = runState(latest[w.wf]);
+    return `<div class="seat ${st === "working" ? "working" : ""}"><div class="bot"><span class="face"><i></i><i></i></span></div>
+      <div><b>${esc(w.name)}</b><small>${esc(w.role)} · ${esc(when)}</small></div></div>`;
+  }).join("");
+  const t = data.top;
+  document.getElementById("k-posts").textContent = t.posts_total + "개";
+  document.getElementById("k-fol").textContent = t.followers + "명";
+  document.getElementById("k-earn").textContent = (t.earn || 0).toLocaleString() + "원";
+  document.getElementById("upd").textContent = data.updated ? `(기록 갱신 ${data.updated})` : "";
+}
+
+function tick(){
+  const t = kstNow();
+  document.getElementById("now").textContent =
+    String(t.getHours()).padStart(2,"0") + ":" + String(t.getMinutes()).padStart(2,"0");
+}
+tick(); setInterval(tick, 10000);
+load(); setInterval(load, 120000);
+</script>
+</body>
+</html>

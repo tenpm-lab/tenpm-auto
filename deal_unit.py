@@ -458,7 +458,7 @@ def goldpost():
     if test:
         fmt = test
         fn = os.path.join(os.path.dirname(q), "..", "..", "curate", f"gold_test_{fmt}.txt")
-    elif glob.glob(os.path.join(q, f"{now:%Y%m%d}-0900_gold*")):
+    elif glob.glob(os.path.join(q, f"{now:%Y%m%d}-0900_gold*")) or glob.glob(os.path.join(os.path.dirname(q), "done", f"{now:%Y%m%d}-0900_gold*")):
         print("이미 있음"); return
     elif f"{now:%Y%m%d}" < "20261126":  # 부계정 워밍업(링크 없이) 기간
         print("워밍업 기간 - 쉼"); return

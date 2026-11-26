@@ -1,0 +1,133 @@
+{
+ "top": {
+  "followers": "53",
+  "posts_total": 52,
+  "clicks": 4,
+  "earn": 0
+ },
+ "staff": [
+  {
+   "id": "poster",
+   "name": "게시 담당",
+   "role": "본계정 글 올리기",
+   "wf": "post.yml",
+   "when": "15분마다",
+   "did": "11/26 12:15 경험 글 올림",
+   "note": "다음: 11/26 20:30 경험 글",
+   "count": "오늘 2개 · 대기 7개"
+  },
+  {
+   "id": "deal",
+   "name": "부계정 점장",
+   "role": "쿠팡 전용 계정 운영",
+   "wf": "post.yml",
+   "when": "15분마다",
+   "did": "11/26 12:16 댓글 답 글 올림",
+   "note": "다음: 11/26 18:30 싸게 사는 법",
+   "count": "오늘 1개 · 대기 14개"
+  },
+  {
+   "id": "reply",
+   "name": "댓글 담당",
+   "role": "링크 묻는 댓글에 답장",
+   "wf": "post.yml",
+   "when": "15분마다",
+   "did": "지금까지 답장 0개",
+   "note": "\"어디서 사요?\" 댓글 기다리는 중",
+   "count": ""
+  },
+  {
+   "id": "gold",
+   "name": "골드박스 담당",
+   "role": "오늘의 특가 골라 글 쓰기",
+   "wf": "goldbox.yml",
+   "when": "매일 08:10",
+   "did": "11/26부터 출근",
+   "note": "",
+   "count": ""
+  },
+  {
+   "id": "stats",
+   "name": "통계 담당",
+   "role": "조회·팔로워·쿠팡 클릭 모으기",
+   "wf": "insights.yml",
+   "when": "매일 23:40",
+   "did": "팔로워 53명 기록",
+   "note": "",
+   "count": ""
+  },
+  {
+   "id": "check",
+   "name": "점검 담당",
+   "role": "클릭 0이면 원인 찾고 고치기",
+   "wf": "insights.yml",
+   "when": "매일 23:40",
+   "did": "11/25 점검: 글 1개 · 조회 11 · 클릭 0 → 표본 적음",
+   "note": "",
+   "count": ""
+  },
+  {
+   "id": "weekly",
+   "name": "집계 담당",
+   "role": "주간 숫자 정리",
+   "wf": "weekly.yml",
+   "when": "일요일 19:00",
+   "did": "11/23 주간 집계",
+   "note": "",
+   "count": ""
+  },
+  {
+   "id": "key",
+   "name": "열쇠 담당",
+   "role": "토큰 연장 (본계정·부계정)",
+   "wf": "token.yml",
+   "when": "매달 1일·15일",
+   "did": "두 계정 열쇠 관리",
+   "note": "",
+   "count": ""
+  },
+  {
+   "id": "planner",
+   "name": "기획실장",
+   "role": "다음 날 글·블로그 초안 (Claude)",
+   "wf": "",
+   "when": "평일 16:47",
+   "did": "11/26 · AI 정보 #5 제미나이 GIF 초안",
+   "note": "",
+   "count": "",
+   "ai": true
+  },
+  {
+   "id": "editor",
+   "name": "편집장",
+   "role": "주간 분석·다음 주 세팅·책 원고 (Claude)",
+   "wf": "",
+   "when": "일요일 19:23",
+   "did": "11/23 주간 리포트",
+   "note": "",
+   "count": "",
+   "ai": true
+  }
+ ],
+ "waiting": [
+  {
+   "id": "links",
+   "name": "링크 담당",
+   "role": "쿠팡 링크 만들기",
+   "wf": "links.yml"
+  },
+  {
+   "id": "photo",
+   "name": "사진 담당",
+   "role": "상품 사진 고르기",
+   "wf": "deal.yml"
+  },
+  {
+   "id": "verify",
+   "name": "확인 담당",
+   "role": "링크 한 번 열어보기",
+   "wf": "check_links.yml"
+  }
+ ],
+ "updated": "2026-11-26 17:53"
+}
