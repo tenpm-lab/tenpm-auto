@@ -30,12 +30,12 @@ svg{display:block;width:100%;height:auto}
 .person .legs rect{transform-box:fill-box;transform-origin:top center}
 .walking .legs rect:first-child{animation:legA .36s infinite alternate}
 .walking .legs rect:last-child{animation:legB .36s infinite alternate}
-.walking .body{animation:bob .36s infinite alternate}
+.walking .body{animation:waddle .32s infinite alternate;transform-box:fill-box;transform-origin:bottom center}
+@keyframes waddle{from{transform:rotate(-6deg) translateY(0)}to{transform:rotate(6deg) translateY(-2px)}}
 .sitting .legs{display:none}
-.sitting .body{transform:translateY(5px)}
+.sitting .body{transform:translateY(4px)}
 .breath{animation:breath 2.6s ease-in-out infinite;transform-box:fill-box;transform-origin:bottom center}
 @keyframes breath{0%,100%{transform:scale(1,1)}50%{transform:scale(1.02,.98)}}
-.napping .eyes{transform:scaleY(.15);transform-box:fill-box;transform-origin:center}
 .jump .body{animation:jump .5s ease-out}
 @keyframes jump{0%{transform:translateY(0)}35%{transform:translateY(-16px)}70%{transform:translateY(0)}85%{transform:translateY(-4px)}100%{transform:translateY(0)}}
 .jump .arm.r{animation:wave .5s 2}
@@ -56,13 +56,13 @@ svg{display:block;width:100%;height:auto}
 @keyframes zz{0%{opacity:0;transform:translate(0,4px)}40%{opacity:1}100%{opacity:0;transform:translate(8px,-10px)}}
 .screen.on{fill:#7dd3fc;animation:glow 1.6s infinite alternate}
 @keyframes glow{from{opacity:.7}to{opacity:1}}
-.panel{position:absolute;left:14px;bottom:14px;max-width:340px;background:rgba(18,19,26,.94);border:1px solid #33384d;border-radius:14px;padding:12px 14px;display:none}
+.panel{position:absolute;left:14px;bottom:14px;max-width:360px;padding-right:30px!important;background:rgba(18,19,26,.94);border:1px solid #33384d;border-radius:14px;padding:12px 14px;display:none}
 .panel.show{display:block}
 .panel b{font-size:15px}
 .panel .st{font-size:11px;font-weight:700;padding:2px 7px;border-radius:99px;margin-left:6px}
 .panel p{font-size:12.5px;color:var(--sub);margin-top:4px;line-height:1.5}
 .panel .did{color:var(--ink);font-size:13.5px;margin-top:8px}
-.panel .x{position:absolute;right:10px;top:8px;color:var(--dim);cursor:pointer;font-size:16px}
+.panel .x{position:absolute;right:10px;top:4px;color:var(--dim);cursor:pointer;font-size:16px}
 .legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px;color:var(--sub);font-size:12px}
 .legend span::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;background:var(--c)}
 footer{color:var(--dim);font-size:12px;margin-top:10px;line-height:1.7}
@@ -163,6 +163,7 @@ footer a{color:var(--sub)}
   </footer>
 </div>
 
+<script src="chars.js"></script>
 <script>
 const REPO = "tenpm-lab/tenpm-auto";
 const NS = "http://www.w3.org/2000/svg";
@@ -222,43 +223,29 @@ class Person {
     this.state = "idle"; this.mode = ""; this.build();
   }
   build(){
-    const [body, hair, style] = LOOK[this.id] || ["#9aa1b5","#222",0];
     const g = this.g = el("g", {class:"person"}, document.getElementById("people"));
     g.addEventListener("click", e => { e.stopPropagation(); this.poke(); showPanel(this); });
-    el("ellipse", {cx:0, cy:2, rx:14, ry:4.5, fill:"#000", opacity:.28}, g);
-    const legs = el("g", {class:"legs"}, g);
-    el("rect", {x:-7, y:-10, width:6, height:11, rx:3, fill:"#3a3f55"}, legs);
-    el("rect", {x:1, y:-10, width:6, height:11, rx:3, fill:"#3a3f55"}, legs);
+    el("ellipse", {cx:0, cy:3, rx:17, ry:4.5, fill:"#000", opacity:.28}, g);
     const b = el("g", {class:"body"}, g);
-    const bb = el("g", {class:"breath"}, b);
-    el("rect", {x:-12, y:-30, width:24, height:22, rx:11, fill:body}, bb);                 // 몸
-    el("ellipse", {cx:-13, cy:-20, rx:4, ry:6, fill:body, class:"arm"}, bb);                // 팔
-    el("ellipse", {cx:13, cy:-20, rx:4, ry:6, fill:body, class:"arm r"}, bb);
-    el("circle", {cx:0, cy:-46, r:17, fill:"#ffe0c7"}, bb);                                  // 큰 머리
-    if (style === 3){
-      el("path", {d:"M-17,-48 Q-15,-68 0,-67 Q15,-68 17,-48 Q8,-58 0,-57 Q-8,-58 -17,-48Z", fill:hair}, bb);
-      el("path", {d:"M-19,-46 Q-19,-66 0,-66 Q19,-66 19,-46", stroke:"#12131a", "stroke-width":3, fill:"none"}, bb);
-      el("rect", {x:-22, y:-52, width:7, height:13, rx:3, fill:"#12131a"}, bb);
-      el("rect", {x:15, y:-52, width:7, height:13, rx:3, fill:"#12131a"}, bb);
-      el("text", {x:-6.5, y:-14, "font-size":9, "font-weight":900, fill:"#12131a"}, bb).textContent = "AI";
-    } else if (style === 1){
-      el("path", {d:"M-17,-46 Q-18,-66 0,-65 Q18,-66 17,-46 Q10,-56 2,-55 Q-6,-58 -17,-46Z", fill:hair}, bb);
-    } else if (style === 2){
-      el("path", {d:"M-18,-42 Q-20,-67 0,-66 Q20,-67 18,-42 L18,-34 L13,-47 Q0,-53 -13,-47 L-18,-34Z", fill:hair}, bb);
-    } else {
-      el("path", {d:"M-17,-48 Q-15,-66 0,-65 Q15,-66 17,-48 Q6,-57 -2,-55 Q-10,-56 -17,-48Z", fill:hair}, bb);
-      el("path", {d:"M-2,-65 Q2,-72 6,-66", stroke:hair, "stroke-width":2.5, fill:"none"}, bb);   // 삐침 머리
-    }
-    const eyes = el("g", {class:"eyes"}, bb);
-    [-6,6].forEach(cx => { el("ellipse", {cx, cy:-44, rx:2.6, ry:3.2, fill:"#2b2118"}, eyes); el("circle", {cx:cx+.9, cy:-45.3, r:1, fill:"#fff"}, eyes); });
-    el("ellipse", {cx:-10, cy:-38, rx:3.2, ry:2, fill:"#ff9aa8", opacity:.7}, bb);           // 볼터치
-    el("ellipse", {cx:10, cy:-38, rx:3.2, ry:2, fill:"#ff9aa8", opacity:.7}, bb);
-    this.mouth = el("path", {d:"M-3,-37 Q0,-34.5 3,-37", stroke:"#b4553f", "stroke-width":1.5, fill:"none", "stroke-linecap":"round"}, bb);
-    this.dot = el("circle", {cx:18, cy:-62, r:4.5, fill:"#7d8399", stroke:"#12131a", "stroke-width":1.5}, g);
-    el("text", {class:"label", x:0, y:17, "text-anchor":"middle"}, g).textContent = this.info.name;
-    this.bub = el("g", {class:"bubble", transform:"translate(0,-82)"}, g);
-    this.zz = el("text", {class:"zz", x:14, y:-66}, g); this.zz.textContent = "z"; this.zz.style.display = "none";
+    const br = el("g", {class:"breath"}, b);
+    this.art = el("g", {transform:"scale(.76)"}, br);
+    this.face = ""; this.setFace("normal");
+    this.dot = el("circle", {cx:22, cy:-70, r:4.5, fill:"#7d8399", stroke:"#12131a", "stroke-width":1.5}, g);
+    el("text", {class:"label", x:0, y:18, "text-anchor":"middle"}, g).textContent = this.info.name;
+    this.bub = el("g", {class:"bubble", transform:"translate(0,-86)"}, g);
+    this.zz = el("text", {class:"zz", x:18, y:-74}, g); this.zz.textContent = "z"; this.zz.style.display = "none";
     this.place();
+  }
+  setFace(k){ if (k !== this.face && window.CHAR && CHAR.TEAM[this.id]){ this.face = k; this.art.innerHTML = CHAR.drawChar(this.id, k); } }
+  pickFace(){
+    const now = Date.now();
+    if (this.faceUntil && now < this.faceUntil) return this.faceTmp;
+    if (now < partyUntil) return "excited";
+    if (this.state === "working") return now - (this.workStart || now) < 25000 ? "focus" : "busy";
+    if (this.state === "error") return "sad";
+    if (this.state === "fresh") return "happy";
+    if (this.g.classList.contains("napping")) return "sleepy";
+    return this.talking && now < this.talking ? "happy" : "normal";
   }
   say(text, typing){
     this.bub.innerHTML = "";
@@ -272,9 +259,11 @@ class Person {
     const w = [...text].length * 11 + 16;
     el("rect", {x:-w/2, y:-12, width:w, height:20, rx:10}, this.bub);
     el("text", {x:0, y:2, "text-anchor":"middle"}, this.bub).textContent = text;
+    this.talking = Date.now() + 2500;
     clearTimeout(this.sayT); this.sayT = setTimeout(() => { if (this.state !== "error") this.bub.innerHTML = ""; }, 4000);
   }
   setState(state, when){
+    if (state === "working" && this.state !== "working") this.workStart = Date.now();
     this.state = state; this.when = when;
     this.dot.setAttribute("fill", {working:"#4ade80", fresh:"#f5b940", error:"#f87171", idle:"#7d8399"}[state]);
     const scr = document.getElementById("scr-"+this.id);
@@ -294,7 +283,12 @@ class Person {
     else if (this.state === "error") line = "사장님 이것 좀 봐주세요 ㅠ";
     else if (this.state === "working") line = ["지금 바빠요! 🔥","거의 다 했어요!","집중 중이에요!"][Math.floor(Math.random()*3)];
     else if (this.info.note && Math.random() < .4) line = this.info.note.replace("다음: ","다음은 ").slice(0,18) + "!";
-    else line = CLICK[Math.floor(Math.random()*CLICK.length)];
+    else {
+      const own = (window.CHAR && CHAR.TEAM[this.id] || {}).say || [];
+      const pool = own.concat(CLICK); line = pool[Math.floor(Math.random()*pool.length)];
+    }
+    this.faceTmp = "surprise"; this.faceUntil = Date.now() + 700;
+    setTimeout(() => { this.faceTmp = again || this.state === "error" ? "sad" : "happy"; this.faceUntil = Date.now() + 2200; }, 700);
     this.say(line);
     for (let i = 0; i < 3; i++){
       const h = el("text", {class:"heart", x:-6 + i*6, y:-70, style:`--hx:${(i-1)*14}px;animation-delay:${i*.12}s`}, this.g);
@@ -344,6 +338,7 @@ class Person {
       this.place();
     } else if ((this.wait -= dt) <= 0) this.wait = this.decide();
   }
+  face2(){ this.setFace(this.pickFace()); }
   place(){ this.g.setAttribute("transform", `translate(${this.x.toFixed(1)},${this.y.toFixed(1)})`); }
 }
 const dist = (a, p) => Math.hypot(a.x-p[0], a.y-p[1]);
@@ -368,7 +363,7 @@ const people = {};
 function showPanel(p){
   const i = p.info, lab = {working:["일하는 중","#4ade80"], fresh:["방금 끝냄","#f5b940"], error:["문제","#f87171"], idle:["쉬는 중","#9aa1b5"]}[p.state];
   document.getElementById("pbody").innerHTML =
-    `<b>${esc(i.name)}</b><span class="st" style="background:${lab[1]}22;color:${lab[1]}">${lab[0]}</span>
+    `<b>${esc(i.name)}</b> <small style="color:#f5b940;font-weight:800">${esc((CHAR.TEAM[p.id]||{}).animal||"")} ${esc((CHAR.TEAM[p.id]||{}).rank||"")}</small><span class="st" style="background:${lab[1]}22;color:${lab[1]}">${lab[0]}</span>
      <p>${esc(i.role)} · 🕘 ${esc(i.when || "")}</p>
      ${i.did ? `<div class="did">${esc(i.did)}</div>` : ""}
      ${i.note ? `<p>${esc(i.note)}</p>` : ""}${i.count ? `<p>${esc(i.count)}</p>` : ""}
@@ -410,7 +405,7 @@ let last = performance.now(), lastOrder = "";
 function loop(now){
   const dt = Math.min(.1, (now-last)/1000); last = now;
   const list = Object.values(people);
-  list.forEach(p => p.step(dt));
+  list.forEach(p => { p.step(dt); p.face2(); });
   list.sort((a,b) => a.y-b.y);
   const order = list.map(p => p.id).join();
   if (order !== lastOrder){ lastOrder = order; list.forEach(p => p.g.parentNode.appendChild(p.g)); }  // 아래쪽 사람이 앞에
