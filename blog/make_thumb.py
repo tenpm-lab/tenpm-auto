@@ -53,9 +53,11 @@ def make(out, label, lines, sub, series=None):
     im = Image.new("RGB", (W, W), c["bg"])
     d = ImageDraw.Draw(im)
     cx, cy, r = W - 150, 150, 62
+    # 실제 로고: 밤 10시 (긴 바늘 12, 노란 짧은 바늘 10)
     d.ellipse((cx - r, cy - r, cx + r, cy + r), outline=c["clock"], width=10)
-    d.line((cx, cy, cx, cy - 38), fill=c["clock"], width=10)
-    d.line((cx, cy, cx + 30, cy + 14), fill="#f5c400", width=10)  # 실제 로고처럼 짧은 바늘은 노랑
+    d.line((cx, cy, cx - 33, cy - 19), fill="#f5b940", width=11)
+    d.line((cx, cy, cx, cy - 42), fill=c["clock"], width=10)
+    d.ellipse((cx - 10, cy - 10, cx + 10, cy + 10), fill=c["clock"])
     lf = fit(d, label, R, 40, 720)
     d.rounded_rectangle((90, 120, 90 + d.textlength(label, font=lf) + 56, 190), radius=35, fill=c["acc"])
     d.text((118, 128), label, font=lf, fill=c["lab_txt"])
