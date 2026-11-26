@@ -1,0 +1,62 @@
+{
+ "top": {
+  "followers": "?",
+  "posts_total": 0,
+  "clicks": 0,
+  "earn": 0,
+  "today": 0,
+  "next": "20:30",
+  "deal_queue": 0
+ },
+ "staff": [
+  {
+   "id": "poster",
+   "name": "게시 담당",
+   "role": "예약한 글 올리기",
+   "wf": "post.yml",
+   "when": "15분마다",
+   "did": "아직 기록 없음",
+   "note": "다음: 12/31 20:30 경험 글",
+   "count": "오늘 0개 · 대기 1개"
+  },
+  {
+   "id": "reply",
+   "name": "댓글 담당",
+   "role": "정해둔 댓글에 답장",
+   "wf": "post.yml",
+   "when": "15분마다",
+   "did": "지금까지 답장 0개",
+   "note": "댓글 기다리는 중",
+   "count": ""
+  },
+  {
+   "id": "stats",
+   "name": "통계 담당",
+   "role": "팔로워 수 기록",
+   "wf": "post.yml",
+   "when": "15분마다",
+   "did": "팔로워 ?명 기록",
+   "note": "",
+   "count": ""
+  },
+  {
+   "id": "key",
+   "name": "열쇠 담당",
+   "role": "토큰 연장",
+   "wf": "token.yml",
+   "when": "매달 1일·15일",
+   "did": "첫 연장 기다리는 중",
+   "note": "",
+   "count": ""
+  }
+ ],
+ "waiting": [],
+ "plan": [
+  {
+   "when": "12/31 20:30",
+   "kind": "경험 글",
+   "title": "예시 글이에요. 파일 이름이 올라갈 날짜와 시간이에요."
+  }
+ ],
+ "updated": "2026-11-26 18:56"
+}

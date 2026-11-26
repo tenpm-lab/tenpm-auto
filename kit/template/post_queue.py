@@ -1,0 +1,363 @@
+# -*- coding: utf-8 -*-
+"""
+쓰레드 예약 게시 프로그램 (GitHub Actions용)
+
+폴더 구조
+  posts/queue/   올릴 글 파일을 넣는 곳
+  posts/done/    다 올린 글이 자동으로 옮겨지는 곳
+  images/        사진을 넣는 곳
+
+글 파일 이름 = 올릴 날짜와 시간 (한국 시간)
+  20261111-2200_장패드.txt   -> 2026년 11월 11일 밤 10시에 올라감
+
+글 파일 내용
+  - --- 로 나누면 그 아래 글은 이어 쓰기로 올라감
+  - 각 글 맨 위에 "주제: 데스크테리어" 를 쓰면 쓰레드 주제 태그가 붙음
+  - 각 글 맨 첫 줄에 "사진: a.jpg, b.jpg" 를 쓰면 images 폴더의 사진이 같이 올라감
+    (영상 .mp4/.mov 도 같은 줄에 섞어 쓸 수 있음)
+    (사진 1장 = 사진 글, 2장 이상 = 여러 장 넘겨보기 글, 최대 20장)
+
+사용법
+  GitHub에서는 15분마다 자동 실행됨. 시간이 된 글만 올라감
+  노트북에서 확인용:  python post_queue.py 미리보기
+"""
+
+import json
+import os
+import shutil
+import sys
+import time
+import urllib.error
+import urllib.parse
+import urllib.request
+from datetime import datetime, timedelta, timezone
+
+API = "https://graph.threads.net/v1.0"
+KST = timezone(timedelta(hours=9))
+HERE = os.path.dirname(os.path.abspath(__file__))
+PBASE = os.path.join(HERE, "posts")
+QUEUE = os.path.join(PBASE, "queue")
+DONE = os.path.join(PBASE, "done")
+IMAGES = os.path.join(HERE, "images")
+LOG = os.path.join(PBASE, "posted_log.txt")
+
+
+# ---------- 설정 ----------
+def read_token():
+    token = os.environ.get("THREADS_TOKEN", "").strip()
+    if token:
+        return token
+    env_path = os.path.join(HERE, ".env")
+    if os.path.exists(env_path):
+        with open(env_path, encoding="utf-8") as f:
+            for line in f:
+                if line.startswith("THREADS_TOKEN="):
+                    return line.split("=", 1)[1].strip()
+    sys.exit("토큰이 없어요. GitHub 비밀값(THREADS_TOKEN)이나 .env 파일을 확인해주세요.")
+
+
+def image_base_url():
+    repo = os.environ.get("GITHUB_REPOSITORY", "")  # 예: 내아이디/내저장소
+    branch = os.environ.get("GITHUB_REF_NAME", "main")
+    if not repo:
+        repo = os.environ.get("MY_REPO", "")
+    if not repo:
+        return None
+    return f"https://raw.githubusercontent.com/{repo}/{branch}/images/"
+
+
+# ---------- API ----------
+def call(method, path, params):
+    url = API + path
+    data = None
+    if method == "GET":
+        url += "?" + urllib.parse.urlencode(params)
+    else:
+        data = urllib.parse.urlencode(params).encode("utf-8")
+    req = urllib.request.Request(url, data=data, method=method)
+    try:
+        with urllib.request.urlopen(req, timeout=60) as res:
+            return json.loads(res.read().decode("utf-8"))
+    except urllib.error.HTTPError as e:
+        body = e.read().decode("utf-8", errors="replace")
+        raise RuntimeError(f"쓰레드 API 오류 ({e.code}): {body}")
+
+
+def wait_ready(token, container_id):
+    """사진은 쓰레드가 가져가서 처리할 시간이 필요하다. 준비될 때까지 기다린다."""
+    for _ in range(60):  # 최대 약 5분 (영상은 오래 걸림)
+        res = call("GET", f"/{container_id}", {"fields": "status,error_message", "access_token": token})
+        status = res.get("status")
+        if status not in ("FINISHED", "PUBLISHED"):
+            print(f"   · 준비 중 {container_id}: {status} {res.get('error_message', '')}")
+        if status in (None, "FINISHED", "PUBLISHED"):
+            return
+        if status in ("ERROR", "EXPIRED"):
+            raise RuntimeError(f"쓰레드가 글을 준비하지 못했어요: {res.get('error_message', status)}")
+        time.sleep(5)
+    raise RuntimeError("쓰레드가 글을 준비하는 데 너무 오래 걸려요. 사진 주소를 확인해주세요.")
+
+
+VIDEO_EXT = (".mp4", ".mov")
+
+
+def media_params(name, base):
+    """사진이면 IMAGE, 영상(.mp4/.mov)이면 VIDEO"""
+    url = base + urllib.parse.quote(name)
+    if name.lower().endswith(VIDEO_EXT):
+        return {"media_type": "VIDEO", "video_url": url}
+    return {"media_type": "IMAGE", "image_url": url}
+
+
+def already_posted(token, text):
+    """최근 내 글 5개 중 첫 줄이 같은 글이 있으면 그 id (중복 게시 방지)"""
+    try:
+        res = call("GET", "/me/threads", {"fields": "id,text,timestamp", "limit": "5", "access_token": token})
+    except RuntimeError:
+        return None
+    first = text.strip().splitlines()[0].strip() if text.strip() else ""
+    for t in res.get("data", []):
+        if first and (t.get("text") or "").strip().startswith(first):
+            return t["id"]
+    return None
+
+
+def publish(token, user_id, text, photos, reply_to, base, topic=""):
+    params = {"access_token": token, "text": text}
+    if topic:
+        params["topic_tag"] = topic
+    if reply_to:
+        params["reply_to_id"] = reply_to
+
+    if not photos:
+        params["media_type"] = "TEXT"
+    elif len(photos) == 1:
+        params.update(media_params(photos[0], base))
+    else:
+        children = []
+        for name in photos:
+            item_params = {"access_token": token, "is_carousel_item": "true"}
+            item_params.update(media_params(name, base))
+            item = call("POST", f"/{user_id}/threads", item_params)
+            wait_ready(token, item["id"])
+            print(f"   · 사진 준비됨: {name} -> {item['id']}")
+            children.append(item["id"])
+        params["media_type"] = "CAROUSEL"
+        params["children"] = ",".join(children)
+
+    try:
+        container = call("POST", f"/{user_id}/threads", params)
+    except RuntimeError as e:
+        if "topic_tag" not in params:
+            raise
+        # 주제 태그 때문에 거절되면 태그 없이 한 번 더 시도 (글은 꼭 올라가게)
+        print(f"   ⚠️ 주제 태그 없이 다시 올림: {e}")
+        params.pop("topic_tag")
+        container = call("POST", f"/{user_id}/threads", params)
+    for attempt in range(3):
+        try:
+            time.sleep(5 if photos else 0)  # 쓰레드가 사진 묶음을 인식할 시간
+            wait_ready(token, container["id"])
+            result = call("POST", f"/{user_id}/threads_publish",
+                          {"creation_id": container["id"], "access_token": token})
+            return result["id"]
+        except RuntimeError as e:
+            # 'does not exist'(4279009): 오류가 나도 실제로는 올라가 있는 경우가 있음 (11/19 중복 게시)
+            # → 다시 올리기 전에 내 최근 글에 같은 글이 있는지 먼저 확인
+            if "4279009" not in str(e):
+                raise
+            time.sleep(15)
+            found = already_posted(token, text)
+            if found:
+                print(f"   ⚠️ 오류가 났지만 이미 올라가 있음 → 그 글로 처리 ({found})")
+                return found
+            if attempt == 2:
+                raise
+            print(f"   ⚠️ 쓰레드 준비 덜 됨, 다시 시도 ({attempt + 1}/3)")
+            if len(photos) > 1:
+                container = call("POST", f"/{user_id}/threads", params)
+
+
+def notify(title, message, link=""):
+    """폰 알림 (ntfy 앱). GitHub 비밀값 NTFY_TOPIC 이 있을 때만 보냄"""
+    topic = os.environ.get("NTFY_TOPIC", "").strip()
+    if not topic:
+        return
+    headers = {"Title": title.encode("utf-8"), "Tags": "clock"}
+    if link:
+        headers["Click"] = link
+    try:
+        req = urllib.request.Request("https://ntfy.sh/" + topic, data=message.encode("utf-8"),
+                                     headers=headers, method="POST")
+        with urllib.request.urlopen(req, timeout=20) as res:
+            status = res.status
+        _notify_log(f"{title}\t보냄({status})")
+    except Exception as e:
+        print(f"   (알림 실패: {e})")
+        _notify_log(f"{title}\t실패: {str(e)[:150]}")
+
+
+def _notify_log(line):
+    """알림이 실제로 나갔는지 기록 (주소·비밀값은 안 적음)"""
+    try:
+        with open(os.path.join(HERE, "posts", "notify_log.txt"), "a", encoding="utf-8") as f:
+            f.write(f"{datetime.now(KST):%Y-%m-%d %H:%M}\t{line}\n")
+    except Exception:
+        pass
+
+
+# ---------- 글 파일 ----------
+def due_time(filename):
+    """20261111-2200_장패드.txt -> 2026-11-11 22:00 (한국 시간)"""
+    try:
+        stamp = filename.split("_", 1)[0]
+        return datetime.strptime(stamp, "%Y%m%d-%H%M").replace(tzinfo=KST)
+    except ValueError:
+        return None
+
+
+def parse_file(path):
+    with open(path, encoding="utf-8") as f:
+        raw = f.read().replace("\r\n", "\n")
+    parts = []
+    for chunk in raw.split("\n---\n"):
+        chunk = chunk.strip()
+        if not chunk:
+            continue
+        photos, topic = [], ""
+        lines = chunk.split("\n")
+        # 맨 위 "사진:" / "주제:" 줄은 글 내용이 아니라 설정 (순서 상관없음)
+        while lines and lines[0].strip().replace(" :", ":").startswith(("사진:", "주제:")):
+            key, value = lines.pop(0).split(":", 1)
+            if key.strip() == "사진":
+                photos = [n.strip() for n in value.split(",") if n.strip()]
+            else:
+                topic = value.strip().replace(".", "").replace("&", "")[:50]
+        chunk = "\n".join(lines).strip()
+        parts.append({"text": chunk, "photos": photos, "topic": topic})
+    return parts
+
+
+def check_parts(name, parts):
+    problems = []
+    if not parts:
+        problems.append("글이 비어 있음")
+    for i, p in enumerate(parts, 1):
+        if len(p["text"]) > 500:
+            problems.append(f"{i}번째 글이 {len(p['text'])}자 (500자까지)")
+        if len(p["photos"]) > 20:
+            problems.append(f"{i}번째 글의 사진이 {len(p['photos'])}장 (20장까지)")
+        for photo in p["photos"]:
+            if not os.path.exists(os.path.join(IMAGES, photo)):
+                problems.append(f"images 폴더에 '{photo}' 사진이 없음")
+    return problems
+
+
+def queue_files():
+    if not os.path.isdir(QUEUE):
+        return []
+    return sorted(f for f in os.listdir(QUEUE) if f.endswith(".txt"))
+
+
+# ---------- 명령 ----------
+def preview():
+    now = datetime.now(KST)
+    files = queue_files()
+    if not files:
+        print("posts/queue 폴더에 올릴 글이 없어요.")
+        return
+    for name in files:
+        when = due_time(name)
+        parts = parse_file(os.path.join(QUEUE, name))
+        state = "시간 됨 (다음 실행 때 올라감)" if when and when <= now else "대기"
+        print(f"■ {name}  |  {when.strftime('%m/%d %H:%M') if when else '파일 이름 오류'}  |  {state}")
+        for problem in check_parts(name, parts):
+            print(f"   ⚠️ {problem}")
+        for i, p in enumerate(parts, 1):
+            label = "본문" if i == 1 else "이어 쓰기"
+            pics = f" + 사진 {len(p['photos'])}장" if p["photos"] else ""
+            pics += f" · 주제 {p['topic']}" if p["topic"] else ""
+            first_line = p["text"].split("\n")[0][:40]
+            print(f"   {i}. {label}{pics}: {first_line}")
+        print()
+
+
+def run():
+    now = datetime.now(KST)
+    due = [f for f in queue_files() if (due_time(f) or now + timedelta(days=999)) <= now]
+    # 3시간 넘게 밀린 글은 한꺼번에 올리지 않음 (처음 설치할 때 쌓인 예시 글 방지)
+    stale = [f for f in due if now - due_time(f) > timedelta(hours=3)]
+    if stale:
+        print("밀린 글은 건너뜀 (파일 이름의 날짜를 다시 잡아주세요):", ", ".join(stale))
+    due = [f for f in due if f not in stale]
+    if not due:
+        print(f"{now:%m/%d %H:%M} 올릴 시간이 된 글이 없어요.")
+        return
+
+    token = read_token()
+    base = image_base_url()
+    me = call("GET", "/me", {"fields": "id,username", "access_token": token})
+    os.makedirs(DONE, exist_ok=True)
+    failed = False
+
+    posted = set()
+    if os.path.exists(LOG):
+        with open(LOG, encoding="utf-8") as f:
+            posted = {l.split("\t")[1] for l in f if l.count("\t") >= 2}
+
+    for name in due:
+        path = os.path.join(QUEUE, name)
+        if name in posted:  # 이미 올린 글이면 다시 안 올림 (중복 방지)
+            print(f"↷ {name} 이미 올라감 → 건너뜀")
+            shutil.move(path, os.path.join(DONE, name))
+            continue
+        parts = parse_file(path)
+        problems = check_parts(name, parts)
+        if any(p["photos"] for p in parts) and not base:
+            problems.append("사진 주소를 만들 수 없음 (GitHub에서 실행해야 함)")
+        if problems:
+            print(f"✗ {name} 건너뜀: " + " / ".join(problems))
+            notify("⚠️ 쓰레드 게시 건너뜀", f"{name}\n{problems[0]}")
+            failed = True
+            continue
+        try:
+            previous, ids = None, []
+            for p in parts:
+                previous = publish(token, me["id"], p["text"], p["photos"], previous, base, p["topic"])
+                ids.append(previous)
+                time.sleep(5)
+            shutil.move(path, os.path.join(DONE, name))
+            with open(LOG, "a", encoding="utf-8") as f:
+                f.write(f"{datetime.now(KST):%Y-%m-%d %H:%M}\t{name}\t{','.join(ids)}\n")
+            print(f"✓ {name} 올림 ({len(ids)}개)")
+            link = ""
+            try:
+                link = call("GET", f"/{ids[0]}", {"fields": "permalink", "access_token": token}).get("permalink", "")
+            except RuntimeError:
+                pass
+            first_line = next((l for l in parts[0]["text"].split("\n") if l.strip() and not l.startswith("[")), "")
+            notify("✅ 쓰레드에 올라감", f"{first_line[:40]}\n({len(ids)}개 · 눌러서 보기)", link)
+        except RuntimeError as e:
+            print(f"✗ {name} 실패: {e}")
+            # 원인 기록 (토큰은 오류 문구에 안 들어감) + 일부만 올라간 경우 중복 게시 막기
+            with open(os.path.join(HERE, "posts", "error_log.txt"), "a", encoding="utf-8") as f:
+                f.write(f"{datetime.now(KST):%Y-%m-%d %H:%M}\t{name}\t올라간 부분={','.join(ids) or '없음'}\t{str(e)[:400]}\n")
+            if ids:
+                hold = os.path.join(HERE, "posts", "hold")
+                os.makedirs(hold, exist_ok=True)
+                shutil.move(path, os.path.join(hold, name))
+            notify("⚠️ 쓰레드 게시 실패", f"{name}\nAI 대화창에 '안 올라왔어'라고 보내줘")
+            failed = True
+
+    if failed:
+        sys.exit(1)  # GitHub에서 실패 알림 메일이 오도록
+
+
+if __name__ == "__main__":
+    if len(sys.argv) > 1 and sys.argv[1] in ("미리보기", "preview"):
+        preview()
+    elif len(sys.argv) > 1 and sys.argv[1] in ("알림테스트", "notify-test"):
+        notify("🔔 알림 테스트", "이게 보이면 알림 설정 완료!\n앞으로 글이 올라갈 때마다 이렇게 와요")
+        print("알림 보냄" if os.environ.get("NTFY_TOPIC") else "NTFY_TOPIC 없음")
+    else:
+        run()
