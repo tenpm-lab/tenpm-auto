@@ -32,7 +32,18 @@ svg{display:block;width:100%;height:auto}
 .walking .legs rect:last-child{animation:legB .36s infinite alternate}
 .walking .body{animation:bob .36s infinite alternate}
 .sitting .legs{display:none}
-.sitting .body{transform:translateY(6px)}
+.sitting .body{transform:translateY(5px)}
+.breath{animation:breath 2.6s ease-in-out infinite;transform-box:fill-box;transform-origin:bottom center}
+@keyframes breath{0%,100%{transform:scale(1,1)}50%{transform:scale(1.02,.98)}}
+.napping .eyes{transform:scaleY(.15);transform-box:fill-box;transform-origin:center}
+.jump .body{animation:jump .5s ease-out}
+@keyframes jump{0%{transform:translateY(0)}35%{transform:translateY(-16px)}70%{transform:translateY(0)}85%{transform:translateY(-4px)}100%{transform:translateY(0)}}
+.jump .arm.r{animation:wave .5s 2}
+.arm{transform-box:fill-box;transform-origin:top center}
+@keyframes wave{50%{transform:rotate(-120deg)}}
+.heart{font-size:14px;animation:heart 1.2s ease-out forwards;pointer-events:none}
+@keyframes heart{0%{opacity:0;transform:translate(0,0) scale(.6)}20%{opacity:1}100%{opacity:0;transform:translate(var(--hx),-46px) scale(1.2)}}
+.clockbtn{cursor:pointer}
 @keyframes legA{from{transform:rotate(18deg)}to{transform:rotate(-18deg)}}
 @keyframes legB{from{transform:rotate(-18deg)}to{transform:rotate(18deg)}}
 @keyframes bob{from{transform:translateY(0)}to{transform:translateY(-1.5px)}}
@@ -62,7 +73,7 @@ footer a{color:var(--sub)}
 <div class="wrap">
   <header>
     <img src="../icon.png" alt="">
-    <div><h1>텐피엠 <b>AI 사무실</b></h1><p>퇴근 후 부업을 대신 하는 AI 직원들 · 실제로 일하는 기록 그대로 · 직원을 눌러보세요</p></div>
+    <div><h1>텐피엠 <b>AI 사무실</b></h1><p>퇴근 후 부업을 대신 하는 AI 직원들 · 실제로 일하는 기록 그대로 · 직원을 눌러보세요 · 벽시계도 눌러보세요 🕙</p></div>
     <div class="kpis">
       <div class="kpi"><span>지금</span><strong id="now">--:--</strong></div>
       <div class="kpi"><span>올린 글</span><strong id="k-posts">-</strong></div>
@@ -95,7 +106,7 @@ footer a{color:var(--sub)}
       </g>
       <circle cx="1080" cy="27" r="8" fill="#f5b940" opacity=".25"/>
       <!-- 벽시계 = 로고 (밤 10시) -->
-      <g transform="translate(600,28)">
+      <g transform="translate(600,28)" class="clockbtn" id="clock"><title>눌러보세요</title>
         <circle r="18" fill="#12131a"/><circle r="13" fill="none" stroke="#f4f1ea" stroke-width="3"/>
         <line x1="0" y1="0" x2="-7" y2="-4" stroke="#f5b940" stroke-width="2.8" stroke-linecap="round"/>
         <line x1="0" y1="0" x2="0" y2="-9" stroke="#f4f1ea" stroke-width="2.6" stroke-linecap="round"/>
@@ -166,8 +177,19 @@ const MEET = { planner:[820,520], editor:[1000,520] };
 const SOFA = [[370,640],[445,640],[520,640]];
 const SPOTS = { coffee:[690,716], water:[783,716], snack:[1095,712], plant:[600,420], lounge1:[360,710],
   lounge2:[500,710], hall1:[605,570], hall2:[300,408], hall3:[900,318], board:[1060,520], shelf:[445,540] };
-const WANDER = Object.keys(SPOTS);
-const LINES = ["오늘 몇 개 올라갔지?","클릭 언제 나와…","스트레칭~","간식 뭐 있지","퇴근하고 싶다","팔로워 늘었나?","0원 탈출 가즈아","커피 한 잔?"];
+// 쉬는 사람이 갈 수 있는 곳 (한 곳에 한 명만 → 겹치지 않게)
+const FREE = [[690,716],[783,716],[860,712],[1095,712],[960,712],[600,420],[360,710],[500,710],[605,570],[300,408],
+  [900,318],[1060,520],[445,540],[250,200],[500,330],[250,330],[160,410],[740,250],[920,250],[1100,250],[700,330],
+  [1150,560],[560,560],[180,690],[90,470],[640,470]];
+const claims = {};                      // 사람 id → [x,y] 가려는 곳
+function freeSpot(id, list){
+  const opts = list.filter(p => !Object.entries(claims).some(([k,c]) => k !== id && Math.hypot(c[0]-p[0], c[1]-p[1]) < 42));
+  return opts.length ? opts[Math.floor(Math.random()*opts.length)] : null;
+}
+const PARTY = [[1050,700],[1080,690],[1110,700],[1140,690],[1030,690],[1000,705],[970,695],[1160,705],[1060,720],[1125,722],[1000,725],[940,712],[1155,675]];
+let partyUntil = 0;
+const CLICK = ["넵 사장님!","바로 할게요!","오늘도 열일 중!","월급 올려주세요 ㅎㅎ","커피 한 잔만요…","0원 탈출 가즈아!","충성충성 ^^7","저 부르셨어요?"];
+const LINES = ["멍~","오늘 몇 개 올라갔지?","클릭 언제 나와…","스트레칭~","간식 뭐 있지","퇴근하고 싶다","팔로워 늘었나?","0원 탈출 가즈아","커피 한 잔?"];
 
 // 생김새: 몸 색, 머리 색, 머리 모양(0 짧은, 1 가르마, 2 단발, 3 AI 헤드셋)
 const LOOK = { poster:["#60a5fa","#2b2118",0], deal:["#f97316","#5b3a1e",1], reply:["#a78bfa","#111",2], gold:["#facc15","#7c4a1e",1],
@@ -202,32 +224,40 @@ class Person {
   build(){
     const [body, hair, style] = LOOK[this.id] || ["#9aa1b5","#222",0];
     const g = this.g = el("g", {class:"person"}, document.getElementById("people"));
-    g.addEventListener("click", () => showPanel(this));
-    el("ellipse", {cx:0, cy:2, rx:13, ry:4, fill:"#000", opacity:.3}, g);
+    g.addEventListener("click", e => { e.stopPropagation(); this.poke(); showPanel(this); });
+    el("ellipse", {cx:0, cy:2, rx:14, ry:4.5, fill:"#000", opacity:.28}, g);
     const legs = el("g", {class:"legs"}, g);
-    el("rect", {x:-7, y:-12, width:5, height:13, rx:2, fill:"#2b2e3d"}, legs);
-    el("rect", {x:2, y:-12, width:5, height:13, rx:2, fill:"#2b2e3d"}, legs);
+    el("rect", {x:-7, y:-10, width:6, height:11, rx:3, fill:"#3a3f55"}, legs);
+    el("rect", {x:1, y:-10, width:6, height:11, rx:3, fill:"#3a3f55"}, legs);
     const b = el("g", {class:"body"}, g);
-    el("rect", {x:-11, y:-34, width:22, height:24, rx:8, fill:body}, b);
-    el("circle", {cx:0, cy:-45, r:12, fill:"#f3d2b3"}, b);
+    const bb = el("g", {class:"breath"}, b);
+    el("rect", {x:-12, y:-30, width:24, height:22, rx:11, fill:body}, bb);                 // 몸
+    el("ellipse", {cx:-13, cy:-20, rx:4, ry:6, fill:body, class:"arm"}, bb);                // 팔
+    el("ellipse", {cx:13, cy:-20, rx:4, ry:6, fill:body, class:"arm r"}, bb);
+    el("circle", {cx:0, cy:-46, r:17, fill:"#ffe0c7"}, bb);                                  // 큰 머리
     if (style === 3){
-      el("path", {d:"M-12,-47 Q0,-64 12,-47 L12,-50 Q0,-60 -12,-50Z", fill:hair}, b);
-      el("rect", {x:-15, y:-49, width:5, height:10, rx:2, fill:"#12131a"}, b);
-      el("rect", {x:10, y:-49, width:5, height:10, rx:2, fill:"#12131a"}, b);
-      el("text", {x:-6, y:-18, "font-size":9, "font-weight":900, fill:"#12131a"}, b).textContent = "AI";
+      el("path", {d:"M-17,-48 Q-15,-68 0,-67 Q15,-68 17,-48 Q8,-58 0,-57 Q-8,-58 -17,-48Z", fill:hair}, bb);
+      el("path", {d:"M-19,-46 Q-19,-66 0,-66 Q19,-66 19,-46", stroke:"#12131a", "stroke-width":3, fill:"none"}, bb);
+      el("rect", {x:-22, y:-52, width:7, height:13, rx:3, fill:"#12131a"}, bb);
+      el("rect", {x:15, y:-52, width:7, height:13, rx:3, fill:"#12131a"}, bb);
+      el("text", {x:-6.5, y:-14, "font-size":9, "font-weight":900, fill:"#12131a"}, bb).textContent = "AI";
     } else if (style === 1){
-      el("path", {d:"M-12,-46 Q-12,-60 0,-59 Q12,-60 12,-46 Q6,-52 0,-51 Q-6,-52 -12,-46Z", fill:hair}, b);
+      el("path", {d:"M-17,-46 Q-18,-66 0,-65 Q18,-66 17,-46 Q10,-56 2,-55 Q-6,-58 -17,-46Z", fill:hair}, bb);
     } else if (style === 2){
-      el("path", {d:"M-13,-44 Q-14,-61 0,-60 Q14,-61 13,-44 L13,-38 L9,-46 Q0,-50 -9,-46 L-13,-38Z", fill:hair}, b);
+      el("path", {d:"M-18,-42 Q-20,-67 0,-66 Q20,-67 18,-42 L18,-34 L13,-47 Q0,-53 -13,-47 L-18,-34Z", fill:hair}, bb);
     } else {
-      el("path", {d:"M-12,-47 Q-10,-59 0,-58 Q10,-59 12,-47 Q4,-53 -12,-47Z", fill:hair}, b);
+      el("path", {d:"M-17,-48 Q-15,-66 0,-65 Q15,-66 17,-48 Q6,-57 -2,-55 Q-10,-56 -17,-48Z", fill:hair}, bb);
+      el("path", {d:"M-2,-65 Q2,-72 6,-66", stroke:hair, "stroke-width":2.5, fill:"none"}, bb);   // 삐침 머리
     }
-    el("circle", {cx:-4, cy:-45, r:1.6, fill:"#222"}, b); el("circle", {cx:4, cy:-45, r:1.6, fill:"#222"}, b);
-    el("path", {d:"M-3,-40 Q0,-38 3,-40", stroke:"#a0634a", "stroke-width":1.3, fill:"none"}, b);
-    this.dot = el("circle", {cx:15, cy:-58, r:4, fill:"#7d8399", stroke:"#12131a", "stroke-width":1.5}, g);
-    el("text", {class:"label", x:0, y:16, "text-anchor":"middle"}, g).textContent = this.info.name;
-    this.bub = el("g", {class:"bubble", transform:"translate(0,-74)"}, g);
-    this.zz = el("text", {class:"zz", x:10, y:-60}, g); this.zz.textContent = "z"; this.zz.style.display = "none";
+    const eyes = el("g", {class:"eyes"}, bb);
+    [-6,6].forEach(cx => { el("ellipse", {cx, cy:-44, rx:2.6, ry:3.2, fill:"#2b2118"}, eyes); el("circle", {cx:cx+.9, cy:-45.3, r:1, fill:"#fff"}, eyes); });
+    el("ellipse", {cx:-10, cy:-38, rx:3.2, ry:2, fill:"#ff9aa8", opacity:.7}, bb);           // 볼터치
+    el("ellipse", {cx:10, cy:-38, rx:3.2, ry:2, fill:"#ff9aa8", opacity:.7}, bb);
+    this.mouth = el("path", {d:"M-3,-37 Q0,-34.5 3,-37", stroke:"#b4553f", "stroke-width":1.5, fill:"none", "stroke-linecap":"round"}, bb);
+    this.dot = el("circle", {cx:18, cy:-62, r:4.5, fill:"#7d8399", stroke:"#12131a", "stroke-width":1.5}, g);
+    el("text", {class:"label", x:0, y:17, "text-anchor":"middle"}, g).textContent = this.info.name;
+    this.bub = el("g", {class:"bubble", transform:"translate(0,-82)"}, g);
+    this.zz = el("text", {class:"zz", x:14, y:-66}, g); this.zz.textContent = "z"; this.zz.style.display = "none";
     this.place();
   }
   say(text, typing){
@@ -251,9 +281,29 @@ class Person {
     if (scr) scr.classList.toggle("on", state === "working");
     this.wait = 0; this.target = null; this.mode = "";
   }
-  go(p){ this.target = p.slice(); this.g.classList.add("walking"); this.g.classList.remove("sitting"); this.zz.style.display = "none"; }
+  go(p){ this.target = p.slice(); claims[this.id] = this.target; this.g.classList.add("walking"); this.g.classList.remove("sitting","napping"); this.zz.style.display = "none"; }
+  poke(){
+    const again = Date.now() - (this.poked || 0) < 2500; this.poked = Date.now();
+    this.g.classList.remove("jump"); void this.g.getBBox(); this.g.classList.add("jump");
+    setTimeout(() => this.g.classList.remove("jump"), 1000);
+    const wasNap = this.g.classList.contains("napping");
+    this.g.classList.remove("napping"); this.zz.style.display = "none";
+    let line;
+    if (again) line = "아 왜요 사장님 ㅠㅠ";
+    else if (wasNap) line = "헉 안 잤어요!!";
+    else if (this.state === "error") line = "사장님 이것 좀 봐주세요 ㅠ";
+    else if (this.state === "working") line = ["지금 바빠요! 🔥","거의 다 했어요!","집중 중이에요!"][Math.floor(Math.random()*3)];
+    else if (this.info.note && Math.random() < .4) line = this.info.note.replace("다음: ","다음은 ").slice(0,18) + "!";
+    else line = CLICK[Math.floor(Math.random()*CLICK.length)];
+    this.say(line);
+    for (let i = 0; i < 3; i++){
+      const h = el("text", {class:"heart", x:-6 + i*6, y:-70, style:`--hx:${(i-1)*14}px;animation-delay:${i*.12}s`}, this.g);
+      h.textContent = ["💛","✨","💙"][i]; setTimeout(() => h.remove(), 1600);
+    }
+  }
   sit(){ this.g.classList.add("sitting"); this.g.classList.remove("walking"); }
   decide(){
+    if (Date.now() < partyUntil) return 1;
     const s = this.state, home = this.home;
     if (s === "working"){
       if (dist(this, home) > 3){ this.go(home); this.bub.innerHTML = ""; return 1; }
@@ -268,18 +318,23 @@ class Person {
       this.mode = "rest"; this.go(home); return 1;
     }
     const r = Math.random();
-    if (r < .3 && !this.info.ai){ this.mode = "nap"; this.go(jit(SOFA[Math.floor(Math.random()*3)])); return 1; }
-    if (r < .5){ this.mode = "rest"; this.go(home); return 1; }
-    this.mode = ""; this.go(jit(SPOTS[WANDER[Math.floor(Math.random()*WANDER.length)]]));
+    if (r < .2 && !this.info.ai){                      // 빈 소파 자리 있으면 낮잠
+      const seat = freeSpot(this.id, SOFA);
+      if (seat){ this.mode = "nap"; this.go(seat); return 1; }
+    }
+    if (r < .55){ this.mode = "rest"; this.go(home); return 1; }   // 내 자리에서 쉬기
+    const spot = freeSpot(this.id, FREE);
+    if (!spot){ this.mode = "rest"; this.go(home); return 1; }
+    this.mode = ""; this.go(jit(spot));
     if (Math.random() < .3) this.say(LINES[Math.floor(Math.random()*LINES.length)]);
     return 1;
   }
   arrive(){
     this.g.classList.remove("walking");
     if (this.mode === "nap" || this.mode === "rest" || this.state === "working"){
-      this.sit(); if (this.state === "idle" && this.mode === "nap") this.zz.style.display = "";
+      this.sit(); if (this.state === "idle" && this.mode === "nap"){ this.zz.style.display = ""; this.g.classList.add("napping"); }
     }
-    this.wait = this.state === "working" ? 0.2 : 4 + Math.random()*6;
+    this.wait = Date.now() < partyUntil ? 1 : this.state === "working" ? 0.2 : 4 + Math.random()*6;
   }
   step(dt){
     if (this.target){
@@ -344,6 +399,11 @@ async function load(){
 }
 
 function tick(){ const t = kstNow(); document.getElementById("now").textContent = String(t.getHours()).padStart(2,"0")+":"+String(t.getMinutes()).padStart(2,"0"); }
+document.getElementById("clock").addEventListener("click", () => {
+  partyUntil = Date.now() + 9000;
+  Object.values(people).forEach((p, i) => { p.mode = "party"; p.go(PARTY[i % PARTY.length]); p.say(i % 3 ? "회식이다! 🍗" : "사장님 최고!"); p.wait = 9; });
+});
+document.getElementById("scene").addEventListener("click", () => document.getElementById("panel").classList.remove("show"));
 drawDesks(); tick(); setInterval(tick, 10000);
 load(); setInterval(load, 120000);
 let last = performance.now(), lastOrder = "";
