@@ -108,7 +108,21 @@ def main():
     earn = sum(int(r.split(",")[4] or 0) for r in cd)
     top = dict(followers=fnum, posts_total=len(lines(p("posts", "posted_log.txt"))) + len(lines(p("posts", "deal", "posted_log.txt"))),
                clicks=clicks, earn=earn)
-    data = dict(top=top, staff=emp, waiting=wait)
+    # 화이트보드 '다음 계획': 본계정 예약 글 앞쪽 8개
+    plan = []
+    for f in sorted(glob.glob(p("posts", "queue", "*.txt")))[:8]:
+        b = os.path.basename(f)
+        title = ""
+        for l in lines(f):
+            if l.startswith(("주제:", "사진:")) or l.strip() == "---":
+                continue
+            title = l.strip()[:34]
+            break
+        plan.append(dict(when=f"{b[4:6]}/{b[6:8]} {b[9:11]}:{b[11:13]}", kind=kind(b), title=title))
+    deal_q = len(glob.glob(p("posts", "deal", "queue", "*.txt")))
+    today_all = today + today2
+    top.update(today=today_all, next=(plan[0]["when"][-5:] if plan else ""), deal_queue=deal_q)
+    data = dict(top=top, staff=emp, waiting=wait, plan=plan)
     old = {}
     if os.path.exists(OUT):
         old = json.load(open(OUT, encoding="utf-8"))

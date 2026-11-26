@@ -44,6 +44,19 @@ svg{display:block;width:100%;height:auto}
 .heart{font-size:14px;animation:heart 1.2s ease-out forwards;pointer-events:none}
 @keyframes heart{0%{opacity:0;transform:translate(0,0) scale(.6)}20%{opacity:1}100%{opacity:0;transform:translate(var(--hx),-46px) scale(1.2)}}
 .clockbtn{cursor:pointer}
+.prop{cursor:pointer}
+.prop:hover{filter:brightness(1.18)}
+.plant{transform-box:fill-box;transform-origin:bottom center}
+.shake{animation:shake .5s}
+@keyframes shake{25%{transform:rotate(-8deg)}75%{transform:rotate(8deg)}}
+.grow{animation:grow .6s}
+@keyframes grow{50%{transform:scale(1.35)}}
+.puff{font-size:13px;animation:puff 1.6s ease-out forwards;pointer-events:none}
+@keyframes puff{0%{opacity:0;transform:translateY(0)}20%{opacity:1}100%{opacity:0;transform:translateY(-34px)}}
+.panel ul{margin:8px 0 0 0;padding:0;list-style:none}
+.panel li{font-size:12.5px;padding:5px 0;border-top:1px solid #2a2e40;color:#e9e6df}
+.panel li span{color:#f5b940;font-weight:800;margin-right:6px;font-variant-numeric:tabular-nums}
+.panel li i{font-style:normal;color:#9aa1b5;font-size:11px;margin-right:6px}
 @keyframes legA{from{transform:rotate(18deg)}to{transform:rotate(-18deg)}}
 @keyframes legB{from{transform:rotate(-18deg)}to{transform:rotate(18deg)}}
 @keyframes bob{from{transform:translateY(0)}to{transform:translateY(-1.5px)}}
@@ -99,12 +112,31 @@ footer a{color:var(--sub)}
 
       <rect width="1200" height="760" fill="url(#wood)"/>
       <rect width="1200" height="56" fill="#1e2130"/>
-      <g fill="#2b4a6b" opacity=".85">
-        <rect x="80" y="12" width="120" height="30" rx="4"/><rect x="240" y="12" width="120" height="30" rx="4"/>
-        <rect x="400" y="12" width="120" height="30" rx="4"/><rect x="700" y="12" width="120" height="30" rx="4"/>
-        <rect x="860" y="12" width="120" height="30" rx="4"/><rect x="1020" y="12" width="120" height="30" rx="4"/>
+      <defs>
+        <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop id="sky1" offset="0" stop-color="#5aa8e6"/><stop id="sky2" offset="1" stop-color="#a9d8f5"/></linearGradient>
+        <clipPath id="tickclip"><rect x="236" y="12" width="322" height="32" rx="5"/></clipPath>
+      </defs>
+      <!-- 창문 (실제 시간 따라 하늘이 바뀜) -->
+      <g id="windows" class="prop" data-prop="window">
+        <g transform="translate(70,10)"><rect width="140" height="36" rx="5" fill="url(#sky)"/><g class="skydeco"></g><rect width="140" height="36" rx="5" fill="none" stroke="#3a3f55" stroke-width="3"/><line x1="70" y1="0" x2="70" y2="36" stroke="#3a3f55" stroke-width="3"/></g>
+        <g transform="translate(930,10)"><rect width="110" height="36" rx="5" fill="url(#sky)"/><g class="skydeco"></g><rect width="110" height="36" rx="5" fill="none" stroke="#3a3f55" stroke-width="3"/><line x1="55" y1="0" x2="55" y2="36" stroke="#3a3f55" stroke-width="3"/></g>
+        <g transform="translate(1060,10)"><rect width="110" height="36" rx="5" fill="url(#sky)"/><g class="skydeco" id="moonwin"></g><rect width="110" height="36" rx="5" fill="none" stroke="#3a3f55" stroke-width="3"/><line x1="55" y1="0" x2="55" y2="36" stroke="#3a3f55" stroke-width="3"/></g>
       </g>
-      <circle cx="1080" cy="27" r="8" fill="#f5b940" opacity=".25"/>
+      <!-- 전광판 -->
+      <g class="prop" data-prop="ticker">
+        <rect x="232" y="8" width="330" height="40" rx="7" fill="#0b0c10" stroke="#3a3f55" stroke-width="3"/>
+        <g clip-path="url(#tickclip)"><text id="ticker" x="560" y="34" font-size="15" font-weight="800" fill="#f5b940" font-family="Pretendard,sans-serif">불러오는 중…</text></g>
+      </g>
+      <!-- 목표 배너 -->
+      <g class="prop" data-prop="goal" transform="translate(650,8)">
+        <rect width="262" height="40" rx="7" fill="#2a2618" stroke="#f5b940" stroke-opacity=".6" stroke-width="2"/>
+        <text x="10" y="17" font-size="11" font-weight="800" fill="#f5d38a" font-family="Pretendard,sans-serif">🎯 팔로워 100명</text>
+        <rect x="104" y="8" width="110" height="10" rx="5" fill="#12131a"/><rect id="gfol" x="104" y="8" width="0" height="10" rx="5" fill="#f5b940"/>
+        <text id="gfolt" x="220" y="17" font-size="10.5" font-weight="800" fill="#f4f1ea" font-family="Pretendard,sans-serif">-</text>
+        <text x="10" y="34" font-size="11" font-weight="800" fill="#f5d38a" font-family="Pretendard,sans-serif">💰 첫 수익</text>
+        <rect x="104" y="25" width="110" height="10" rx="5" fill="#12131a"/><rect id="gearn" x="104" y="25" width="0" height="10" rx="5" fill="#4ade80"/>
+        <text id="gearnt" x="220" y="34" font-size="10.5" font-weight="800" fill="#f4f1ea" font-family="Pretendard,sans-serif">-</text>
+      </g>
       <!-- 벽시계 = 로고 (밤 10시) -->
       <g transform="translate(600,28)" class="clockbtn" id="clock"><title>눌러보세요</title>
         <circle r="18" fill="#12131a"/><circle r="13" fill="none" stroke="#f4f1ea" stroke-width="3"/>
@@ -130,20 +162,20 @@ footer a{color:var(--sub)}
       <rect x="730" y="420" width="330" height="70" rx="20" fill="#5a4630" filter="url(#sh)"/>
       <rect x="742" y="430" width="306" height="50" rx="14" fill="#6b5338"/>
       <rect x="770" y="442" width="34" height="22" rx="3" fill="#1b1d27"/><rect x="960" y="442" width="34" height="22" rx="3" fill="#1b1d27"/>
-      <rect x="1084" y="372" width="70" height="110" rx="6" fill="#e8e6e0"/>
+      <g class="prop" data-prop="board"><rect x="1084" y="372" width="70" height="110" rx="6" fill="#e8e6e0"/>
       <rect x="1092" y="384" width="54" height="3" fill="#60a5fa"/><rect x="1092" y="394" width="38" height="3" fill="#f87171"/><rect x="1092" y="404" width="46" height="3" fill="#9aa1b5"/><rect x="1092" y="414" width="30" height="3" fill="#4ade80"/>
-      <text x="1094" y="466" font-size="9" fill="#555" font-weight="800">다음 주 계획</text>
+      <text x="1094" y="466" font-size="9" fill="#555" font-weight="800">다음 주 계획</text></g>
       <!-- 관리실 금고 -->
-      <rect x="190" y="460" width="70" height="80" rx="8" fill="#3a3f55" filter="url(#sh)"/><circle cx="225" cy="500" r="15" fill="#2a2e40" stroke="#9aa1b5" stroke-width="2"/><text x="214" y="506" font-size="16">🔑</text>
+      <g class="prop" data-prop="safe"><rect x="190" y="460" width="70" height="80" rx="8" fill="#3a3f55" filter="url(#sh)"/><circle cx="225" cy="500" r="15" fill="#2a2e40" stroke="#9aa1b5" stroke-width="2"/><text x="214" y="506" font-size="16">🔑</text></g>
       <!-- 대기실 소파, 화분, 책장 -->
-      <rect x="330" y="610" width="230" height="56" rx="18" fill="#3b4a7a" filter="url(#sh)"/><rect x="330" y="596" width="230" height="26" rx="12" fill="#4a5b92"/>
-      <text x="316" y="500" font-size="30">🪴</text><text x="550" y="500" font-size="30">🪴</text>
-      <rect x="400" y="470" width="90" height="46" rx="10" fill="#5a4630"/><text x="428" y="500" font-size="18">📚</text>
+      <g class="prop" data-prop="sofa"><rect x="330" y="610" width="230" height="56" rx="18" fill="#3b4a7a" filter="url(#sh)"/><rect x="330" y="596" width="230" height="26" rx="12" fill="#4a5b92"/></g>
+      <text class="prop plant" data-prop="plant" x="316" y="500" font-size="30">🪴</text><text class="prop plant" data-prop="plant" x="550" y="500" font-size="30">🪴</text>
+      <g class="prop" data-prop="book"><rect x="400" y="470" width="90" height="46" rx="10" fill="#5a4630"/><text x="428" y="500" font-size="18">📚</text></g>
       <!-- 탕비실 -->
-      <rect x="660" y="626" width="60" height="70" rx="8" fill="#3a3f55" filter="url(#sh)"/><text x="674" y="668" font-size="26">☕</text>
-      <rect x="760" y="626" width="46" height="70" rx="8" fill="#cfe3f3" filter="url(#sh)"/><rect x="768" y="632" width="30" height="24" rx="6" fill="#7dd3fc"/>
-      <rect x="1040" y="636" width="110" height="46" rx="10" fill="#5a4630"/><text x="1056" y="666" font-size="20">🍩🍪</text>
-      <text x="584" y="410" font-size="26">🪴</text><text x="1146" y="300" font-size="24">🪴</text>
+      <g class="prop" data-prop="coffee"><rect x="660" y="626" width="60" height="70" rx="8" fill="#3a3f55" filter="url(#sh)"/><text x="674" y="668" font-size="26">☕</text><g id="steam"></g></g>
+      <g class="prop" data-prop="water"><rect x="760" y="626" width="46" height="70" rx="8" fill="#cfe3f3" filter="url(#sh)"/><rect x="768" y="632" width="30" height="24" rx="6" fill="#7dd3fc"/></g>
+      <g class="prop" data-prop="snack"><rect x="1040" y="636" width="110" height="46" rx="10" fill="#5a4630"/><text id="snacktext" x="1056" y="666" font-size="20">🍩🍪</text></g>
+      <text class="prop plant" data-prop="plant" x="584" y="410" font-size="26">🪴</text><text class="prop plant" data-prop="plant" x="1146" y="300" font-size="24">🪴</text>
 
       <g id="desks"></g>
       <g id="people"></g>
@@ -386,7 +418,9 @@ async function load(){
     if (info.waiting) p.home = st === "working" ? SPARE[idx % 3] : p.base;   // 호출되면 빈 자리로 출근
     if (p.state !== st) p.setState(st, when); else p.when = when;
   });
-  const t = data.top;
+  DATA = data;
+  const t = data.top; setWall(t);
+  try { if (t.earn > 0 && !localStorage.getItem("tenpm_first_earn")){ localStorage.setItem("tenpm_first_earn", "1"); setTimeout(() => document.getElementById("clock").dispatchEvent(new Event("click")), 1500); } } catch(e){}
   document.getElementById("k-posts").textContent = t.posts_total+"개";
   document.getElementById("k-fol").textContent = t.followers+"명";
   document.getElementById("k-earn").textContent = (t.earn||0).toLocaleString()+"원";
@@ -394,16 +428,103 @@ async function load(){
 }
 
 function tick(){ const t = kstNow(); document.getElementById("now").textContent = String(t.getHours()).padStart(2,"0")+":"+String(t.getMinutes()).padStart(2,"0"); }
+
+// ---------- 위쪽 벽: 하늘·전광판·목표 ----------
+let DATA = null;
+function paintSky(){
+  const h = kstNow().getHours() + kstNow().getMinutes()/60;
+  let c1, c2, mode;
+  if (h >= 5 && h < 7){ c1="#f6a5c0"; c2="#ffd6a5"; mode="dawn"; }
+  else if (h >= 7 && h < 17){ c1="#5aa8e6"; c2="#bfe3fa"; mode="day"; }
+  else if (h >= 17 && h < 19.5){ c1="#f97362"; c2="#fbbf5c"; mode="sunset"; }
+  else { c1="#0b1030"; c2="#25305e"; mode="night"; }
+  document.getElementById("sky1").setAttribute("stop-color", c1);
+  document.getElementById("sky2").setAttribute("stop-color", c2);
+  if (paintSky.mode === mode) return; paintSky.mode = mode;
+  document.querySelectorAll(".skydeco").forEach((g, i) => {
+    const w = i ? 110 : 140;
+    if (mode === "night") g.innerHTML = [...Array(6)].map(() => `<circle cx="${8+Math.random()*(w-16)}" cy="${5+Math.random()*24}" r="${Math.random()<.3?1.4:.8}" fill="#fff" opacity=".9"/>`).join("") + (g.id === "moonwin" ? `<circle cx="80" cy="16" r="9" fill="#fef3c7"/><circle cx="84" cy="13" r="8" fill="#25305e"/>` : "");
+    else if (mode === "day") g.innerHTML = `<ellipse cx="${30+i*10}" cy="14" rx="14" ry="5" fill="#fff" opacity=".85"/><ellipse cx="${w-30}" cy="24" rx="11" ry="4" fill="#fff" opacity=".7"/>` + (i === 0 ? `<circle cx="120" cy="10" r="6" fill="#fde68a"/>` : "");
+    else if (mode === "sunset") g.innerHTML = i === 2 ? `<circle cx="60" cy="30" r="10" fill="#fde68a" opacity=".9"/>` : `<ellipse cx="40" cy="12" rx="16" ry="4" fill="#ffd1a1" opacity=".6"/>`;
+    else g.innerHTML = `<circle cx="${w/2}" cy="34" r="8" fill="#fde68a" opacity=".8"/>`;
+  });
+}
+function setWall(t){
+  const msg = `📢 오늘 올린 글 ${t.today ?? 0}개   ·   팔로워 ${t.followers}명   ·   쿠팡 클릭 ${t.clicks}번   ·   수익 ${(t.earn||0).toLocaleString()}원   ·   다음 게시 ${t.next || "-"}   ·   부계정 예약 ${t.deal_queue ?? 0}개   ·   `;
+  const tk = document.getElementById("ticker"); tk.textContent = msg + msg;
+  const fol = Math.min(1, (+t.followers || 0) / 100);
+  document.getElementById("gfol").setAttribute("width", 110 * fol);
+  document.getElementById("gfolt").textContent = `${t.followers}/100`;
+  document.getElementById("gearn").setAttribute("width", t.earn > 0 ? 110 : 0);
+  document.getElementById("gearnt").textContent = `${(t.earn||0).toLocaleString()}원`;
+}
+let tickX = 560;
+function moveTicker(dt){
+  const tk = document.getElementById("ticker"); tickX -= 45*dt;
+  const half = tk.getComputedTextLength() / 2;
+  if (half > 0 && tickX < 236 - half) tickX += half;
+  tk.setAttribute("x", tickX.toFixed(1));
+}
+
+// ---------- 소품 누르면 반응 ----------
+function info(title, html){
+  document.getElementById("pbody").innerHTML = `<b>${title}</b>${html}`;
+  document.getElementById("panel").classList.add("show");
+}
+function puff(x, y, text){
+  const t = el("text", {class:"puff", x, y}, document.getElementById("people")); t.textContent = text;
+  setTimeout(() => t.remove(), 1700);
+}
+function nearestIdle(x, y, n=1){
+  return Object.values(people).filter(p => p.state === "idle" && Date.now() > partyUntil)
+    .sort((a,b) => Math.hypot(a.x-x,a.y-y) - Math.hypot(b.x-x,b.y-y)).slice(0, n);
+}
+function errand(p, spot, line, face){
+  p.mode = "errand"; p.go(jit(spot)); p.say(line); p.faceTmp = face || "happy"; p.faceUntil = Date.now() + 6000; p.wait = 6;
+}
+const PROP = {
+  board(){
+    const pl = (DATA && DATA.plan) || [];
+    info("📋 다음 계획 <small style='color:#9aa1b5'>본계정 예약 글</small>",
+      pl.length ? `<ul>${pl.map(x => `<li><span>${esc(x.when)}</span><i>${esc(x.kind)}</i>${esc(x.title)}</li>`).join("")}</ul><p>부계정 예약 글 ${DATA.top.deal_queue}개는 곰 과장이 따로 관리해요.</p>` : "<p>예약 글이 비었어요. 일요일에 판다 부장이 채워요.</p>");
+    const pd = people.editor || people.planner; if (pd) pd.say("다음 주도 빡세게!");
+  },
+  ticker(){ const t = DATA.top;
+    info("📢 오늘의 현황", `<ul><li><span>${t.today}개</span>오늘 올린 글 (두 계정)</li><li><span>${t.posts_total}개</span>지금까지 올린 글</li><li><span>${t.followers}명</span>본계정 팔로워</li><li><span>${t.clicks}번</span>쿠팡 클릭 (누적)</li><li><span>${(t.earn||0).toLocaleString()}원</span>쿠팡 수익 (누적)</li></ul>`); },
+  goal(){ const t = DATA.top;
+    info("🎯 목표", `<ul><li><span>${t.followers}/100</span>본계정 팔로워 100명</li><li><span>${(t.earn||0).toLocaleString()}원</span>첫 수익 1원</li></ul><p>${t.earn > 0 ? "첫 수익 달성! 🎉" : "첫 수익이 생기면 사무실에서 축하 파티가 열려요 🎉"}</p>`); },
+  window(){ const h = kstNow().getHours();
+    info("🪟 창밖", `<p>지금 한국 시간 ${String(h).padStart(2,"0")}시 · ${h >= 22 || h < 5 ? "텐피엠 시간! 두 번째 출근 🌙" : h >= 17 ? "퇴근길 노을" : "낮 근무 중"}</p><p>밤 10시엔 달이 떠요.</p>`);
+    nearestIdle(300, 80, 2).forEach(p => p.say(pick(["바람 좋다~","하늘 예쁘다","창밖 구경 중"]))); },
+  safe(){ info("🔑 열쇠 금고", "<p>쓰레드 두 계정 열쇠(토큰)가 들어 있어요.</p><p>거북이 고문이 매달 1일·15일에 새 열쇠로 바꿔요. 비밀번호를 바꾸면 열쇠가 무효가 되니 사장님께 꼭 알려주세요.</p>");
+    if (people.key) people.key.say("열쇠는 내가 지키지"); },
+  book(){ info("📚 책장", "<p>실험 일지가 매주 책 원고 한 장으로 쌓이고 있어요.</p><p>판다 부장이 일요일마다 정리해요. 제목 후보: 《AI가 시키는 대로》</p>"); },
+  sofa(){ let n = 0;
+    Object.values(people).forEach(p => { if (p.g.classList.contains("napping")){ n++; p.g.classList.remove("napping"); p.zz.style.display="none"; p.say("헉 안 잤어요!!"); p.faceTmp="surprise"; p.faceUntil=Date.now()+1500; } });
+    if (!n) puff(430, 600, "푹신~ 🛋️"); },
+  coffee(){ for (let i = 0; i < 4; i++) setTimeout(() => puff(680 + Math.random()*16, 630, "♨️"), i*250);
+    const p = nearestIdle(690, 716)[0]; if (p) errand(p, SPOTS.coffee, "잘 마실게요 사장님!"); },
+  water(){ for (let i = 0; i < 3; i++) setTimeout(() => puff(775 + i*6, 630, "💧"), i*200);
+    const p = nearestIdle(783, 716)[0]; if (p) errand(p, SPOTS.water, "꼴깍꼴깍"); },
+  snack(){ const st = document.getElementById("snacktext"); st.textContent = "🍩🍪🍰🍫"; setTimeout(() => st.textContent = "🍩🍪", 7000);
+    nearestIdle(1095, 712, 3).forEach((p, i) => errand(p, [1060 + i*30, 712], pick(["간식이다!","사장님 최고!","냠냠"]), "excited")); },
+  plant(e){ const t = e.currentTarget; t.classList.remove("grow"); void t.getBBox(); t.classList.add("grow"); setTimeout(() => t.classList.remove("grow"), 700);
+    const b = t.getBBox(); puff(b.x + 8, b.y, "💦 쑥쑥"); },
+};
+document.querySelectorAll(".prop").forEach(n => n.addEventListener("click", e => { e.stopPropagation(); const f = PROP[n.dataset.prop]; if (f && DATA) f(e); }));
+const pick = a => a[Math.floor(Math.random()*a.length)];
 document.getElementById("clock").addEventListener("click", () => {
   partyUntil = Date.now() + 9000;
   Object.values(people).forEach((p, i) => { p.mode = "party"; p.go(PARTY[i % PARTY.length]); p.say(i % 3 ? "회식이다! 🍗" : "사장님 최고!"); p.wait = 9; });
 });
 document.getElementById("scene").addEventListener("click", () => document.getElementById("panel").classList.remove("show"));
+paintSky(); setInterval(paintSky, 60000);
 drawDesks(); tick(); setInterval(tick, 10000);
 load(); setInterval(load, 120000);
 let last = performance.now(), lastOrder = "";
 function loop(now){
   const dt = Math.min(.1, (now-last)/1000); last = now;
+  moveTicker(dt);
   const list = Object.values(people);
   list.forEach(p => { p.step(dt); p.face2(); });
   list.sort((a,b) => a.y-b.y);
