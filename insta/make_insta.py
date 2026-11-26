@@ -12,7 +12,7 @@ B = "/usr/share/fonts/opentype/noto/NotoSansCJK-Black.ttc"
 M = "/usr/share/fonts/opentype/noto/NotoSansCJK-Medium.ttc"
 W, H, PAD = 1080, 1350, 96
 PAL = {
-    "ai": dict(bg="#0e1a24", acc="#4fd1ff", ink="#ffffff", sub="#a3b8c6", line="#1f3140", card="#142433", acc_ink="#0e1a24"),
+    "ai": dict(bg="#0e1a24", acc="#4fd1ff", ink="#ffffff", sub="#a3b8c6", line="#1f3140", card="#142433", acc_ink="#0e1a24", warn="#ffd23f"),
 }
 
 
@@ -34,6 +34,64 @@ def wrap(d, text, fnt, maxw):
                 line = word
         out.append(line)
     return out
+
+
+def segs(text):
+    """'**강조**' 표시를 (글자, 강조여부) 조각으로"""
+    out, hi = [], False
+    for k, part in enumerate(text.split("**")):
+        if part:
+            out.append((part, k % 2 == 1))
+    return out
+
+
+def rich(d, xy, text, fnt, ink, acc):
+    """한 줄을 강조 조각별 색으로 그림"""
+    x, y = xy
+    for part, hi in segs(text):
+        d.text((x, y), part, font=fnt, fill=acc if hi else ink)
+        x += d.textlength(part, font=fnt)
+
+
+def wrap_rich(d, text, fnt, maxw):
+    """강조 표시를 유지한 채 줄바꿈 (강조 구간이 줄을 넘으면 양쪽에 ** 다시 붙임)"""
+    lines = wrap(d, text.replace("**", "\u0001"), fnt, maxw) if False else None
+    plain = text.replace("**", "")
+    flags = []
+    hi = False
+    i = 0
+    while i < len(text):
+        if text.startswith("**", i):
+            hi = not hi
+            i += 2
+            continue
+        flags.append(hi)
+        i += 1
+    out, pos = [], 0
+    for line in wrap(d, plain, fnt, maxw):
+        # wrap 이 공백을 줄였으니 plain 에서 그 줄 위치를 찾아 강조 복원
+        start = plain.find(line, pos) if line else pos
+        if start < 0:
+            out.append(line)
+            continue
+        buf, cur = "", False
+        for k, ch in enumerate(line):
+            f = flags[start + k]
+            if f != cur:
+                buf += "**"
+                cur = f
+            buf += ch
+        if cur:
+            buf += "**"
+        out.append(buf)
+        pos = start + len(line)
+    return out
+
+
+def tri(d, x, y, s, fill, ink):
+    d.polygon([(x + s / 2, y), (x + s, y + s * 0.9), (x, y + s * 0.9)], fill=fill)
+    d.rectangle((x + s / 2 - s * 0.05, y + s * 0.3, x + s / 2 + s * 0.05, y + s * 0.6), fill=ink)
+    d.ellipse((x + s / 2 - s * 0.06, y + s * 0.68, x + s / 2 + s * 0.06, y + s * 0.8), fill=ink)
 
 
 def clock(d, cx, cy, r, c):
@@ -70,6 +128,12 @@ def make(spec, outdir):
             kw = d.textlength(cd["kicker"], font=fk)
             d.rounded_rectangle((PAD, 300, PAD + kw + 56, 376), radius=38, fill=c["acc"])
             d.text((PAD + 28, 310), cd["kicker"], font=fk, fill=c["acc_ink"])
+            if cd.get("badge"):
+                fb = font(B, 40)
+                bw = d.textlength(cd["badge"], font=fb)
+                bx = PAD + kw + 80
+                d.rounded_rectangle((bx, 300, bx + bw + 56, 376), radius=38, fill=c["warn"])
+                d.text((bx + 28, 310), cd["badge"], font=fb, fill=c["bg"])
             y = 450
             for k, line in enumerate(cd["title"]):
                 fs = 124
@@ -88,18 +152,50 @@ def make(spec, outdir):
             if cd.get("num"):
                 d.text((PAD, y), cd["num"], font=font(B, 150), fill=c["acc"])
                 y += 210
-            for line in wrap(d, cd["title"], font(B, 92), maxw):
-                d.text((PAD, y), line, font=font(B, 92), fill=c["ink"])
+            for line in wrap_rich(d, cd["title"], font(B, 92), maxw):
+                rich(d, (PAD, y), line, font(B, 92), c["ink"], c["acc"])
                 y += 118
             d.line((PAD, y + 30, PAD + 120, y + 30), fill=c["acc"], width=8)
             y += 90
-            for line in wrap(d, cd["body"], font(M, 56), maxw):
-                d.text((PAD, y), line, font=font(M, 56), fill=c["sub"] if line else c["sub"])
+            for line in wrap_rich(d, cd["body"], font(M, 56), maxw):
+                rich(d, (PAD, y), line, font(M, 56), c["sub"], c["acc"])
                 y += 84
+        elif t == "warn":
+            # 노란 경고 카드: 흐름 끊고 멈추게
+            box_top = 0
+            tri(d, PAD, 0, 130, c["warn"], c["bg"])
+            y = 180
+            for line in wrap_rich(d, cd["title"], font(B, 92), maxw):
+                rich(d, (PAD, y), line, font(B, 92), c["ink"], c["warn"])
+                y += 118
+            y += 40
+            for line in wrap_rich(d, cd["body"], font(M, 56), maxw):
+                rich(d, (PAD, y), line, font(M, 56), c["sub"], c["warn"])
+                y += 84
+        elif t == "vs":
+            y = 0
+            for line in wrap_rich(d, cd["title"], font(B, 92), maxw):
+                rich(d, (PAD, y), line, font(B, 92), c["ink"], c["acc"])
+                y += 118
+            y += 50
+            colw = (maxw - 40) // 2
+            for k, side in enumerate(cd["sides"]):
+                x = PAD + k * (colw + 40)
+                new = k == 1
+                d.rounded_rectangle((x, y, x + colw, y + 700), radius=32, fill=c["acc"] if new else c["card"])
+                ink = c["acc_ink"] if new else c["sub"]
+                d.text((x + 40, y + 40), side["tag"], font=font(M, 40), fill=ink)
+                d.text((x + 40, y + 100), side["name"], font=font(B, 88), fill=c["acc_ink"] if new else c["ink"])
+                yy = y + 250
+                for item in side["items"]:
+                    for line in wrap(d, item, font(B, 42), colw - 70):
+                        d.text((x + 40, yy), line, font=font(B, 42), fill=ink)
+                        yy += 56
+                    yy += 30
         elif t == "check":
             y = 250
-            for line in wrap(d, cd["title"], font(B, 92), maxw):
-                d.text((PAD, y), line, font=font(B, 92), fill=c["ink"])
+            for line in wrap_rich(d, cd["title"], font(B, 92), maxw):
+                rich(d, (PAD, y), line, font(B, 92), c["ink"], c["acc"])
                 y += 118
             y += 50
             for item in cd["items"]:
