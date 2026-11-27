@@ -24,6 +24,7 @@ tenpm.lab 쓰레드 예약 게시 프로그램 (2차 버전, GitHub Actions용)
 
 import json
 import os
+import re
 import shutil
 import sys
 import time
@@ -277,6 +278,22 @@ def queue_files():
     return sorted(f for f in os.listdir(QUEUE) if f.endswith(".txt"))
 
 
+def post_link(token, key):
+    """올린 기록에서 파일 이름에 _key 가 들어간 글을 찾아 쓰레드 주소를 돌려줌"""
+    if not os.path.exists(LOG):
+        return ""
+    with open(LOG, encoding="utf-8") as f:
+        rows = [l.rstrip("\n").split("\t") for l in f if l.count("\t") >= 2]
+    for row in reversed(rows):
+        if f"_{key}" in row[1]:
+            try:
+                first = row[2].split(",")[0]
+                return call("GET", f"/{first}", {"fields": "permalink", "access_token": token}).get("permalink", "")
+            except RuntimeError:
+                return ""
+    return ""
+
+
 # ---------- 명령 ----------
 def preview():
     now = datetime.now(KST)
@@ -332,6 +349,14 @@ def run():
             continue
         parts = parse_file(path)
         problems = check_parts(name, parts)
+        # {링크:이름} → 이미 올린 글(파일 이름에 _이름 포함)의 주소로 바꿔 넣음 (목차 글용, 11/27~)
+        for p in parts:
+            for key in re.findall(r"\{링크:([^}]+)\}", p["text"]):
+                url = post_link(token, key)
+                if url:
+                    p["text"] = p["text"].replace("{링크:" + key + "}", url)
+                else:
+                    problems.append(f"'{key}' 글 주소를 못 찾음 (아직 안 올라감?)")
         if any(p["photos"] for p in parts) and not base:
             problems.append("사진 주소를 만들 수 없음 (GitHub에서 실행해야 함)")
         if problems:
