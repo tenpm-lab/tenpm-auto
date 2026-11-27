@@ -317,10 +317,13 @@ class Person {
     else if (wasNap) line = "헉 안 잤어요!!";
     else if (this.state === "error") line = "사장님 이것 좀 봐주세요 ㅠ";
     else if (this.state === "working") line = ["지금 바빠요! 🔥","거의 다 했어요!","집중 중이에요!"][Math.floor(Math.random()*3)];
-    else if (this.info.note && Math.random() < .4) line = this.info.note.replace("다음: ","다음은 ").slice(0,18) + "!";
     else {
+      // 누르면 그 직원 고유 대사가 먼저 (60%), 가끔 지금 하는 일, 나머지는 공용 대사
       const own = (window.CHAR && CHAR.TEAM[this.id] || {}).say || [];
-      const pool = own.concat(CLICK); line = pool[Math.floor(Math.random()*pool.length)];
+      const r = Math.random();
+      if (own.length && r < .6) line = own[Math.floor(Math.random()*own.length)];
+      else if (this.info.note && r < .75) line = this.info.note.replace("다음: ","다음은 ").slice(0,18) + "!";
+      else line = CLICK[Math.floor(Math.random()*CLICK.length)];
     }
     this.faceTmp = "surprise"; this.faceUntil = Date.now() + 700;
     setTimeout(() => { this.faceTmp = again || this.state === "error" ? "sad" : "happy"; this.faceUntil = Date.now() + 2200; }, 700);
