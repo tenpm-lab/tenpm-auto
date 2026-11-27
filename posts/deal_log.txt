@@ -6,3 +6,4 @@
 2026-11-22 | save | 키친타월 | sv112202 | 20261128-2200_save_kitchentowel.txt
 2026-11-23 | find | 노트북 트리플 모니터 | ssagesave01 | 20261130-2200_find_triple.txt
 2026-11-28 | top5 | 과자 | ssageitem01 | 20261128-2200_top5_282200.txt
+2026-11-28 | top5 | 라면 | ssageitem01 | 20261129-2200_top5_292200.txt
