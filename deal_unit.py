@@ -530,9 +530,18 @@ def _badge(im, n, size=1080):
 SET_RE = re.compile(r"세트|\d+\s*종|혼합|모음|골라|랜덤|\+|선물")
 
 
+MAKERS = ("농심", "오뚜기", "팔도", "삼양", "오리온", "롯데", "롯데웰푸드", "해태", "해태제과", "크라운", "빙그레",
+          "동원", "CJ", "풀무원", "하림", "청정원", "대상", "남양", "매일", "동서", "맥심", "노브랜드", "곰곰", "탐사")
+
+
 def _brand_key(name):
-    w = re.sub(r"[\[\]()]", " ", name).split()
-    return " ".join(w[:2])
+    """같은 상품(제조사 이름 유무·용량만 다른 것)을 하나로 보기 위한 열쇠: 제조사·괄호 뺀 첫 낱말"""
+    w = [t for t in re.sub(r"\[[^\]]*\]|\([^)]*\)", " ", name).replace(",", " ").split() if t not in MAKERS]
+    return w[0] if w else name
+
+
+def _multi_maker(name):
+    return sum(1 for m in ("농심", "오뚜기", "팔도", "삼양", "오리온", "롯데", "해태", "크라운") if m in name) >= 2
 
 
 def top5_one(stamp, kw, label, topic):
@@ -550,7 +559,7 @@ def top5_one(stamp, kw, label, topic):
     rows, seen = [], set()
     for x in got:
         nm = str(x.get("productName", ""))
-        if not x.get("productImage") or any(b in nm for b in BAD) or SET_RE.search(nm):
+        if not x.get("productImage") or any(b in nm for b in BAD) or SET_RE.search(nm) or _multi_maker(nm):
             continue
         k = _brand_key(nm)
         if k in seen:
