@@ -495,7 +495,121 @@ def goldpost():
     print("골드박스 글", fmt, fn, [r[0] for r in rows])
 
 
+# ---------- TOP 5 목록 글 (11/28 Ssuii: "쿠팡에서 제일 인기많은것 후기좋은것 이런식으러 해서 사람을 끌어모아보자") ----------
+# deal/top5.txt 한 줄에 하나: "YYYYMMDD-HHMM|검색어|보여줄 이름|주제"  예) 20261128-2200|과자|과자|간식추천
+# 순위 = 쿠팡 검색 상위 순서 그대로 (API 에 리뷰 수·별점은 없음 → 글에 기준을 밝힘). 같은 상품 맛·용량 다른 건 하나만.
+def _font(size):
+    from PIL import ImageFont
+    F = (sorted(glob.glob("/usr/share/fonts/**/NotoSansCJK*Bl*.tt*", recursive=True)) +
+         sorted(glob.glob("/usr/share/fonts/**/NotoSansCJK*Bold*.tt*", recursive=True)) +
+         sorted(glob.glob("/usr/share/fonts/**/*CJK*Bold*.tt*", recursive=True)))[0]
+    return ImageFont.truetype(F, size, index=1 if F.endswith("ttc") else 0)
+
+
+def _square(url):
+    from PIL import Image
+    import io
+    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+    im = Image.open(io.BytesIO(urllib.request.urlopen(req, timeout=20).read())).convert("RGB")
+    side = max(im.size)
+    bg = Image.new("RGB", (side, side), "white")
+    bg.paste(im, ((side - im.size[0]) // 2, (side - im.size[1]) // 2))
+    return bg.resize((1080, 1080))
+
+
+def _badge(im, n, size=1080):
+    from PIL import ImageDraw
+    d = ImageDraw.Draw(im)
+    r = size // 7
+    d.ellipse((size // 30, size // 30, size // 30 + r, size // 30 + r), fill="#e53935")
+    d.text((size // 30 + r // 2, size // 30 + r // 2), f"{n}위", font=_font(r // 3), fill="white", anchor="mm")
+    return im
+
+
+def _brand_key(name):
+    w = re.sub(r"[\[\]()]", " ", name).split()
+    return " ".join(w[:2])
+
+
+def top5_one(stamp, kw, label, topic):
+    from PIL import Image, ImageDraw
+    q = os.path.join(HERE, "posts", "deal", "queue")
+    tag = f"top5_{stamp.replace('-', '')}"
+    fn = os.path.join(q, f"{stamp}_top5_{tag[-6:]}.txt")
+    if glob.glob(os.path.join(q, f"{stamp}_*")) or glob.glob(os.path.join(HERE, "posts", "deal", "done", f"{stamp}_*")):
+        print("그 자리에 이미 글 있음", stamp); return
+    got = items(call("GET", f"{BASE}/products/search", "keyword=" + urllib.parse.quote(kw) + "&limit=10&subId=ssageitem01"))
+    rows, seen = [], set()
+    for x in got:
+        nm = str(x.get("productName", ""))
+        if not x.get("productImage") or any(b in nm for b in BAD):
+            continue
+        k = _brand_key(nm)
+        if k in seen:
+            continue
+        seen.add(k)
+        rows.append(x)
+        if len(rows) == 5:
+            break
+    if len(rows) < 5:
+        print("상품 부족", kw, len(rows)); return
+    photos, lines, links_ = [], [], []
+    tiles = []
+    for i, x in enumerate(rows, 1):
+        lk = link(str(x["productId"]), "ssageitem01")
+        if not lk:
+            print("링크 실패"); return
+        made([{"link": lk, "subId": "ssageitem01"}])
+        im = _square(x["productImage"])
+        tiles.append(im.copy())
+        _badge(im, i).save(os.path.join(HERE, "images", "deal", f"{tag}_{i}.jpg"), quality=90)
+        photos.append(f"deal/{tag}_{i}.jpg")
+        nm = short(str(x["productName"]))
+        lines.append(f"{i}위 {nm}")
+        links_.append(f"{i}위 👉 {lk}")
+    # 표지: 왼쪽 위 제목 칸 + 상품 5칸 (3x2)
+    cover = Image.new("RGB", (1080, 720), "white")
+    t = 360
+    d = ImageDraw.Draw(cover)
+    d.rectangle((0, 0, t, t), fill=(24, 24, 24))
+    d.text((t // 2, t // 2 - 50), "쿠팡", font=_font(44), fill="#ffd54f", anchor="mm")
+    d.text((t // 2, t // 2 + 10), label, font=_font(64 if len(label) <= 4 else 44), fill="white", anchor="mm")
+    d.text((t // 2, t // 2 + 85), "TOP 5", font=_font(60), fill="#ffd54f", anchor="mm")
+    for i, im in enumerate(tiles):
+        pos = i + 1
+        x0, y0 = (pos % 3) * t, (pos // 3) * t
+        cover.paste(_badge(im.resize((t, t)), i + 1, t), (x0, y0))
+    cover.save(os.path.join(HERE, "images", "deal", f"{tag}_0.jpg"), quality=90)
+    photos.insert(0, f"deal/{tag}_0.jpg")
+    now = datetime.datetime.utcnow() + datetime.timedelta(hours=9)
+    body = [f"주제: {topic}", "사진: " + ", ".join(photos),
+            f"쿠팡 {label} TOP 5 (광고)",
+            "(이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.)", ""]
+    body += lines
+    body += ["", "넘겨서 하나씩 봐봐", "몇 개나 먹어봄?" if topic in ("간식추천", "먹거리") else "몇 개나 써봄?",
+             "---"] + links_ + ["", f"쿠팡에서 '{kw}' 검색했을 때 맨 위 5개 ({now:%m/%d} 기준, 같은 상품 맛·용량 다른 건 하나만)",
+             "가격·후기는 링크에서 확인!", "", "이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다."]
+    open(fn, "w", encoding="utf-8").write("\n".join(body) + "\n")
+    with open(LOG, "a", encoding="utf-8") as w:
+        w.write(f"{now:%Y-%m-%d} | top5 | {kw} | ssageitem01 | {os.path.basename(fn)}\n")
+    print("TOP5 글", fn, lines)
+
+
+def top5():
+    src = os.path.join(HERE, "deal", "top5.txt")
+    for l in open(src, encoding="utf-8"):
+        if l.count("|") >= 3 and not l.startswith("#"):
+            stamp, kw, label, topic = [v.strip() for v in l.split("|")[:4]]
+            try:
+                top5_one(stamp, kw, label, topic)
+            except Exception as e:
+                print("실패", kw, e)
+    open(src, "w", encoding="utf-8").write("# 형식: YYYYMMDD-HHMM|검색어|보여줄 이름|주제 (처리되면 비워짐)\n")
+
+
 if __name__ == "__main__":
+    if len(sys.argv) > 1 and sys.argv[1] == "top5":
+        top5(); sys.exit()
     if len(sys.argv) > 1 and sys.argv[1] == "goldpost":
         goldpost(); sys.exit()
     if len(sys.argv) > 1 and sys.argv[1] == "goldbox":
