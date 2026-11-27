@@ -58,4 +58,5 @@
 1. 사무실 글 반응 확인 → posts/hold/XXXXXXXX-XXXX_story_kitopen.txt 를 날짜 붙여 queue로 옮김 (_kitopen 유지)
 2. 노션 가이드 웹 공개 (사장님이 직접. notion.site 주소에 실명 없는지 확인)
 3. kit/open_post.txt, kit/beta_link.txt 채우기
-4. 미뤄둔 것: 사무실 업그레이드(이달의 직원, 레벨업), 키트 추가 직원 팩
+4. 새 수익 방법 후보를 사장님과 같이 고르기 (실험 일지 맨 끝 "돈 버는 방법 후보")
+5. 미뤄둔 것: 사무실 업그레이드(이달의 직원, 레벨업), 키트 추가 직원 팩
