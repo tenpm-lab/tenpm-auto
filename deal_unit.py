@@ -526,6 +526,10 @@ def _badge(im, n, size=1080):
     return im
 
 
+# 여러 상품 묶은 세트는 순위 글에 안 맞음 (11/28 첫 시도: '과자' 상위가 사무실 과자 세트뿐)
+SET_RE = re.compile(r"세트|\d+\s*종|혼합|모음|골라|랜덤|\+|선물")
+
+
 def _brand_key(name):
     w = re.sub(r"[\[\]()]", " ", name).split()
     return " ".join(w[:2])
@@ -538,11 +542,15 @@ def top5_one(stamp, kw, label, topic):
     fn = os.path.join(q, f"{stamp}_top5_{tag[-6:]}.txt")
     if glob.glob(os.path.join(q, f"{stamp}_*")) or glob.glob(os.path.join(HERE, "posts", "deal", "done", f"{stamp}_*")):
         print("그 자리에 이미 글 있음", stamp); return
-    got = items(call("GET", f"{BASE}/products/search", "keyword=" + urllib.parse.quote(kw) + "&limit=10&subId=ssageitem01"))
+    got = []
+    for qkw in (kw, kw + " 베스트"):  # 세트 상품을 빼고 5개가 안 되면 한 번 더 찾음
+        got += items(call("GET", f"{BASE}/products/search", "keyword=" + urllib.parse.quote(qkw) + "&limit=10&subId=ssageitem01"))
+        if sum(1 for x in got if not SET_RE.search(str(x.get("productName", "")))) >= 7:
+            break
     rows, seen = [], set()
     for x in got:
         nm = str(x.get("productName", ""))
-        if not x.get("productImage") or any(b in nm for b in BAD):
+        if not x.get("productImage") or any(b in nm for b in BAD) or SET_RE.search(nm):
             continue
         k = _brand_key(nm)
         if k in seen:
