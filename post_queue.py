@@ -220,6 +220,9 @@ def due_time(filename):
         return None
 
 
+REPLY_TO = {}  # "답글: 글ID" 가 있으면 이미 올라간 그 글 아래 이어 쓰기로 올림 (11/27~)
+
+
 def parse_file(path):
     with open(path, encoding="utf-8") as f:
         raw = f.read().replace("\r\n", "\n")
@@ -231,8 +234,11 @@ def parse_file(path):
         photos, topic = [], ""
         lines = chunk.split("\n")
         # 맨 위 "사진:" / "주제:" 줄은 글 내용이 아니라 설정 (순서 상관없음)
-        while lines and lines[0].strip().replace(" :", ":").startswith(("사진:", "주제:")):
+        while lines and lines[0].strip().replace(" :", ":").startswith(("사진:", "주제:", "답글:")):
             key, value = lines.pop(0).split(":", 1)
+            if key.strip() == "답글":
+                REPLY_TO[path] = value.strip()
+                continue
             if key.strip() == "사진":
                 photos = [n.strip() for n in value.split(",") if n.strip()]
             else:
@@ -264,6 +270,9 @@ def check_parts(name, parts):
             problems.append(f"{i}번째 글에 쿠팡 링크가 아직 안 들어감")
         if len(p["text"]) > 500:
             problems.append(f"{i}번째 글이 {len(p['text'])}자 (500자까지)")
+        links = set(re.findall(r"https?://\S+", p["text"]))
+        if len(links) > 5:
+            problems.append(f"{i}번째 글에 링크가 {len(links)}개 (쓰레드는 한 글에 5개까지, --- 로 나눠줘)")
         if len(p["photos"]) > 20:
             problems.append(f"{i}번째 글의 사진이 {len(p['photos'])}장 (20장까지)")
         for photo in p["photos"]:
@@ -365,7 +374,7 @@ def run():
             failed = True
             continue
         try:
-            previous, ids = None, []
+            previous, ids = REPLY_TO.get(path), []
             for p in parts:
                 previous = publish(token, me["id"], p["text"], p["photos"], previous, base, p["topic"])
                 ids.append(previous)
