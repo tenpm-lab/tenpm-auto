@@ -18,6 +18,7 @@ concurrency:
 
 jobs:
   post:
+    if: github.repository != 'tenpm-lab/ai-office-kit'   # 키트 원본에서는 안 돌고, 복사한 내 저장소에서만 돌아요
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
