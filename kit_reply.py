@@ -113,12 +113,65 @@ def interest(token, me):
     return sent
 
 
+# ---------- 48시간 미션 글 (파일 이름에 _mission, 11/28~) ----------
+# kit/sale_link.txt 에 판매 페이지 주소를 넣으면 '키트'·'링크' 같은 댓글에 주소를 답글로. 넣기 전엔 "곧 열림" 답글.
+SALEF = os.path.join(HERE, "kit", "sale_link.txt")
+MLOG = os.path.join(HERE, "stats", "mission_replies.txt")   # 댓글ID \t 시간 \t 상태(링크/대기)
+MWANT = WANT + ("링크", "주소", "어디", "구매", "살게", "살래", "얼마")
+SALE_MSG = ["여기 있어요 👉 {l}\n막히면 이 댓글에 물어봐줘", "키트 링크 👉 {l}\n사면 미션 숫자에 바로 반영됨 ㅋㅋ"]
+SOON_MSG = ["판매 페이지 여는 중! 열리면 이 댓글에 바로 답글 달아줄게 🙌"]
+
+
+def mission(token, me):
+    posts = kit_posts("_mission")
+    if not posts:
+        return 0
+    rd = lambda f: open(f, encoding="utf-8").read().strip() if os.path.exists(f) else ""
+    url = rd(SALEF)
+    rows = [l.split("\t") for l in rd(MLOG).splitlines() if l.count("\t") == 2]
+    seen = {r[0] for r in rows}; sent = 0
+    for pid in posts:
+        conv = call("GET", f"/{pid}/conversation",
+                    {"fields": "id,text,username,timestamp", "limit": 100, "access_token": token}).get("data", [])
+        conv.sort(key=lambda c: c.get("timestamp", ""))
+        for c in conv:
+            if sent >= MAX_PER_RUN:
+                break
+            cid, who, text = c["id"], c.get("username"), (c.get("text") or "")
+            if who in (None, me["username"]) or cid in seen or not any(w in text for w in MWANT):
+                continue
+            msg, st = (random.choice(SALE_MSG).format(l=url), "링크") if url else (SOON_MSG[0], "대기")
+            try:
+                publish(token, me["id"], msg, [], cid, ""); sent += 1
+                rows.append([cid, datetime.now(KST).strftime("%m/%d %H:%M"), st]); seen.add(cid)
+            except Exception as e:
+                print("답장 실패", str(e)[:100])
+    if url:   # 링크 열리기 전에 물어본 사람들
+        for r in rows:
+            if sent >= MAX_PER_RUN:
+                break
+            if r[2] == "대기":
+                try:
+                    publish(token, me["id"], random.choice(SALE_MSG).format(l=url), [], r[0], ""); sent += 1; r[2] = "링크"
+                except Exception as e:
+                    print("답장 실패", str(e)[:100])
+    if rows:
+        os.makedirs(os.path.dirname(MLOG), exist_ok=True)
+        open(MLOG, "w", encoding="utf-8").write("".join("\t".join(r) + "\n" for r in rows))
+    print("미션 댓글", len(rows), "개 · 이번에 답장", sent, "개")
+    return sent
+
+
 def main():
     token = os.environ.get("THREADS_TOKEN", "").strip()
     if not token:
         return
     me = call("GET", "/me", {"fields": "id,username", "access_token": token})
     interest(token, me)
+    try:
+        mission(token, me)
+    except Exception as e:
+        print("미션 답장 건너뜀:", str(e)[:120])
     posts = kit_posts()
     if not posts:
         print("키트 신청: 신청 글 아직 없음"); return
