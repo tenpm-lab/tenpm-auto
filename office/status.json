@@ -1,6 +1,6 @@
 {
  "top": {
-  "followers": "66",
+  "followers": "65",
   "posts_total": 70,
   "clicks": 4,
   "earn": 0,
@@ -55,7 +55,7 @@
    "role": "조회·팔로워·쿠팡 클릭 모으기",
    "wf": "insights.yml",
    "when": "매일 23:40",
-   "did": "팔로워 66명 기록",
+   "did": "팔로워 65명 기록",
    "note": "",
    "count": ""
   },
@@ -154,5 +154,5 @@
    "title": "어제 AI 비서 13명이 한 일"
   }
  ],
- "updated": "2026-11-28 22:02"
+ "updated": "2026-11-28 23:30"
 }
