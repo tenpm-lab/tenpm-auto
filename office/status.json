@@ -1,12 +1,12 @@
 {
  "top": {
   "followers": "65",
-  "posts_total": 67,
+  "posts_total": 68,
   "clicks": 4,
   "earn": 0,
-  "today": 5,
+  "today": 6,
   "next": "20:30",
-  "deal_queue": 8
+  "deal_queue": 7
  },
  "staff": [
   {
@@ -25,9 +25,9 @@
    "role": "쿠팡 전용 계정 운영",
    "wf": "post.yml",
    "when": "15분마다",
-   "did": "11/28 12:16 글 올림",
-   "note": "다음: 11/28 18:30 글",
-   "count": "오늘 2개 · 대기 8개"
+   "did": "11/28 18:32 글 올림",
+   "note": "다음: 11/28 22:00 글",
+   "count": "오늘 3개 · 대기 7개"
   },
   {
    "id": "reply",
@@ -159,5 +159,5 @@
    "title": "어제 AI 비서 13명이 한 일"
   }
  ],
- "updated": "2026-11-28 15:30"
+ "updated": "2026-11-28 18:32"
 }
